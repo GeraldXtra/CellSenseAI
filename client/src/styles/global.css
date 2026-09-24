@@ -1,0 +1,12 @@
+.cs-app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--cs-page-bg);
+  color: var(--cs-ink);
+  font-family: var(--cs-font);
+}
+
+.cs-main {
+  flex: 1;
+}

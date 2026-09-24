@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="CellSense AI">
+  <defs>
+    <mask id="cut">
+      <rect width="64" height="64" fill="#fff"/>
+      <path d="M4 35 H21 L27 20 L34 48 L40 35 H60" fill="none" stroke="#000" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    </mask>
+  </defs>
+  <g mask="url(#cut)" fill="none" stroke="#1d1d1f" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="17" y="6" width="30" height="52" rx="8"/>
+    <path d="M28 13 H36"/>
+  </g>
+  <path d="M4 35 H21 L27 20 L34 48 L40 35 H60" fill="none" stroke="#1d1d1f" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
