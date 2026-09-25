@@ -11,6 +11,7 @@
   --cs-ink-faint: #c7c7cc;
   --cs-on-ink: #ffffff;
   --cs-button-bg: #1d1d1f;
+  --cs-menu-w: 160px;
   --cs-button-bg-hover: #000000;
   --cs-price-note: #e8632b;
   --cs-error: #c0392b;
@@ -23,6 +24,7 @@
     Helvetica, Arial, sans-serif;
   --cs-size-hero: 3.5rem;
   --cs-size-page-title: 2.75rem;
+  --cs-icon-lg: 24px;
   --cs-size-section-title: 2rem;
   --cs-size-block-title: 1.5rem;
   --cs-size-card-title: 1.25rem;

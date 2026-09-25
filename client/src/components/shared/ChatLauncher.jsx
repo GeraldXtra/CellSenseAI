@@ -1,2 +1,25 @@
-// ChatLauncher: the fixed button at the bottom right that opens the floating chat window, hidden on the Assistant page. Owner: Gerald.
-export default function ChatLauncher() {}
+import { useLocation } from "react-router-dom";
+import { FiMessageCircle } from "react-icons/fi";
+import { useChat } from "../../context/ChatContext";
+
+export default function ChatLauncher() {
+  const { pathName } = useLocation();
+  const { open, openWindow } = useChat();
+
+  if (pathName === "/assistant" || open) return null;
+
+  function handleClick() {
+    if (openWindow) openWindow();
+  }
+
+  return (
+    <button
+      type="button"
+      className="cs-chat-launcher"
+      aria-label="Open the assistant"
+      onClick={handleClick}
+    >
+      <FiMessageCircle />
+    </button>
+  );
+}
