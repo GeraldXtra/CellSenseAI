@@ -14,6 +14,7 @@ import ForgetPassword from "./pages/ForgotPassword/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import About from "./pages/About/About";
 import NotFound from "./pages/NotFound/NotFound";
+import ProtectedRoute from "./components/shared/ProtectedRoute.jsx";
 
 export default function App() {
   return (
@@ -27,7 +28,14 @@ export default function App() {
         <Route path="/compare" element={<Compare />} />
         <Route path="/recommend" element={<Recommend />} />
         <Route path="/assistant" element={<Assistant />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forget-password" element={<ForgetPassword />} />

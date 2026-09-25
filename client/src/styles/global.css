@@ -262,3 +262,131 @@
   width: var(--cs-icon-lg);
   height: var(--cs-icon-lg);
 }
+
+.cs-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cs-space-2);
+  padding: var(--cs-space-8) 0;
+  font-size: var(--cs-size-small);
+  color: var(--cs-ink-soft);
+}
+
+.cs-spinner {
+  width: var(--cs-icon);
+  height: var(--cs-icon);
+  border: 2px solid var(--cs-line-strong);
+  border-top-color: var(--cs-ink);
+  border-radius: 50%;
+  animation: cs-spin 0.8s linear infinite;
+}
+
+@keyframes cs-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.cs-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--cs-space-3);
+  padding: var(--cs-space-12) var(--cs-space-6);
+  background: var(--cs-band-bg);
+  border-radius: var(--cs-radius-card);
+  text-align: center;
+}
+
+.cs-empty-title {
+  margin: 0;
+  font-size: var(--cs-size-block-title);
+  font-weight: var(--cs-weight-medium);
+}
+
+.cs-empty-message {
+  margin: 0;
+  color: var(--cs-ink-soft);
+}
+
+.cs-phone-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cs-space-2);
+  padding: var(--cs-space-6);
+  background: var(--cs-card-bg);
+  border-radius: var(--cs-radius-card);
+}
+
+.cs-phone-rank {
+  position: absolute;
+  top: var(--cs-space-4);
+  left: var(--cs-space-4);
+  font-size: var(--cs-size-section-title);
+  font-weight: var(--cs-weight-medium);
+  color: var(--cs-ink-faint);
+}
+
+.cs-phone-card-image {
+  display: flex;
+  justify-content: center;
+  height: var(--cs-card-image-h);
+}
+
+.cs-phone-image {
+  max-height: 100%;
+  width: auto;
+  object-fit: contain;
+}
+
+.cs-phone-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60%;
+  height: 100%;
+  padding: var(--cs-space-3);
+  background: var(--cs-band-bg);
+  border-radius: var(--cs-radius-card);
+  font-size: var(--cs-size-small);
+  color: var(--cs-ink-soft);
+  text-align: center;
+}
+
+.cs-phone-card-name {
+  margin: var(--cs-space-2) 0 0;
+  font-size: var(--cs-size-card-title);
+  font-weight: var(--cs-weight-medium);
+}
+
+.cs-phone-card-specs,
+.cs-phone-card-reason {
+  margin: 0;
+  font-size: var(--cs-size-small);
+  color: var(--cs-ink-soft);
+}
+
+.cs-phone-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--cs-space-2);
+  font-size: var(--cs-size-small);
+}
+
+.cs-compare-check {
+  display: flex;
+  align-items: center;
+  gap: var(--cs-space-2);
+  color: var(--cs-ink-soft);
+  cursor: pointer;
+}
+
+.cs-compare-check input {
+  width: var(--cs-icon);
+  height: var(--cs-icon);
+  margin: 0;
+  accent-color: var(--cs-ink);
+}
