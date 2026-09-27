@@ -3,7 +3,7 @@ import { Outlet, useLocation, useNavigationType } from "react-router-dom";
 import Navbar from "./Navbar.jsx";
 import Footer from "./Footer.jsx";
 import ChatLauncher from "./ChatLauncher.jsx";
-import ChatWindow from "../osakue/ChatWindow.jsx";
+import ChatWindow from "./ChatWindow.jsx";
 
 export default function Layout() {
   const { key, hash } = useLocation();
@@ -29,8 +29,8 @@ export default function Layout() {
         <Outlet />
       </main>
       <Footer />
-      <ChatWindow />
       <ChatLauncher />
+      <ChatWindow />
     </div>
   );
 }

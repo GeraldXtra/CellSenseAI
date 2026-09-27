@@ -9,7 +9,7 @@ Two notes that apply everywhere:
 
 ## Table 1: frontend routes
 
-All routes sit inside `<Route element={<Layout />}>`, so every page gets the top bar, the footer, the assistant launcher and the floating chat window.
+All routes sit inside `<Route element={<Layout />}>`, so every page gets the shared components that Layout renders: Navbar (the top bar), Footer, ChatLauncher (the assistant launcher) and ChatWindow (the floating chat window). All four are mine.
 
 | Path                     | Parameters and query                                       | Example URL                                                                                | Page                             | Owner   | Login required |
 | ------------------------ | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------ | -------------------------------- | ------- | -------------- |
@@ -31,7 +31,7 @@ All routes sit inside `<Route element={<Layout />}>`, so every page gets the top
 
 ## Table 2: clicks
 
-### On every page
+### On every page (Gerald)
 
 | Where               | What                                                | What it does                                             | Leads to                                                                                |
 | ------------------- | --------------------------------------------------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------- |
@@ -67,6 +67,7 @@ All routes sit inside `<Route element={<Layout />}>`, so every page gets the top
 | Chat window         | The x in the header                                 | Closes the window                                        | `closeWindow()` from `useChat` |
 | Chat window         | "Open full page"                                    | Opens the Assistant page with the same messages and closes the window | `/assistant` |
 | Chat window         | Send button, or Enter                               | Sends the message with the full history                  | `send(text)` from `useChat`, which calls `POST /ai/chat` |
+| Chat window         | A suggestion chip before the first message          | Sends that text as a message                             | `send(text)` from `useChat` |
 | Chat window         | "See details" on a phone row                        | Opens the phone page                                     | `/phones/<slug>` |
 
 ### Home (Ibrahim)

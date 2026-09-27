@@ -23,7 +23,7 @@ Ibrahim, Osakue, this is one table of every folder and file in `client/` and `se
 | `client/src/main.jsx` | shared, changed only by Gerald | The entry point: loads Bootstrap and the styles, renders App inside the router and the providers. |
 | `client/src/App.jsx` | shared, changed only by Gerald | The route table. Every page sits inside Layout. |
 | `client/src/styles/theme.css` | shared, changed only by Gerald | Every colour, spacing, font size, radius and shadow, the Bootstrap hooks and the shared classes. |
-| `client/src/styles/global.css` | shared, changed only by Gerald | The body defaults, the page shell, the top bar, the footer, the phone card and the breakpoints. |
+| `client/src/styles/global.css` | shared, changed only by Gerald | The body defaults, the page shell, the top bar, the footer, the phone card, the chat window and the breakpoints. |
 | `client/src/services/api.js` | shared, changed only by Gerald | The axios instance, the token storage, the auth header and the envelope unwrapping. |
 | `client/src/services/phones.service.js` | shared, changed only by Gerald | listPhones, getPhone, comparePhones, getPriceTrend, getReviews, addReview, getReviewSummary. |
 | `client/src/services/ai.service.js` | shared, changed only by Gerald | searchPhones, chat, recommend. |
@@ -34,11 +34,12 @@ Ibrahim, Osakue, this is one table of every folder and file in `client/` and `se
 | `client/src/context/ChatContext.jsx` | shared, changed only by Gerald | The chat messages, the loading flag, the open state of the chat window, the send action, and the useChat hook. |
 | `client/src/hooks/useAsync.js` | shared, changed only by Gerald | Runs an async function and gives data, loading, error and reload. |
 | `client/src/data/mockPhones.js` | shared, changed only by Gerald | The six sample phones, the brands, the three sample reviews and the sample review summary. |
-| `client/src/components/shared/Layout.jsx` | shared, changed only by Gerald | The shell: Navbar, the page, Footer, ChatLauncher. |
+| `client/src/components/shared/Layout.jsx` | shared, changed only by Gerald | The shell: Navbar, the page, Footer, ChatLauncher, ChatWindow. |
 | `client/src/components/shared/Navbar.jsx` | shared, changed only by Gerald | The top bar and its collapsed form under 768px. |
 | `client/src/components/shared/AccountMenu.jsx` | shared, changed only by Gerald | The Dashboard and Log out dropdown. |
 | `client/src/components/shared/Footer.jsx` | shared, changed only by Gerald | The five column footer. |
 | `client/src/components/shared/ChatLauncher.jsx` | shared, changed only by Gerald | The fixed button that opens the floating chat window. |
+| `client/src/components/shared/ChatWindow.jsx` | shared, changed only by Gerald | The small floating chat window at the bottom right, with the same conversation as the Assistant page. |
 | `client/src/components/shared/PhoneImage.jsx` | shared, changed only by Gerald | The phone picture or the grey placeholder, and the phoneName helper. |
 | `client/src/components/shared/PhoneCard.jsx` | shared, changed only by Gerald | The product card, and the specLine helper. |
 | `client/src/components/shared/Loader.jsx` | shared, changed only by Gerald | The spinner with a label. |
@@ -56,9 +57,8 @@ Ibrahim, Osakue, this is one table of every folder and file in `client/` and `se
 | `client/src/components/osakue/CompareSlots.jsx` | Osakue | The slots above the compare table. |
 | `client/src/components/osakue/AddPhoneDialog.jsx` | Osakue | The Add a phone dialog. |
 | `client/src/components/osakue/RecommendForm.jsx` | Osakue | The recommendation form. |
-| `client/src/components/osakue/ChatThread.jsx` | Osakue | The chat bubbles, the phones under a reply and the typing dots, on Assistant and inside ChatWindow. |
-| `client/src/components/osakue/ChatInput.jsx` | Osakue | The chat text field and send button, on Assistant and inside ChatWindow. |
-| `client/src/components/osakue/ChatWindow.jsx` | Osakue | The small floating chat window at the bottom right, built from ChatThread and ChatInput. |
+| `client/src/components/osakue/ChatThread.jsx` | Osakue | The chat bubbles, the phones under a reply and the typing dots on Assistant. |
+| `client/src/components/osakue/ChatInput.jsx` | Osakue | The chat text field and send button on Assistant. |
 | `client/src/components/osakue/ReviewsSection.jsx` | Osakue | The reviews block placed on Phone detail. |
 | `client/src/components/osakue/AuthCard.jsx` | Osakue | The card on the four account pages. |
 | `client/src/pages/Home/` (Home.jsx, Home.css, README.md) | Ibrahim | The Home page. |

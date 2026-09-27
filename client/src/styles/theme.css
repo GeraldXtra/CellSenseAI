@@ -60,6 +60,10 @@
   --cs-auth-card-w: 440px;
   --cs-dialog-w: 640px;
   --cs-launcher-size: 56px;
+  --cs-chat-w: 380px;
+  --cs-chat-h: 560px;
+  --cs-chat-thumb-h: 80px;
+  --cs-chat-dot: 8px;
   --cs-icon: 18px;
   --cs-z-topbar: 100;
   --cs-z-menu: 200;
