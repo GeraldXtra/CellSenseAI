@@ -27,7 +27,9 @@ export function ChatProvider({ children }) {
     setError(null);
 
     try {
-      const data = await chat(history.map(({ role, content }) => ({ role, content })));
+      const data = await chat(
+        history.map(({ role, content }) => ({ role, content })),
+      );
       setMessages([
         ...history,
         { role: "assistant", content: data.reply, phones: data.phones || [] },
@@ -42,7 +44,15 @@ export function ChatProvider({ children }) {
     }
   }
 
-  const value = { messages, loading, error, open, openWindow, closeWindow, send };
+  const value = {
+    messages,
+    loading,
+    error,
+    open,
+    openWindow,
+    closeWindow,
+    send,
+  };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 }

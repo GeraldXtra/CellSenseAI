@@ -80,7 +80,9 @@ export default function Footer() {
           <p className="cs-footer-legal">
             <span>Copyright {year} CellSense AI. All rights reserved.</span>
             <span>An eProject built for ASKME Ltd.</span>
-            <span>Prices are guide prices with the date they were checked.</span>
+            <span>
+              Prices are guide prices with the date they were checked.
+            </span>
           </p>
           <span className="cs-footer-region">Nigeria / English</span>
         </div>

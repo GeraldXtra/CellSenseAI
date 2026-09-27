@@ -3,7 +3,12 @@ import api from "./api.js";
 function cleanParams(values = {}) {
   const params = {};
   for (const [key, value] of Object.entries(values)) {
-    if (value !== undefined && value !== null && value !== "" && value !== false) {
+    if (
+      value !== undefined &&
+      value !== null &&
+      value !== "" &&
+      value !== false
+    ) {
       params[key] = value;
     }
   }

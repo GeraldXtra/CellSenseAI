@@ -36,8 +36,12 @@ function same(a, b) {
 
 export function CompareProvider({ children }) {
   const location = useLocation();
-  const urlSearch = matchPath("/compare", location.pathname) ? location.search : "";
-  const [slugs, setSlugs] = useState(() => clean([...readIds(urlSearch), ...readSaved()]));
+  const urlSearch = matchPath("/compare", location.pathname)
+    ? location.search
+    : "";
+  const [slugs, setSlugs] = useState(() =>
+    clean([...readIds(urlSearch), ...readSaved()]),
+  );
   const [seenSearch, setSeenSearch] = useState(urlSearch);
 
   if (seenSearch !== urlSearch) {
@@ -86,7 +90,9 @@ export function CompareProvider({ children }) {
     isFull: slugs.length >= MAX,
   };
 
-  return <CompareContext.Provider value={value}>{children}</CompareContext.Provider>;
+  return (
+    <CompareContext.Provider value={value}>{children}</CompareContext.Provider>
+  );
 }
 
 export function useCompare() {
