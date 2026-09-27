@@ -1,25 +1,51 @@
-// api: the axios instance with the token storage, the auth header and the envelope unwrapping. Owner: Gerald.
 import axios from "axios";
 
 const TOKEN_KEY = "cs_token";
+const OFFLINE_MESSAGE = "Could not reach the server. Check that it is running.";
+const GATEWAY_STATUSES = [502, 503, 504];
 
 export function getToken() {
-  return localStorage.getItem(TOKEN_KEY);
+  try {
+    return localStorage.getItem(TOKEN_KEY);
+  } catch {
+    return null;
+  }
 }
 
 export function setToken(token) {
-  localStorage.setItem(TOKEN_KEY, token);
+  try {
+    localStorage.setItem(TOKEN_KEY, token);
+  } catch {
+    return;
+  }
 }
 
 export function clearToken() {
-  localStorage.removeItem(TOKEN_KEY);
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+  } catch {
+    return;
+  }
 }
 
-const client = axios.create({
+function fail(message, status) {
+  const error = new Error(message);
+  error.status = status;
+  return Promise.reject(error);
+}
+
+function envelopeMessage(body) {
+  if (body && typeof body === "object" && body.ok === false) {
+    return body.error?.message || "Request failed";
+  }
+  return null;
+}
+
+export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "/api",
 });
 
-client.interceptors.request.use((config) => {
+api.interceptors.request.use((config) => {
   const token = getToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -27,23 +53,26 @@ client.interceptors.request.use((config) => {
   return config;
 });
 
-client.interceptors.response.use(
+api.interceptors.response.use(
   (response) => {
     const body = response.data;
-    if (body && body.ok === false) {
-      throw new Error(body.error?.message || "Request failed");
+    const message = envelopeMessage(body);
+    if (message) {
+      return fail(message, response.status);
     }
     return body && body.data !== undefined ? body.data : body;
   },
   (error) => {
-    const message =
-      error.response?.data?.error?.message || "Could not reach the server";
-    return Promise.reject(new Error(message));
+    const response = error.response;
+    if (!response) {
+      return fail(OFFLINE_MESSAGE);
+    }
+    const message = envelopeMessage(response.data);
+    if (!message && GATEWAY_STATUSES.includes(response.status)) {
+      return fail(OFFLINE_MESSAGE, response.status);
+    }
+    return fail(message || `Request failed with status ${response.status}`, response.status);
   },
 );
 
-export const api = {
-  get: (path, params) => client.get(path, { params }),
-  post: (path, body) => client.post(path, body),
-  del: (path) => client.delete(path),
-};
+export default api;

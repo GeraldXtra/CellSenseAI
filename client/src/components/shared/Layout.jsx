@@ -1,11 +1,27 @@
-// Layout: the shell around every page with the top bar, the footer, the launcher and the chat window. Owner: Gerald. Renders only the page until it is built.
-import { Outlet } from "react-router-dom";
-import Navbar from "./Navbar";
-import Footer from "./Footer";
-import ChatWindow from "../osakue/ChatWIndow";
-import ChatLauncher from "./ChatLauncher";
+import { useEffect } from "react";
+import { Outlet, useLocation, useNavigationType } from "react-router-dom";
+import Navbar from "./Navbar.jsx";
+import Footer from "./Footer.jsx";
+import ChatLauncher from "./ChatLauncher.jsx";
+import ChatWindow from "../osakue/ChatWindow.jsx";
 
 export default function Layout() {
+  const { key, hash } = useLocation();
+  const navigationType = useNavigationType();
+
+  useEffect(() => {
+    if (hash) {
+      const target = document.getElementById(hash.slice(1));
+      if (target) {
+        target.scrollIntoView({ block: "start" });
+        return;
+      }
+    }
+    if (navigationType !== "POP") {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    }
+  }, [key, hash, navigationType]);
+
   return (
     <div className="cs-app">
       <Navbar />
@@ -13,8 +29,8 @@ export default function Layout() {
         <Outlet />
       </main>
       <Footer />
-      <ChatLauncher />
       <ChatWindow />
+      <ChatLauncher />
     </div>
   );
 }

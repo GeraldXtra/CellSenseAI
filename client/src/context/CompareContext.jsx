@@ -1,5 +1,5 @@
-// CompareContext: the compare list of up to three phone slugs kept in the browser. Owner: Gerald. Pass through until it is built.
 import { createContext, useContext, useEffect, useState } from "react";
+import { matchPath, useLocation } from "react-router-dom";
 
 const CompareContext = createContext(null);
 const STORAGE_KEY = "cs_compare";
@@ -14,14 +14,15 @@ function readSaved() {
   }
 }
 
-function readUrl() {
-  const ids = new URLSearchParams(window.location.search).get("ids");
+function readIds(search) {
+  const ids = new URLSearchParams(search).get("ids");
   return ids ? ids.split(",") : [];
 }
 
 function clean(list) {
   const result = [];
-  for (const slug of list) {
+  for (const item of list) {
+    const slug = typeof item === "string" ? item.trim() : "";
     if (slug && !result.includes(slug) && result.length < MAX) {
       result.push(slug);
     }
@@ -29,17 +30,38 @@ function clean(list) {
   return result;
 }
 
+function same(a, b) {
+  return a.length === b.length && a.every((slug, index) => slug === b[index]);
+}
+
 export function CompareProvider({ children }) {
-  const [slugs, setSlugs] = useState(() =>
-    clean([...readUrl(), ...readSaved()]),
-  );
+  const location = useLocation();
+  const urlSearch = matchPath("/compare", location.pathname) ? location.search : "";
+  const [slugs, setSlugs] = useState(() => clean([...readIds(urlSearch), ...readSaved()]));
+  const [seenSearch, setSeenSearch] = useState(urlSearch);
+
+  if (seenSearch !== urlSearch) {
+    setSeenSearch(urlSearch);
+    const ids = readIds(urlSearch);
+    if (ids.length) {
+      const next = clean([...ids, ...slugs]);
+      if (!same(next, slugs)) setSlugs(next);
+    }
+  }
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(slugs));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(slugs));
+    } catch {
+      return;
+    }
   }, [slugs]);
 
   function add(slug) {
+    if (slugs.includes(slug)) return true;
+    if (slugs.length >= MAX) return false;
     setSlugs((current) => clean([...current, slug]));
+    return true;
   }
 
   function remove(slug) {
@@ -64,11 +86,13 @@ export function CompareProvider({ children }) {
     isFull: slugs.length >= MAX,
   };
 
-  return (
-    <CompareContext.Provider value={value}>{children}</CompareContext.Provider>
-  );
+  return <CompareContext.Provider value={value}>{children}</CompareContext.Provider>;
 }
 
 export function useCompare() {
-  return useContext(CompareContext);
+  const context = useContext(CompareContext);
+  if (!context) {
+    throw new Error("useCompare must be used inside CompareProvider");
+  }
+  return context;
 }

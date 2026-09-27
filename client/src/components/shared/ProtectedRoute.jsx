@@ -1,4 +1,3 @@
-// ProtectedRoute: shows the loader while login is checked and sends a logged out person to the login page. Owner: Gerald.
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import Loader from "./Loader.jsx";
@@ -12,7 +11,7 @@ export default function ProtectedRoute({ children }) {
   }
 
   if (!user) {
-    const next = encodeURIComponent(location.pathname);
+    const next = encodeURIComponent(location.pathname + location.search + location.hash);
     return <Navigate to={`/login?next=${next}`} replace />;
   }
 

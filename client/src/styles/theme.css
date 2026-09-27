@@ -1,6 +1,7 @@
 :root {
   --cs-page-bg: #ffffff;
   --cs-band-bg: #f5f5f7;
+  --cs-empty-bg: #ededf0;
   --cs-brand-mark: 28px;
   --cs-card-bg: #ffffff;
   --cs-field-bg: #ffffff;
@@ -83,6 +84,8 @@
   --bs-border-radius: var(--cs-radius-control);
   --bs-link-color: var(--cs-ink);
   --bs-link-hover-color: var(--cs-button-bg-hover);
+  --bs-link-color-rgb: 29, 29, 31;
+  --bs-link-hover-color-rgb: 0, 0, 0;
 }
 
 .btn {

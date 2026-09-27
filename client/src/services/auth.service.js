@@ -1,5 +1,4 @@
-// authService: register, login, me, forgotPassword and resetPassword. Owner: Gerald.
-import { api } from "./api.js";
+import api from "./api.js";
 
 export function register(body) {
   return api.post("/auth/register", body);
