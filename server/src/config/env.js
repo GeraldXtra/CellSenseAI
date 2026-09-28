@@ -5,12 +5,8 @@ export const env = Object.freeze({
   PORT: +process.env.PORT || 5000,
   NODE_ENV: process.env.NODE_ENV || "development",
   CLIENT_ORIGIN: process.env.CLIENT_ORIGIN || "http://localhost:5173",
-  MONGODB_URI:
-    process.env.MONGODB_URI ||
-    "mongodb://sonpele_db_user:Leogeraldbl4ze@ac-p6ngxgw-shard-00-00.ndhcxlv.mongodb.net:27017,ac-p6ngxgw-shard-00-01.ndhcxlv.mongodb.net:27017,ac-p6ngxgw-shard-00-02.ndhcxlv.mongodb.net:27017/cellsense?ssl=true&replicaSet=atlas-nwcm4r-shard-0&authSource=admin&appName=cellsense",
-  JWT_SECRET:
-    process.env.JWT_SECRET ||
-    "b5ddb6a1fb1c1b0d5f845d431f1660e7531f46d8a79d2f28e8453ec6f13fe38fb517b8fd2621cbe99b1cbbd9bb5fba36",
+  MONGODB_URI: process.env.MONGODB_URI || "",
+  JWT_SECRET: process.env.JWT_SECRET || "",
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || "7d",
   AI_BASE_URL: process.env.AI_BASE_URL || "",
   AI_API_KEY: process.env.AI_API_KEY || "",

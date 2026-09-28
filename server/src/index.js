@@ -8,6 +8,7 @@ import { notFound, errorHandler } from "./middleware/error.js";
 import { connectDB } from "./config/db.js";
 import { ok } from "./utils/http.js";
 import { authRoutes } from "./routes/auth.routes.js";
+import { phonesRoutes } from "./routes/phones.routes.js";
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use("/api", rateLimit({ windowMs: 15 * 60 * 1000, limit: 300 }));
 
 app.get("/api/health", (req, res) => ok(res, { status: "up" }));
 app.use("/api/auth", authRoutes);
+app.use("/api/phones", phonesRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
