@@ -13,4 +13,34 @@ if (mongoose.connection.readyState !== 1) {
   console.error(
     "Seed stopped: no database connection. Check MONGODB_URI in server/.env.",
   );
+  process.exit(1);
 }
+
+let saved = 0;
+for (const item of phones) {
+  const slug = Slugify(`${item.brand} ${item.model}`);
+  const history = (
+    item.priceHistory || [{ price: item.price, data: new Date() }]
+  ).map((point) => ({
+    price: point.price,
+    date: new Date(point.date),
+    source: "seed",
+  }));
+  const last = history[history.length - 1];
+
+  await Phone.findOneAndUpdate(
+    { slug },
+    {
+      ...item,
+      slug,
+      price: { current: item.price, currency: "USD", updatedAt: last.date },
+      priceHistory: history,
+      source: "seed",
+    },
+    { upsert: true, runValidators: true },
+  );
+  saved += 1;
+}
+
+console.log(`Seeded ${saved} phones`);
+await mongoose.disconnect();
