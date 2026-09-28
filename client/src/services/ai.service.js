@@ -1,5 +1,4 @@
-// aiService: searchPhones, chat and recommend. Owner: Gerald.
-import { api } from "./api.js";
+import api from "./api.js";
 
 export function searchPhones(query) {
   return api.post("/ai/search", { query });

@@ -1,4 +1,3 @@
-// ChatContext: the chat messages, the loading flag, the open state of the chat window and the send action. Owner: Gerald. Pass through until it is built.
 import { createContext, useContext, useState } from "react";
 import { chat } from "../services/ai.service.js";
 
@@ -19,7 +18,7 @@ export function ChatProvider({ children }) {
   }
 
   async function send(text) {
-    const content = text.trim();
+    const content = typeof text === "string" ? text.trim() : "";
     if (!content || loading) return false;
 
     const history = [...messages, { role: "user", content }];
@@ -28,9 +27,7 @@ export function ChatProvider({ children }) {
     setError(null);
 
     try {
-      const data = await chat(
-        history.map(({ role, content }) => ({ role, content })),
-      );
+      const data = await chat(history.map(({ role, content }) => ({ role, content })));
       setMessages([
         ...history,
         { role: "assistant", content: data.reply, phones: data.phones || [] },
@@ -45,19 +42,15 @@ export function ChatProvider({ children }) {
     }
   }
 
-  const value = {
-    messages,
-    loading,
-    error,
-    open,
-    openWindow,
-    closeWindow,
-    send,
-  };
+  const value = { messages, loading, error, open, openWindow, closeWindow, send };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 }
 
 export function useChat() {
-  return useContext(ChatContext);
+  const context = useContext(ChatContext);
+  if (!context) {
+    throw new Error("useChat must be used inside ChatProvider");
+  }
+  return context;
 }

@@ -1,30 +1,39 @@
-// phonesService: listPhones, getPhone, comparePhones, getPriceTrend, getReviews, addReview and getReviewSummary. Owner: Gerald.
-import { api } from "./api.js";
+import api from "./api.js";
+
+function cleanParams(values = {}) {
+  const params = {};
+  for (const [key, value] of Object.entries(values)) {
+    if (value !== undefined && value !== null && value !== "" && value !== false) {
+      params[key] = value;
+    }
+  }
+  return params;
+}
 
 export function listPhones(params) {
-  return api.get("/phones", params);
+  return api.get("/phones", { params: cleanParams(params) });
 }
 
 export function getPhone(slug) {
-  return api.get(`/phones/${slug}`);
+  return api.get(`/phones/${encodeURIComponent(slug)}`);
 }
 
 export function comparePhones(slugs) {
-  return api.get("/phones/compare", { ids: slugs.join(",") });
+  return api.get("/phones/compare", { params: { ids: slugs.join(",") } });
 }
 
 export function getPriceTrend(slug) {
-  return api.get(`/phones/${slug}/price-trend`);
+  return api.get(`/phones/${encodeURIComponent(slug)}/price-trend`);
 }
 
 export function getReviews(slug) {
-  return api.get(`/phones/${slug}/reviews`);
+  return api.get(`/phones/${encodeURIComponent(slug)}/reviews`);
 }
 
 export function addReview(slug, body) {
-  return api.post(`/phones/${slug}/reviews`, body);
+  return api.post(`/phones/${encodeURIComponent(slug)}/reviews`, body);
 }
 
 export function getReviewSummary(slug) {
-  return api.get(`/phones/${slug}/review-summary`);
+  return api.get(`/phones/${encodeURIComponent(slug)}/review-summary`);
 }

@@ -1,30 +1,25 @@
 import { Link } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext.jsx";
 
-export default function AccountMenu() {
+export default function AccountMenu({ onClose }) {
   const { logout } = useAuth();
 
-  function handleLogOut() {
-    if (logout) logout();
-    onclose();
+  function close() {
+    if (onClose) onClose();
   }
+
+  function handleLogout() {
+    logout();
+    close();
+  }
+
   return (
-    <div className="cs-account-menu" role="menu">
-      <Link
-        to="/dashboard"
-        className="cs-account-item"
-        role="menuitem"
-        onClick={onclose}
-      >
+    <div id="cs-account-menu" className="cs-account-menu">
+      <Link to="/dashboard" className="cs-account-item" onClick={close}>
         Dashboard
       </Link>
-      <button
-        type="button"
-        className="cs-account-item"
-        role="menuitem"
-        onClick={handleLogOut}
-      >
-        Log Out
+      <button type="button" className="cs-account-item" onClick={handleLogout}>
+        Log out
       </button>
     </div>
   );

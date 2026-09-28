@@ -1,20 +1,20 @@
-import { Routes, Route, BrowserRouter } from "react-router-dom";
-import Layout from "./components/shared/Layout";
-import Home from "./pages/Home/Home";
-import SearchResults from "./pages/SearchResults/SearchResults";
-import Browse from "./pages/Browse/Browse";
-import PhoneDetail from "./pages/PhoneDetail/PhoneDetail";
-import Compare from "./pages/Compare/Compare";
-import Recommend from "./pages/Recommend/Recommend";
-import Assistant from "./pages/Assistant/Assistant";
-import Dashboard from "./pages/Dashboard/Dashboard";
-import Login from "./pages/Login/Login";
-import Register from "./pages/Register/Register";
-import ForgetPassword from "./pages/ForgotPassword/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword/ResetPassword";
-import About from "./pages/About/About";
-import NotFound from "./pages/NotFound/NotFound";
+import { Route, Routes } from "react-router-dom";
+import Layout from "./components/shared/Layout.jsx";
 import ProtectedRoute from "./components/shared/ProtectedRoute.jsx";
+import Home from "./pages/Home/Home.jsx";
+import SearchResults from "./pages/SearchResults/SearchResults.jsx";
+import Browse from "./pages/Browse/Browse.jsx";
+import PhoneDetail from "./pages/PhoneDetail/PhoneDetail.jsx";
+import Compare from "./pages/Compare/Compare.jsx";
+import Recommend from "./pages/Recommend/Recommend.jsx";
+import Assistant from "./pages/Assistant/Assistant.jsx";
+import Dashboard from "./pages/Dashboard/Dashboard.jsx";
+import Login from "./pages/Login/Login.jsx";
+import Register from "./pages/Register/Register.jsx";
+import ForgotPassword from "./pages/ForgotPassword/ForgotPassword.jsx";
+import ResetPassword from "./pages/ResetPassword/ResetPassword.jsx";
+import About from "./pages/About/About.jsx";
+import NotFound from "./pages/NotFound/NotFound.jsx";
 
 export default function App() {
   return (
@@ -38,7 +38,7 @@ export default function App() {
         />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/forget-password" element={<ForgetPassword />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/about" element={<About />} />
         <Route path="*" element={<NotFound />} />

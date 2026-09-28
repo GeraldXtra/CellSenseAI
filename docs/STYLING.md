@@ -42,25 +42,29 @@ One row per variable, in the same order as the file. The last column says where 
 | --- | --- | --- | --- |
 | `--cs-page-bg` | `#ffffff` | The white page background | `home-page.png`, the hero area and the "Ask the assistant" band |
 | `--cs-band-bg` | `#f5f5f7` | The light grey section bands, the search field fill, chips, the notice bar, the assistant reply bubble, the winning compare cell, the check icon circle | `home-page.png` the "Compare side by side" band; `search-result.png` the chips; `search-added-by-assistant.png` the notice bar; `assistant.png` the reply bubble; `compare.png` the bold cells; `reset-password-saved.png` the circle |
+| `--cs-empty-bg` | `#ededf0` | The empty boxes that EmptyState draws, a shade darker than the bands so they still show on a grey band | `compare-one-phone.png` the "Add at least one more phone to compare." box; `dashboard-new-account.png` the boxes under Recently viewed and Recommended for you |
+| `--cs-brand-mark` | `28px` | The height of the logo mark in the top bar | `mobile-topbar.png` the mark left of "CellSense AI"; every page, the top bar |
 | `--cs-card-bg` | `#ffffff` | Cards, dialogs, the account menu, product cards | `search-result.png` the three cards; `compare-add-phone.png` the dialog; `home-page-logged-in.png` the account menu |
 | `--cs-field-bg` | `#ffffff` | Inputs and selects on forms | `log-in.png` the email and password fields; `recommend.png` the selects |
 | `--cs-line` | `#e5e5ea` | Hairline dividers, table rows, card borders on grey bands, the footer divider | `phone-detail.png` the lines between the Tech specs rows; every page, the line above the copyright lines |
-| `--cs-line-strong` | `#d2d2d7` | Input borders, the vertical dividers in the filter strip, the dashed Add a phone slot | `search-result.png` the price inputs and the vertical lines between the filter groups; `compare.png` the dashed slot |
+| `--cs-line-strong` | `#d2d2d7` | Input borders, the vertical dividers in the filter strip, the dashed Add a phone slot, the border of the chat suggestion chips | `search-result.png` the price inputs and the vertical lines between the filter groups; `compare.png` the dashed slot; `assistant-empty.png` the chips |
 | `--cs-ink` | `#1d1d1f` | All headings and body text, the active brand tab underline, the chart line | `browse.png` the line under the Samsung tab; `phone-detail.png` the chart line |
 | `--cs-ink-soft` | `#6e6e73` | Sub lines under headings, spec labels, footer links, dates, the "Guide price, checked" text | `phone-detail.png` "Guide price, checked 22 Sep 2026"; `phone-detail-reviews.png` the review dates; every page, the footer links |
 | `--cs-ink-faint` | `#c7c7cc` | The rank numbers 1 2 3, typing dots, placeholder text | `recommend.png` the 1, 2, 3 on the cards; `assistant.png` the three dots; `home-page.png` the placeholder in the search field |
 | `--cs-on-ink` | `#ffffff` | Text and icons on near black buttons and on the user's chat bubble | `home-page.png` the word Search on the button; `assistant.png` the text in the user bubble |
 | `--cs-button-bg` | `#1d1d1f` | Primary buttons, the send button, the assistant launcher, the user's chat bubble | `home-page.png` the Search button and the launcher at the bottom right; `assistant.png` the send button |
+| `--cs-menu-w` | `160px` | The narrowest the account menu gets | `home-page-logged-in.png` the menu with Dashboard and Log out |
 | `--cs-button-bg-hover` | `#000000` | A primary button while the mouse is over it | Not in a still image. Move the mouse over any near black button. |
 | `--cs-price-note` | `#e8632b` | Only the orange "Price has been falling" line and its arrow | `phone-detail.png` under the price |
-| `--cs-error` | `#c0392b` | Form field error text | Not in the designs. The state to build on Log in when the password is wrong. |
-| `--cs-error-bg` | `#fbeae7` | Form field error background | Same as above |
+| `--cs-error` | `#c0392b` | Form field error text, and the text of the error bubble in the chat | Not in the designs. The state to build on Log in when the password is wrong, and in the chat when a send fails. |
+| `--cs-error-bg` | `#fbeae7` | Form field error background, and the error bubble in the chat | Same as above |
 | `--cs-overlay` | `rgba(29,29,31,0.4)` | The dimmed page behind a dialog | `compare-add-phone.png` the page behind the dialog |
 | `--cs-focus-ring` | `0 0 0 3px rgba(29,29,31,0.25)` | Keyboard focus on inputs and buttons | Not in a still image. Press Tab on any page. |
-| `--cs-shadow-float` | `0 8px 24px rgba(29,29,31,0.08)` | The account menu, the dialog, the assistant launcher; nothing else has a shadow | `home-page-logged-in.png` the account menu; `compare-add-phone.png` the dialog; every page, the launcher |
+| `--cs-shadow-float` | `0 8px 24px rgba(29,29,31,0.08)` | The account menu, the dialog, the assistant launcher and the chat window; nothing else has a shadow | `home-page-logged-in.png` the account menu; `compare-add-phone.png` the dialog; every page, the launcher; `assistant-window.png` the window |
 | `--cs-font` | `-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif` | The one font for everything | Every page |
 | `--cs-size-hero` | `3.5rem` | The Home headline only | `home-page.png` "Find a phone by budget, camera, battery and brand" |
 | `--cs-size-page-title` | `2.75rem` | Page headings such as Compare, Your dashboard, Log in, and the price on the phone page | `compare.png` "Compare"; `dashboard.png` "Your dashboard"; `log-in.png` "Log in"; `phone-detail.png` "$699" |
+| `--cs-icon-lg` | `24px` | The larger icons: the one in the launcher, the search and menu icons in the top bar under 768px, and the loading spinner | `mobile-topbar.png` the search and menu icons; every page, the icon in the launcher |
 | `--cs-size-section-title` | `2rem` | Tech specs, Price history, Reviews, Recently viewed, Browse by brand | `phone-detail.png` "Tech specs"; `dashboard.png` "Recently viewed"; `home-page.png` "Browse by brand" |
 | `--cs-size-block-title` | `1.5rem` | Favourites, Search history, Summary, Verdict, the Add a phone dialog heading, the price on cards | `dashboard.png` "Favourites"; `phone-detail-reviews.png` "Summary"; `compare.png` "Verdict"; `compare-add-phone.png` "Add a phone"; `search-result.png` "$299" |
 | `--cs-size-card-title` | `1.25rem` | Phone names on cards and in the compare columns | `search-result.png` "Xiaomi Redmi Note 13 Pro"; `compare.png` "Galaxy S24" above the column |
@@ -85,7 +89,7 @@ One row per variable, in the same order as the file. The last column says where 
 | `--cs-space-16` | `64px` | Section band top and bottom | `home-page.png` above and below "Compare side by side" |
 | `--cs-space-20` | `80px` | Hero top | `home-page.png` between the top bar and the headline |
 | `--cs-radius-chip` | `6px` | Chips, the Estimated label, small labels | `search-result.png` the chips; `search-added-by-assistant.png` "Estimated" |
-| `--cs-radius-control` | `10px` | Buttons, inputs, selects, the launcher | `home-page.png` the Search button and the search field; every page, the launcher |
+| `--cs-radius-control` | `10px` | Buttons, inputs, selects, the launcher, chat bubbles and suggestion chips | `home-page.png` the Search button and the search field; every page, the launcher; `assistant.png` the bubbles |
 | `--cs-radius-card` | `16px` | Cards, dialogs, the account menu | `search-result.png` the cards; `compare-add-phone.png` the dialog |
 | `--cs-container` | `1200px` | The widest the page content gets | Every page at 1280px |
 | `--cs-topbar-h` | `56px` | The height of the top bar | Every page, the top bar |
@@ -95,10 +99,14 @@ One row per variable, in the same order as the file. The last column says where 
 | `--cs-auth-card-w` | `440px` | Log in, Create account, Forgot password and Reset password cards | `log-in.png` the card |
 | `--cs-dialog-w` | `640px` | The Add a phone dialog | `compare-add-phone.png` the dialog |
 | `--cs-launcher-size` | `56px` | The assistant launcher | Every page, the launcher |
+| `--cs-chat-w` | `380px` | The width of the floating chat window | `assistant-window.png` the window at the bottom right |
+| `--cs-chat-h` | `560px` | The height of the floating chat window | `assistant-window.png` the window at the bottom right |
+| `--cs-chat-thumb-h` | `80px` | The height of the phone picture in a row under a reply in the chat window | `assistant-window.png` the pictures next to Redmi Note 13 Pro and Vivo V30 |
+| `--cs-chat-dot` | `8px` | The size of each typing dot | `assistant.png` the three dots under "Which one has the better battery?" |
 | `--cs-icon` | `18px` | Icons inside text and buttons | `search-result.png` the sliders icon next to "Filters" |
 | `--cs-z-topbar` | `100` | The top bar stays above the page | Every page when you scroll |
 | `--cs-z-menu` | `200` | The account menu and the mobile panel stay above the top bar | `home-page-logged-in.png` |
-| `--cs-z-launcher` | `300` | The launcher stays above everything but a dialog | Every page |
+| `--cs-z-launcher` | `300` | The launcher and the chat window stay above everything but a dialog | Every page; `assistant-window.png` |
 | `--cs-z-dialog` | `400` | The dialog stays above everything | `compare-add-phone.png` |
 | `--cs-transition` | `150ms ease` | How fast a hover or focus change happens | Not in a still image |
 | `--cs-bubble-user-bg` | `var(--cs-button-bg)` | The user's chat bubble | `assistant.png` the bubbles on the right |
@@ -124,7 +132,7 @@ Use the space variables like this. Do not pick by eye.
 
 ## The shared classes
 
-`theme.css` also holds classes you use straight in your JSX. Each one is built only from the variables.
+`theme.css` and `global.css` also hold classes you use straight in your JSX. Each one is built only from the variables.
 
 | Class | What it is | Pages that use it |
 | --- | --- | --- |
@@ -146,7 +154,15 @@ Use the space variables like this. Do not pick by eye.
 | `.cs-empty` | The centred grey empty box (`.cs-empty-title`, `.cs-empty-message`, `.cs-empty-action`), what EmptyState renders | Search results, Compare, Dashboard |
 | `.cs-overlay` and `.cs-dialog` | The dimmed page and the white dialog over it | Compare |
 | `.cs-chat-launcher` | The fixed launcher button | ChatLauncher, on every page but Assistant |
-| `.cs-grid` | One column on a phone, two on a tablet, three at 1280px, with `--cs-space-6` gaps | Search results, Browse, Recommend, Dashboard, the cards under an assistant reply |
+| `.cs-chat-window` | The floating chat window: white, the card radius and the float shadow, 380 by 560, fixed at the bottom right over the page without moving it. Under 768px it takes the full width less `--cs-space-4` on each side and most of the height | ChatWindow, on every page but Assistant |
+| `.cs-chat-header`, `.cs-chat-bar`, `.cs-chat-title`, `.cs-chat-open`, `.cs-chat-close`, `.cs-chat-note` | The window header: the bold title, the grey "Open full page" link, the x, the hairline under them and the grey line "Answers from the same phone data as the site." | ChatWindow |
+| `.cs-chat-thread` | The part of the window that scrolls; the page behind it does not move | ChatWindow |
+| `.cs-chat-message` and `.cs-chat-bubble` | One message and its bubble. Add `.cs-chat-bubble-user` for the near black bubble on the right, `.cs-chat-bubble-reply` for the grey one on the left, or `.cs-chat-bubble-error` for the error bubble | ChatWindow |
+| `.cs-chat-dot` | One of the three typing dots in a reply bubble | ChatWindow |
+| `.cs-chat-phones` and `.cs-chat-phone` | The compact rows under a reply: the picture in `.cs-chat-phone-thumb`, then `.cs-chat-phone-body` with `.cs-chat-phone-name`, `.cs-chat-phone-price` and the "See details" link `.cs-chat-phone-link` | ChatWindow |
+| `.cs-chat-empty`, `.cs-chat-empty-text`, `.cs-chat-chips`, `.cs-chat-chip` | The empty window: the centred grey line and the suggestion chips, with `--cs-radius-control` corners (never pills) and a hairline border | ChatWindow |
+| `.cs-chat-form`, `.cs-chat-field`, `.cs-chat-send` | The text field at the bottom with the square send button in its right end | ChatWindow |
+| `.cs-grid` | The card grid: one column on phones, two on tablets, three at 1280px, with `--cs-space-6` gaps. Use it for every list of PhoneCards | Search results, Browse, Recommend, Dashboard, the cards under an assistant reply |
 
 Buttons use the Bootstrap classes `btn btn-primary` (near black) and `btn btn-outline-primary` (ink outline, as "Save to favourites"). Inputs use `form-control`, selects `form-select`, checkboxes `form-check-input`. The theme restyles all of them, so you get the right shape for free.
 
@@ -210,7 +226,7 @@ A desktop layout, from 1280px:
 }
 ```
 
-The breakpoint numbers are the only other pixel values allowed in a css file. `global.css` already collapses the top bar under 768px and sets the footer and `.cs-grid` columns, so you only write media queries for your own layout.
+The breakpoint numbers are the only other pixel values allowed in a css file. `global.css` already collapses the top bar under 768px, sets the footer and `.cs-grid` columns and resizes the chat window, so you only write media queries for your own layout.
 
 ## When a value is missing
 

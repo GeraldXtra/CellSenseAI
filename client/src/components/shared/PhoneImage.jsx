@@ -1,31 +1,41 @@
-// PhoneImage: the phone picture when there is one, otherwise a plain grey box with the phone name. Owner: Gerald.
+import { useState } from "react";
+
 export function phoneName(phone) {
-  const brand = phone.brand || "";
-  const model = phone.model || "";
+  const brand = phone && phone.brand ? String(phone.brand).trim() : "";
+  const model = phone && phone.model ? String(phone.model).trim() : "";
+  if (!brand) return model;
   if (model.toLowerCase().startsWith(brand.toLowerCase())) return model;
   return `${brand} ${model}`.trim();
 }
 
-export default function PhoneImage({ phone, className = "" }) {
-  const name = phoneName(phone);
+function join(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
 
-  if (phone.imageUrl) {
+export default function PhoneImage({ phone, className = "" }) {
+  const [brokenUrl, setBrokenUrl] = useState(null);
+  const name = phoneName(phone);
+  const imageUrl = phone && phone.imageUrl ? phone.imageUrl : "";
+
+  if (imageUrl && imageUrl !== brokenUrl) {
     return (
       <img
-        src={phone.imageUrl}
+        src={imageUrl}
         alt={name}
-        className={`cs-phone-image ${className}`}
+        className={join("cs-phone-image", className)}
         loading="lazy"
+        onError={() => setBrokenUrl(imageUrl)}
       />
     );
   }
 
   return (
     <div
-      className={`cs-phone-image cs-phone-placeholder ${className}`}
-      aria-label={name}
+      className={join("cs-phone-image", "cs-phone-placeholder", className)}
+      role="img"
+      aria-label={name || "Phone"}
     >
-      {name}
+      <span aria-hidden="true">{name}</span>
     </div>
   );
 }

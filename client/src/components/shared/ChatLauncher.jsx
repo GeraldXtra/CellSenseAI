@@ -1,25 +1,30 @@
-import { useLocation } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import { matchPath, useLocation } from "react-router-dom";
 import { FiMessageCircle } from "react-icons/fi";
-import { useChat } from "../../context/ChatContext";
+import { useChat } from "../../context/ChatContext.jsx";
 
 export default function ChatLauncher() {
-  const { pathName } = useLocation();
+  const { pathname } = useLocation();
   const { open, openWindow } = useChat();
+  const buttonRef = useRef(null);
+  const wasOpen = useRef(open);
 
-  if (pathName === "/assistant" || open) return null;
+  useEffect(() => {
+    if (wasOpen.current && !open && buttonRef.current) buttonRef.current.focus();
+    wasOpen.current = open;
+  }, [open]);
 
-  function handleClick() {
-    if (openWindow) openWindow();
-  }
+  if (matchPath("/assistant", pathname) || open) return null;
 
   return (
     <button
+      ref={buttonRef}
       type="button"
       className="cs-chat-launcher"
       aria-label="Open the assistant"
-      onClick={handleClick}
+      onClick={openWindow}
     >
-      <FiMessageCircle />
+      <FiMessageCircle aria-hidden="true" />
     </button>
   );
 }

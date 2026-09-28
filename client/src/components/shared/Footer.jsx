@@ -17,7 +17,7 @@ const columns = [
       { label: "Log in", to: "/login" },
       { label: "Create account", to: "/register" },
       { label: "Favourites", to: "/dashboard#favourites" },
-      { label: "Search history", to: "/dashboard#history" },
+      { label: "Search history", to: "/dashboard#search-history" },
     ],
   },
   {
@@ -34,7 +34,7 @@ const columns = [
     title: "About",
     links: [
       { label: "About CellSense AI", to: "/about#about" },
-      { label: "How prices work", to: "/about#prices" },
+      { label: "How prices work", to: "/about#how-prices-work" },
       { label: "ASKME Ltd.", to: "/about#askme" },
       { label: "Contact", to: "/about#contact" },
     ],
@@ -77,13 +77,11 @@ export default function Footer() {
         </div>
 
         <div className="cs-footer-bottom">
-          <div className="cs-footer-legal">
+          <p className="cs-footer-legal">
             <span>Copyright {year} CellSense AI. All rights reserved.</span>
             <span>An eProject built for ASKME Ltd.</span>
-            <span>
-              Prices are guide prices with the date they were checked.
-            </span>
-          </div>
+            <span>Prices are guide prices with the date they were checked.</span>
+          </p>
           <span className="cs-footer-region">Nigeria / English</span>
         </div>
       </div>

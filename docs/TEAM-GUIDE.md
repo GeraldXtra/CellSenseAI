@@ -36,7 +36,7 @@ I am the lead. I own the repo, the backend, the database, the AI features, the s
 | Compare, Recommend, Assistant, Dashboard, Log in, Create account, Forgot password, Reset password | Osakue | `osakue` | `client/src/pages/Compare/`, `Recommend/`, `Assistant/`, `Dashboard/`, `Login/`, `Register/`, `ForgotPassword/`, `ResetPassword/` and `client/src/components/osakue/` |
 | Documentation, diagrams, reviews and merges | Gerald | `backend` | `docs/` |
 
-The split is even by weight, not by page count. Ibrahim, your five pages are the heavy browsing pages: search, filters, the spec table and the chart. Osakue, your four account pages share one AuthCard component and are small, and your weight is in Compare, Recommend, Assistant and Dashboard. Ibrahim, you own eight components. Osakue, you own nine, the ninth being ChatWindow, the floating chat window. The full list with the pages that use each one is in [COMPONENTS.md](COMPONENTS.md). The owner of every file is in [OWNERSHIP.md](OWNERSHIP.md).
+The split is even by weight, not by page count. Ibrahim, your five pages are the heavy browsing pages: search, filters, the spec table and the chart. Osakue, your four account pages share one AuthCard component and are small, and your weight is in Compare, Recommend, Assistant and Dashboard. Ibrahim, you own eight components. Osakue, you own eight too. The full list with the pages that use each one is in [COMPONENTS.md](COMPONENTS.md). The owner of every file is in [OWNERSHIP.md](OWNERSHIP.md).
 
 ## How to start
 
@@ -55,7 +55,7 @@ You do not need the server running to build your pages. Every page runs on `clie
 
 1. A page is done when it matches its image in `docs/ui/` at 1280px. Then it must also work at 375px and 768px. The page never scrolls sideways. Wide tables scroll inside their own box.
 2. Every colour, spacing, font size, corner radius and shadow comes from `client/src/styles/theme.css`. Never type a hex code or a pixel value into a component. If a value is missing, do not invent one: send me the image and the element and I add it to the theme.
-3. Use the shared components in `client/src/components/shared/`: Layout, Navbar, AccountMenu, Footer, ChatLauncher, PhoneImage, PhoneCard, Loader, EmptyState and ProtectedRoute. Never make a second version of one. If a shared component needs a new prop, ask me.
+3. Use the shared components in `client/src/components/shared/`: Layout, Navbar, AccountMenu, Footer, ChatLauncher, ChatWindow, PhoneImage, PhoneCard, Loader, EmptyState and ProtectedRoute. Never make a second version of one. If a shared component needs a new prop, ask me.
 4. Shared files, services and context are changed only by me. That is everything in `client/src/styles/`, `client/src/services/`, `client/src/context/`, `client/src/hooks/`, `client/src/data/`, `client/src/components/shared/`, plus `App.jsx`, `main.jsx`, `index.html` and `vite.config.js`. If you need something changed there, ask me and I do it on `backend`.
 5. All data comes through the functions in `client/src/services/`. Never call fetch or axios inside a page or a component.
 6. Until an endpoint is ready, use `client/src/data/mockPhones.js`. It has the exact shape the API returns.
@@ -135,7 +135,7 @@ All endpoints sit under `/api`, so `GET /phones` is served at `/api/phones`. Eve
 * Route: `/assistant`
 * Designs: `assistant.png`, `assistant-empty.png`, `assistant-window.png`
 * Must have: the heading and sub line, ChatThread with the bubbles, the phone cards under a reply and the typing dots, ChatInput, the three suggestion links, and the empty state with the three suggestion chips. The messages come from `useChat()` in ChatContext (mine), so this page shows the same conversation as the floating chat window.
-* The window: the launcher button on every other page opens ChatWindow, a small floating chat over the page, about 380 by 560, bottom right, over the page without moving it, with an x to close and an "Open full page" link to this page. It is hidden on `/assistant`. Osakue, you build it from ChatThread and ChatInput, and it reads its messages and its open state from `useChat()` too, so the conversation survives moving between pages.
+* The window: the launcher button on every other page opens ChatWindow, a small floating chat over the page, 380 by 560, bottom right, over the page without moving it, with an x to close and an "Open full page" link to this page. It is hidden on `/assistant`. The window is mine: a shared component in `client/src/components/shared/`, already built, that Layout renders on every page. It reads its messages and its open state from `useChat()` too, so it shows the same conversation as your page, Osakue, and the conversation survives moving between pages. You do not build it or render it.
 * Calls: `chat(messages)` with the full history `[{ role, content }]` returns `{ reply, phones }`. ChatContext calls it inside `send(text)`; the page and the window only call `send`.
 
 ### Dashboard (Osakue)
