@@ -1,1 +1,170 @@
-[]
+[
+  {
+    "brand": "Samsung",
+    "model": "Galaxy S24",
+    "category": "flagship",
+    "releaseYear": 2024,
+    "imageUrl": "",
+    "specs": {
+      "processor": "Exynos 2400",
+      "ram": 8,
+      "storage": 256,
+      "mainCamera": 50,
+      "frontCamera": 12,
+      "battery": 4000,
+      "displaySize": 6.2,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 699,
+    "priceHistory": [
+      { "price": 749, "date": "2026-06-01" },
+      { "price": 729, "date": "2026-07-01" },
+      { "price": 719, "date": "2026-08-01" },
+      { "price": 699, "date": "2026-09-01" }
+    ],
+    "aiSummary": "A compact flagship with a bright 120Hz screen and a strong main camera. Battery is average for the size."
+  },
+  {
+    "brand": "Apple",
+    "model": "iPhone 15",
+    "category": "flagship",
+    "releaseYear": 2023,
+    "imageUrl": "",
+    "specs": {
+      "processor": "A16 Bionic",
+      "ram": 6,
+      "storage": 128,
+      "mainCamera": 48,
+      "frontCamera": 12,
+      "battery": 3349,
+      "displaySize": 6.1,
+      "displayType": "OLED",
+      "refreshRate": 60,
+      "os": "iOS 17",
+      "has5G": true
+    },
+    "price": 699,
+    "priceHistory": [
+      { "price": 729, "date": "2026-06-01" },
+      { "price": 719, "date": "2026-07-01" },
+      { "price": 699, "date": "2026-08-01" },
+      { "price": 699, "date": "2026-09-01" }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "OnePlus",
+    "model": "12",
+    "category": "flagship",
+    "releaseYear": 2024,
+    "imageUrl": "",
+    "specs": {
+      "processor": "Snapdragon 8 Gen 3",
+      "ram": 12,
+      "storage": 256,
+      "mainCamera": 50,
+      "frontCamera": 32,
+      "battery": 5400,
+      "displaySize": 6.82,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 699,
+    "priceHistory": [
+      { "price": 699, "date": "2026-06-01" },
+      { "price": 699, "date": "2026-07-01" },
+      { "price": 699, "date": "2026-08-01" },
+      { "price": 699, "date": "2026-09-01" }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Xiaomi",
+    "model": "Redmi Note 13 Pro",
+    "category": "midrange",
+    "releaseYear": 2024,
+    "imageUrl": "",
+    "specs": {
+      "processor": "Snapdragon 7s Gen 2",
+      "ram": 8,
+      "storage": 256,
+      "mainCamera": 200,
+      "frontCamera": 16,
+      "battery": 5100,
+      "displaySize": 6.67,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 13",
+      "has5G": true
+    },
+    "price": 299,
+    "priceHistory": [
+      { "price": 319, "date": "2026-06-01" },
+      { "price": 309, "date": "2026-07-01" },
+      { "price": 299, "date": "2026-08-01" },
+      { "price": 299, "date": "2026-09-01" }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Vivo",
+    "model": "V30",
+    "category": "camera",
+    "releaseYear": 2024,
+    "imageUrl": "",
+    "specs": {
+      "processor": "Snapdragon 7 Gen 3",
+      "ram": 8,
+      "storage": 256,
+      "mainCamera": 50,
+      "frontCamera": 50,
+      "battery": 5000,
+      "displaySize": 6.78,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 399,
+    "priceHistory": [
+      { "price": 379, "date": "2026-06-01" },
+      { "price": 389, "date": "2026-07-01" },
+      { "price": 399, "date": "2026-08-01" },
+      { "price": 399, "date": "2026-09-01" }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Samsung",
+    "model": "Galaxy A15 5G",
+    "category": "budget",
+    "releaseYear": 2024,
+    "imageUrl": "",
+    "specs": {
+      "processor": "Dimensity 6100+",
+      "ram": 4,
+      "storage": 128,
+      "mainCamera": 50,
+      "frontCamera": 13,
+      "battery": 5000,
+      "displaySize": 6.5,
+      "displayType": "Super AMOLED",
+      "refreshRate": 90,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 199,
+    "priceHistory": [
+      { "price": 219, "date": "2026-06-01" },
+      { "price": 209, "date": "2026-07-01" },
+      { "price": 199, "date": "2026-08-01" },
+      { "price": 199, "date": "2026-09-01" }
+    ],
+    "aiSummary": ""
+  }
+]
