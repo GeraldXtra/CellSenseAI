@@ -1,11 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 export function useAsync(task, deps = []) {
-  const [state, setState] = useState({
-    data: null,
-    loading: true,
-    error: null,
-  });
+  const [state, setState] = useState({ data: null, loading: true, error: null });
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
@@ -36,12 +32,7 @@ export function useAsync(task, deps = []) {
     setAttempt((count) => count + 1);
   }, []);
 
-  return {
-    data: state.data,
-    loading: state.loading,
-    error: state.error,
-    reload,
-  };
+  return { data: state.data, loading: state.loading, error: state.error, reload };
 }
 
 export default useAsync;

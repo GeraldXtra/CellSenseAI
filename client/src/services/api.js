@@ -71,10 +71,7 @@ api.interceptors.response.use(
     if (!message && GATEWAY_STATUSES.includes(response.status)) {
       return fail(OFFLINE_MESSAGE, response.status);
     }
-    return fail(
-      message || `Request failed with status ${response.status}`,
-      response.status,
-    );
+    return fail(message || `Request failed with status ${response.status}`, response.status);
   },
 );
 

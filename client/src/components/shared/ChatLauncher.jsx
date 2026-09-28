@@ -10,8 +10,7 @@ export default function ChatLauncher() {
   const wasOpen = useRef(open);
 
   useEffect(() => {
-    if (wasOpen.current && !open && buttonRef.current)
-      buttonRef.current.focus();
+    if (wasOpen.current && !open && buttonRef.current) buttonRef.current.focus();
     wasOpen.current = open;
   }, [open]);
 

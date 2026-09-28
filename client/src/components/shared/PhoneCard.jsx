@@ -18,23 +18,14 @@ export function specLine(phone) {
 function formatPrice(price) {
   if (!price || price.current == null) return "";
   const currency = price.currency || "USD";
-  return currency === "USD"
-    ? `$${price.current}`
-    : `${price.current} ${currency}`;
+  return currency === "USD" ? `$${price.current}` : `${price.current} ${currency}`;
 }
 
-export default function PhoneCard({
-  phone,
-  reason,
-  estimated,
-  rank,
-  compare = true,
-}) {
+export default function PhoneCard({ phone, reason, estimated, rank, compare = true }) {
   const { has, add, remove, isFull } = useCompare();
   const href = `/phones/${phone.slug}`;
   const checked = has(phone.slug);
-  const showEstimated =
-    estimated === undefined ? phone.source === "ai" : Boolean(estimated);
+  const showEstimated = estimated === undefined ? phone.source === "ai" : Boolean(estimated);
 
   function toggleCompare(event) {
     if (event.target.checked) add(phone.slug);
@@ -48,12 +39,7 @@ export default function PhoneCard({
           {rank}
         </span>
       )}
-      <Link
-        to={href}
-        className="cs-phone-card-image"
-        tabIndex={-1}
-        aria-hidden="true"
-      >
+      <Link to={href} className="cs-phone-card-image" tabIndex={-1} aria-hidden="true">
         <PhoneImage phone={phone} />
       </Link>
       <h3 className="cs-phone-card-name">{phoneName(phone)}</h3>

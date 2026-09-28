@@ -119,9 +119,7 @@ export default function Navbar() {
                 {user.name || "Account"}
                 <FiChevronDown aria-hidden="true" />
               </button>
-              {accountOpen && (
-                <AccountMenu onClose={() => setAccountOpen(false)} />
-              )}
+              {accountOpen && <AccountMenu onClose={() => setAccountOpen(false)} />}
             </div>
           ) : (
             <Link to="/login" className="cs-nav-link cs-desktop-only">
@@ -140,11 +138,7 @@ export default function Navbar() {
             aria-controls="cs-nav"
             onClick={() => setMenuOpen((open) => !open)}
           >
-            {menuOpen ? (
-              <FiX aria-hidden="true" />
-            ) : (
-              <FiMenu aria-hidden="true" />
-            )}
+            {menuOpen ? <FiX aria-hidden="true" /> : <FiMenu aria-hidden="true" />}
           </button>
         </div>
       </div>
