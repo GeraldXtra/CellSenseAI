@@ -49,7 +49,7 @@ The split is even by weight, not by page count. Ibrahim, your five pages are the
 7. Read [STYLING.md](STYLING.md) (the theme variables and where you see them), [COMPONENTS.md](COMPONENTS.md) (what to reuse), [DATA-FLOW.md](DATA-FLOW.md) (how a page gets data) and [ROUTES.md](ROUTES.md) (every route and every click).
 8. Build the page in `<Page>.jsx` with its styles in `<Page>.css`. Import the css file at the top of the page file.
 
-You do not need the server running to build your pages. Every page runs on `client/src/data/mockPhones.js` until the endpoint is ready, and I tell you when to switch.
+You do not need the server running to build a page on sample data. Every page runs on `client/src/data/mockPhones.js` until the endpoint is ready, and I tell you when to switch. Log in and Create account are the exception, Osakue: they call the live endpoints, so they need the server. When you connect a page to a live endpoint, run the server on your own laptop with the steps in [INSTALLATION.md](INSTALLATION.md).
 
 ## The rules
 
@@ -79,7 +79,7 @@ Go through these eight points before you open a pull request into `develop`.
 
 ## Page by page
 
-All endpoints sit under `/api`, so `GET /phones` is served at `/api/phones`. Every response uses the same envelope: `{ "ok": true, "data": { } }` on success and `{ "ok": false, "error": { "message": "..." } }` on failure. `api.js` unwraps it, so the service functions give you `data` directly. Endpoints marked (login) need the token, which `api.js` adds for you. Right now the route files hold no routes, so every endpoint except `GET /api/health` answers 404. Until an endpoint is ready, a page runs on `client/src/data/mockPhones.js`. Every endpoint is described in full in [API.md](API.md) and every click on every page in [ROUTES.md](ROUTES.md). The README in each page folder repeats the part that matters for that page.
+All endpoints sit under `/api`, so `GET /phones` is served at `/api/phones`. Every response uses the same envelope: `{ "ok": true, "data": { } }` on success and `{ "ok": false, "error": { "message": "..." } }` on failure. `api.js` unwraps it, so the service functions give you `data` directly. Endpoints marked (login) need the token, which `api.js` adds for you. Live today: register, login and me under `/auth`, every `/phones` endpoint (the list, the detail, compare, the price trend, the reviews and the review summary), and `POST /ai/search`. Still to come: `POST /ai/chat`, `POST /ai/recommend`, the dashboard and the favourites under `/users/me`, and the two password reset endpoints. Those answer 404 for now. Until an endpoint is ready, a page runs on `client/src/data/mockPhones.js`. Every endpoint is described in full in [API.md](API.md) and every click on every page in [ROUTES.md](ROUTES.md). The README in each page folder repeats the part that matters for that page.
 
 ### Home (Ibrahim)
 
@@ -107,7 +107,7 @@ All endpoints sit under `/api`, so `GET /phones` is served at `/api/phones`. Eve
 * Route: `/phones/:slug`
 * Designs: `phone-detail.png`, `phone-detail-reviews.png`
 * Must have: the breadcrumb, the picture, brand, name, price, "Guide price, checked <date>", the orange trend note when the trend is falling, the "In plain words" box, Add to compare, Save to favourites, SpecTable, PriceHistoryChart with its caption, and the reviews block. Osakue, the reviews block is yours: build it as ReviewsSection and Ibrahim places `<ReviewsSection slug={slug} />` where the design shows it.
-* Calls: `getPhone(slug)` returns `{ phone }` and records the phone in recently viewed when logged in. `getPriceTrend(slug)` returns `{ history, trend, suggestion }`. `getReviews(slug)` returns `{ items, average, count }`. `getReviewSummary(slug)` returns `{ summary, sentiment }`. `addReview(slug, { rating, text })` (login) returns `{ review }`. `addFavourite(slug)` (login) returns `{ favourites }`.
+* Calls: `getPhone(slug)` returns `{ phone }`. It will also record the phone in recently viewed when logged in, once I build the dashboard. `getPriceTrend(slug)` returns `{ history, trend, suggestion }`. `getReviews(slug)` returns `{ items, average, count }`. `getReviewSummary(slug)` returns `{ summary, sentiment }`. `addReview(slug, { rating, text })` (login) returns `{ review }`. `addFavourite(slug)` (login) returns `{ favourites }`.
 
 ### About (Ibrahim)
 
@@ -150,14 +150,16 @@ All endpoints sit under `/api`, so `GET /phones` is served at `/api/phones`. Eve
 * Route: `/login`, with `?next=` for the page that asked for login
 * Design: `log-in.png`
 * Must have: AuthCard with the email and password fields, "Forgot password?", the Log in button and "New here? Create an account".
-* Calls: `login({ email, password })` from `useAuth` returns the user and stores the token. `GET /auth/me` runs on load through AuthContext, you do not call it.
+* Calls: `login({ email, password })` from `useAuth` returns the user and stores the token. The endpoint is live. `GET /auth/me` runs on load through AuthContext, you do not call it.
+* After Log in: go to the page in `next`, or to the Home page `/` when there is no `next`.
 
 ### Create account (Osakue)
 
-* Route: `/register`
+* Route: `/register`, with `?next=` when the person came from a page that asked for login
 * Design: `create-account.png`
 * Must have: AuthCard with name, email and password (at least 8 characters), the Create account button and "Already have an account? Log in".
-* Calls: `register({ name, email, password })` from `useAuth`.
+* Calls: `register({ name, email, password })` from `useAuth` returns the user and stores the token, the same way `login` does. The endpoint is live.
+* After Create account: go to the page in `next`, or to the Home page `/` when there is no `next`.
 
 ### Forgot password (Osakue)
 

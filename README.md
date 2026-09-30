@@ -32,8 +32,12 @@ The site runs in the browser and is built with React. It asks our server for eve
 
 When someone types "phone under $400 with a great camera", the browser sends the sentence to the server, the server asks the model to turn it into filters, looks up the matching phones in the database, and sends them back for the page to show.
 
-Stack: React 19 with Vite, React Router, Bootstrap 5 and plain CSS; Node 20 with Express 5; MongoDB Atlas with Mongoose; JWT login with bcrypt; an OpenAI compatible chat API; node-cron; Nodemailer.
+Stack: React 19 with Vite, React Router, Bootstrap 5 and plain CSS; Node 20 with Express 5; MongoDB Atlas with Mongoose; JWT login with bcrypt; an OpenAI compatible chat API; `node-cron`; Nodemailer.
 
 ## Where we are
 
-The designs are finished and the project structure is in place. We are building the backend and the pages now, then the mobile layouts, then the report, the test data and the demo video.
+The designs are finished and the project structure is in place. The shared frontend is built: the layout, the top bar with the account menu, the footer, the chat window and the parts every page uses. On the server, login, the phone data, search, comparison, reviews and the price trend are built and working. Search matches a brand or a model name directly, and sends a full sentence to the model, which turns it into filters for the same database search.
+
+The dashboard is not built yet. The server already keeps the search history of a logged in user, and the dashboard itself, the favourites and the recently viewed phones are still to come.
+
+Next on the server are the assistant, the recommendations and the dashboard. Password reset and the nightly price check come after that. Ibrahim and Osakue are building the pages against the designs and connecting them to the server, starting with Log in and Create account. Then come the mobile layouts, the report, the test data and the demo video.

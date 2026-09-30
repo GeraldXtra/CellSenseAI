@@ -8,14 +8,14 @@ Owner: Osakue. Branch: `osakue`. Files: `Register.jsx` and `Register.css` in thi
 
 ## Routes
 
-Path: `/register`. No parameters. Example: `http://localhost:5173/register`. After a successful register, go to `/dashboard`. A person who is already logged in goes straight to `/dashboard`.
+Path: `/register`, with an optional `?next=<path>`. Read `next` with `useSearchParams`. Example: `http://localhost:5173/register`. After a successful register, go to `next`, or to the Home page `/` when there is no `next`. A person who is already logged in goes straight to `next`, or to `/` when there is no `next`.
 
 Where every click on this page leads, from `docs/ROUTES.md`:
 
 | What | Leads to |
 | --- | --- |
-| "Create account" button | `register({ name, email, password })` from `useAuth`, then `/dashboard` |
-| "Log in" | `/login` |
+| "Create account" button | `register({ name, email, password })` from `useAuth`, then `next` or `/` |
+| "Log in" | `/login`, with the same `?next=` when there is one |
 
 ## Designs to match
 
@@ -41,15 +41,15 @@ From `create-account.png`. The page body is the grey band with the card in the m
 
 ## Mock data until the backend is ready
 
-The endpoint answers 404 today, so `register` throws. Build the page against that. There is nothing to swap later.
+No mock data here. `POST /api/auth/register` is live, so `useAuth().register` is the real call and there is nothing to swap later. Start the server as in `docs/INSTALLATION.md`. `register` throws an Error with the server's message: "Name, email and password are required.", "Enter a valid email address.", "Password must be at least 8 characters." or "An account with that email already exists." Build the form, the error line and the redirect against those.
 
 ## The states to handle
 
 - Idle: the form as in the design.
 - Submitting: the button disabled with the label "Creating your account".
-- Error: the server message in `--cs-error` under the button, for example "That email already has an account."
+- Error: the server message in `--cs-error` under the button, for example "An account with that email already exists."
 - Bad input: an empty name, an email without an @, or a password under 8 characters shows the field with `is-invalid` and a short line; the form does not submit.
-- Already logged in: redirect to `/dashboard`.
+- Already logged in: redirect to `next`, or to `/` when there is no `next`.
 
 ## Done checklist
 

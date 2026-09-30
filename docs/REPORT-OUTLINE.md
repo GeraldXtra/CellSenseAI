@@ -34,7 +34,7 @@ It comes from [INSTALLATION.md](INSTALLATION.md).
 
 ### 8. Assumptions (the ReadMe.doc)
 
-It comes from [ASSUMPTIONS.md](ASSUMPTIONS.md); the same ten assumptions make up the ReadMe.doc that ships in the zip.
+It comes from [ASSUMPTIONS.md](ASSUMPTIONS.md); the same fifteen assumptions make up the ReadMe.doc that ships in the zip.
 
 ### 9. Demo video
 
