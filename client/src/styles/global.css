@@ -558,10 +558,7 @@ html {
 .cs-chat-phone-thumb .cs-phone-placeholder {
   padding: 0;
   border-radius: var(--cs-radius-chip);
-}
-
-.cs-chat-phone-thumb .cs-phone-placeholder span {
-  display: none;
+  color: transparent;
 }
 
 .cs-chat-phone-body {

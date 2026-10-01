@@ -29,7 +29,7 @@ const phoneSchema = new Schema(
       has5G: { type: Boolean, default: false },
     },
     price: {
-      current: { type: Number, require: true },
+      current: { type: Number, required: true },
       currency: { type: String, default: "USD" },
       updatedAt: { type: Date, default: Date.now },
     },

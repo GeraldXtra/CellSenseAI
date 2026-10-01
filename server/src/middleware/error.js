@@ -19,7 +19,7 @@ export function errorHandler(err, req, res, next) {
   }
 
   if (status >= 500) console.error(err);
-  const showReal = status < 500 || env.NODE_ENV !== "production";
+  const showReal = status !== 500 || env.NODE_ENV !== "production";
   res.status(status).json({
     ok: false,
     error: {

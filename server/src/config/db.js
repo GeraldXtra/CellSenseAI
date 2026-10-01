@@ -9,11 +9,11 @@ export async function connectDB() {
     );
     return;
   }
-}
 
-try {
-  await mongoose.connect(env.MONGODB_URI);
-  console.log(`MongoDB connected: ${mongoose.connection.name}`);
-} catch (err) {
-  console.error(`MongoDB connection failed: ${err.message}`);
+  try {
+    await mongoose.connect(env.MONGODB_URI);
+    console.log(`MongoDB connected: ${mongoose.connection.name}`);
+  } catch (err) {
+    console.error(`MongoDB connection failed: ${err.message}`);
+  }
 }
