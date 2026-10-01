@@ -125,3 +125,70 @@ export async function parseSearchQuery(query) {
   );
   return cleanFilters(readJson(reply) || {});
 }
+
+const CATEGORIES = ["budget", "midrange", "flagship", "gaming", "camera"];
+
+const LOOKUP_PROMPT = `You are a phone specifications reference. The user names a phone.
+If it is a real phone model that you know well, reply with one JSON object and nothing else, in exactly this shape:
+{"found":true,"brand":"Samsung","model":"Galaxy S24","category":"flagship","releaseYear":2024,"price":699,"summary":"A compact flagship with a bright 120Hz screen and a strong main camera. Battery is average for the size.","specs":{"processor":"Exynos 2400","ram":8,"storage":256,"mainCamera":50,"frontCamera":12,"battery":4000,"displaySize":6.2,"displayType":"AMOLED","refreshRate":120,"os":"Android 14","has5G":true}}
+brand is the maker only. model is the name without the brand.
+category is one of budget, midrange, flagship, gaming, camera.
+price is a typical guide price in US dollars, as a whole number.
+ram and storage are in GB, cameras in megapixels, battery in mAh, displaySize in inches, refreshRate in Hz.
+summary is one or two plain sentences about who the phone suits.
+If you are not sure the phone exists, or it is not a phone, reply {"found":false}.`;
+
+function cleanNumber(value, min, max) {
+  const number = Number(value);
+  return Number.isFinite(number) && number >= min && number <= max
+    ? number
+    : undefined;
+}
+
+function cleanText(value, max = 80) {
+  return typeof value === "string" && value.trim()
+    ? value.trim().slice(0, max)
+    : undefined;
+}
+
+export async function lookUpPhone(name) {
+  const reply = await askModel(
+    [
+      { role: "system", content: LOOKUP_PROMPT },
+      { role: "user", content: name },
+    ],
+    { temperature: 0 },
+  );
+  const raw = readJson(reply);
+  if (!raw || raw.found !== true) return null;
+
+  const brand = cleanText(raw.brand, 40);
+  const model = cleanText(raw.model, 60);
+  const price = cleanNumber(raw.price, 20, 5000);
+  if (!brand || !model || !price) return null;
+
+  const specs = raw.specs || {};
+  const thisYear = new Date().getFullYear();
+
+  return {
+    brand,
+    model,
+    category: CATEGORIES.includes(raw.category) ? raw.category : "midrange",
+    releaseYear: cleanNumber(raw.releaseYear, 2000, thisYear + 1),
+    price: Math.round(price),
+    summary: cleanText(raw.summary, 400) || "",
+    specs: {
+      processor: cleanText(specs.processor),
+      ram: cleanNumber(specs.ram, 1, 32),
+      storage: cleanNumber(specs.storage, 8, 2048),
+      mainCamera: cleanNumber(specs.mainCamera, 2, 300),
+      frontCamera: cleanNumber(specs.frontCamera, 1, 100),
+      battery: cleanNumber(specs.battery, 1000, 10000),
+      displaySize: cleanNumber(specs.displaySize, 3, 9),
+      displayType: cleanText(specs.displayType, 30),
+      refreshRate: cleanNumber(specs.refreshRate, 30, 240),
+      os: cleanText(specs.os, 30),
+      has5G: specs.has5G === true,
+    },
+  };
+}
