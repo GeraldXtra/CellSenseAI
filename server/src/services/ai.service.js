@@ -192,3 +192,51 @@ export async function lookUpPhone(name) {
     },
   };
 }
+
+const CHAT_RULES = `You are the CellSense AI assistant on a phone information website run by ASKME Ltd.
+Answer questions about phones, specs, prices, comparisons and what to buy.
+Use only the phone data below for specs and prices. Never invent a spec or a price.
+Prices are guide prices in US dollars with the date they were checked. Say "guide price" when you give one.
+A phone marked estimated has specs and a price that are estimates. Say so when you mention it.
+If the data does not cover what the person asks, say so plainly and suggest they search the site for that phone.
+If the question is not about phones, say politely that you can only help with phones.
+Keep the answer short: at most four sentences, and at most three phones.
+Write plain text only: no markdown, no asterisks, no bullet points, no headings, no tables.
+When you name a phone, write its full name exactly as it appears in the data.`;
+
+function phoneLine(phone) {
+  const s = phone.specs || {};
+  const parts = [
+    s.ram && `${s.ram} GB RAM`,
+    s.storage && `${s.storage} GB storage`,
+    s.mainCamera && `${s.mainCamera} MP main camera`,
+    s.frontCamera && `${s.frontCamera} MP front camera`,
+    s.battery && `${s.battery} mAh battery`,
+    s.displaySize && `${s.displaySize} inch screen`,
+    s.displayType,
+    s.refreshRate && `${s.refreshRate}Hz`,
+    s.processor,
+    s.os,
+    s.has5G ? "5G" : "no 5G",
+  ].filter(Boolean);
+  const checked = phone.price?.updatedAt
+    ? new Date(phone.price.updatedAt).toISOString().slice(0, 10)
+    : "unknown";
+  const estimated = phone.source === "ai" ? " (estimated)" : "";
+  return `${phone.brand} ${phone.model}: guide price $${phone.price.current}${estimated}, checked ${checked}. ${phone.category}, released ${phone.releaseYear || "unknown"}. ${parts.join(", ")}.`;
+}
+
+export async function answerChat(messages, phones) {
+  const data = phones.length
+    ? phones.map(phoneLine).join("\n")
+    : "No phones matched this conversation.";
+  return askModel(
+    [
+      { role: "system", content: `${CHAT_RULES}\n\nPhone data:\n${data}` },
+      ...messages,
+    ],
+    {
+      temperature: 0.4,
+    },
+  );
+}
