@@ -11,6 +11,7 @@ import { phonesRoutes } from "./routes/phones.routes.js";
 import { aiRoutes } from "./routes/ai.routes.js";
 import { usersRoutes } from "./routes/users.routes.js";
 import { notFound, errorHandler } from "./middleware/error.js";
+import { startPriceUpdater } from "./jobs/priceUpdater.js";
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use(notFound);
 app.use(errorHandler);
 
 await connectDB();
+startPriceUpdater();
 
 app.listen(env.PORT, () => {
   console.log(`CellSense API running on http://localhost:${env.PORT}`);
