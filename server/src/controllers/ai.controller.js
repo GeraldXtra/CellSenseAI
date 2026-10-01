@@ -7,13 +7,20 @@ import {
   buildSort,
   escapeRegex,
 } from "../services/phoneQuery.js";
+import { Slugify } from "../utils/slug.js";
 import {
   isAIConfigured,
   parseSearchQuery,
   lookUpPhone,
   answerChat,
+  rankShortlist,
 } from "../services/ai.service.js";
-import { Slugify } from "../utils/slug.js";
+import {
+  readNeeds,
+  buildShortlist,
+  describeNeeds,
+  ruleReason,
+} from "../services/recommend.service.js";
 
 const SENTENCE_WORDS =
   /\b(under|below|over|above|less|more|than|with|without|best|good|great|cheap|cheapest|budget|around|between|for|long|big|fast|gaming|camera|battery|selfie|selfies)\b/i;
@@ -212,4 +219,55 @@ export async function chat(req, res) {
     .slice(0, 3);
 
   return ok(res, { reply, phones });
+}
+
+export async function recommend(req, res) {
+  const needs = readNeeds(req.body);
+  const { shortlist, widened, budget } = await buildShortlist(needs);
+
+  let items = shortlist
+    .slice(0, 3)
+    .map((phone) => ({ phone, reason: ruleReason(phone, needs) }));
+
+  if (shortlist.length && isAIConfigured()) {
+    try {
+      const picks = await rankShortlist(
+        shortlist,
+        describeNeeds(needs, widened, budget),
+      );
+      const chosen = [];
+      for (const pick of picks) {
+        const phone = shortlist.find((p) => p.slug === pick.slug);
+        if (phone && !chosen.some((c) => c.phone.slug === phone.slug))
+          chosen.push({ phone, reason: pick.reason });
+        if (chosen.length === 3) break;
+      }
+      for (const item of items) {
+        if (chosen.length === 3) break;
+        if (!chosen.some((c) => c.phone.slug === item.phone.slug))
+          chosen.push(item);
+      }
+      if (chosen.length) items = chosen;
+    } catch (err) {
+      console.error(`Ranking fell back to our own order: ${err.message}`);
+    }
+  }
+
+  if (req.user && items.length) {
+    const at = new Date();
+    await User.updateOne(
+      { _id: req.user._id },
+      {
+        $set: {
+          recommendations: items.map((item) => ({
+            phone: item.phone._id,
+            reason: item.reason,
+            at,
+          })),
+        },
+      },
+    );
+  }
+
+  return ok(res, { items, widened });
 }

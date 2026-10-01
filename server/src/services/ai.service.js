@@ -240,3 +240,35 @@ export async function answerChat(messages, phones) {
     },
   );
 }
+
+const RANK_RULES = `You help a shopper choose a phone. You get their needs and a shortlist of phones from our database.
+Pick the three phones that suit the needs best, best first. Use only phones from the shortlist and only the facts given.
+For each pick, write a reason of one or two plain sentences that names the specs that matter for these needs and the guide price.
+Reply with one JSON object and nothing else, in this shape:
+{"picks":[{"slug":"the-phone-slug","reason":"The reason."}]}`;
+
+export async function rankShortlist(phones, needsText) {
+  const data = phones
+    .map((phone) => `${phone.slug} | ${phoneLine(phone)}`)
+    .join("\n");
+  const reply = await askModel(
+    [
+      { role: "system", content: RANK_RULES },
+      { role: "user", content: `Needs: ${needsText}\n\nShortlist:\n${data}` },
+    ],
+    { temperature: 0.2 },
+  );
+  const raw = readJson(reply);
+  if (!raw || !Array.isArray(raw.picks)) return [];
+  return raw.picks
+    .filter(
+      (pick) =>
+        pick &&
+        typeof pick.slug === "string" &&
+        typeof pick.reason === "string",
+    )
+    .map((pick) => ({
+      slug: pick.slug.trim(),
+      reason: pick.reason.trim().slice(0, 300),
+    }));
+}
