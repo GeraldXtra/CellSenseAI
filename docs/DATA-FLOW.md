@@ -14,7 +14,7 @@ Take the Phone detail page opening `/phones/samsung-galaxy-s24`.
 
 2. That function calls `api.js`. `getPhone` is one line: `api.get('/phones/samsung-galaxy-s24')`. `api.js` holds one axios instance with the base URL `/api`. Its request interceptor reads the token from localStorage (key `cs_token`) and, when there is one, adds the header `Authorization: Bearer <token>`. The request leaves the browser as `GET /api/phones/samsung-galaxy-s24`.
 3. The Vite dev server on port 5173 sees a path that starts with `/api` and forwards it to the Express server on port 5000. That is the proxy in `vite.config.js`. Nothing on the page knows the server's port.
-4. In Express, the request passes helmet, cors, the logger, the JSON parser and the rate limit, then reaches the router mounted at `/api/phones`. The route `GET /:slug` matches with `slug` set to `samsung-galaxy-s24`.
+4. In Express, the request passes helmet, cors, the JSON parser, the logger and the rate limit, then reaches the router mounted at `/api/phones`. The route `GET /:slug` matches with `slug` set to `samsung-galaxy-s24`.
 5. The controller asks the Phone model for the document with that slug. The model queries MongoDB Atlas and gets the document back.
 6. The controller sends the document as JSON inside the envelope: `{ "ok": true, "data": { "phone": { ... } } }`.
 7. `api.js` gets the answer. Its response interceptor looks at `ok`. When it is true, it returns `data`, so your function receives `{ phone }` and nothing else. When `ok` is false, it throws an `Error` whose message is the server's message. When the server cannot be reached at all, it throws "Could not reach the server. Check that it is running."
@@ -30,13 +30,13 @@ The Search results page calls `searchPhones(query)` from `src/services/ai.servic
 
 1. `searchPhones` calls `api.post('/ai/search', { query })`.
 2. The proxy forwards `POST /api/ai/search` to Express, which routes it to the search controller.
-3. The controller first matches the words against brand and model in MongoDB. When the query reads like a sentence, or nothing matched, it sends the sentence to the model through `ai.service.js` and gets filters back as JSON. It runs the phone query with those filters. If still nothing matches and the sentence names a real phone we do not have, it asks the model for that phone's specs and saves it with source `ai`.
+3. The controller searches directly first: it matches the words against brand and model in MongoDB. When the query reads like a sentence, it skips that match and sends the sentence to the model through `ai.service.js`, and it does the same when a short query matched nothing. The model gives filters back as JSON, and the controller runs the same phone query with those filters. Without the AI settings in `server/.env` the model is never called and every search stays direct. Still to come: when nothing matches and the sentence names a real phone we do not have, the controller will ask the model for that phone's specs and save it with source `ai`.
 4. The controller writes the search to `searchlogs`, and to the user's search history when a token was sent.
-5. The answer is `{ ok: true, data: { items, filters, source } }`. You get `{ items, filters, source }`. `filters` feeds UnderstoodChips. A phone in `items` with `source` set to `ai` gets the NoticeBar and the Estimated label.
+5. The answer is `{ ok: true, data: { items, filters, source } }`. You get `{ items, filters, source }`. `source` is `direct` or `ai`. `filters` feeds UnderstoodChips. A phone in `items` with `source` set to `ai` gets the NoticeBar and the Estimated label; the server does not add such phones yet.
 
 ### A page that needs login
 
-The Dashboard page calls `getDashboard()` from `src/services/users.service.js`.
+The Dashboard page calls `getDashboard()` from `src/services/users.service.js`. The endpoint behind it is not built yet, so steps 2 to 4 show how it will run. Steps 1 and 5 work today.
 
 1. ProtectedRoute in `App.jsx` runs first. While `useAuth().loading` is true it shows Loader. When there is no user it sends the person to `/login?next=/dashboard` and the page never renders.
 2. With a user, the page calls `getDashboard()`, which calls `api.get('/users/me/dashboard')`. The request interceptor adds `Authorization: Bearer <token>`.
@@ -50,8 +50,8 @@ The Compare page gets its slugs from the browser, not from a URL it builds.
 
 1. `useCompare()` returns `slugs`, the list of up to three slugs kept in localStorage under `cs_compare`. The Compare checkbox on every PhoneCard and the Add to compare button on the phone page fill that list. When the page was opened with `/compare?ids=a,b,c`, CompareContext read those ids on load and put them in the same list.
 2. With two or three slugs the page calls `comparePhones(slugs)` from `src/services/phones.service.js`, which calls `api.get('/phones/compare', { params: { ids: slugs.join(',') } })`, so the request is `GET /api/phones/compare?ids=a,b,c`.
-3. The controller loads the phones by slug, builds the ten rows and marks the best value in each.
-4. You get `{ phones, best }`. `phones` fills CompareSlots and the columns of CompareTable. `best` says which slug wins each row, so the table can add `cs-cell-best` to that cell.
+3. The controller loads the phones by slug, keeps them in the order you sent, and works out the best value in each of the eight number rows: price, RAM, storage, main camera, front camera, battery, display size and refresh rate.
+4. You get `{ phones, best }`. `phones` fills CompareSlots and the columns of CompareTable, which draws the ten rows itself. `best` lists the slugs that win each row, so the table can add `cs-cell-best` to those cells. A row where every phone is equal is not in `best`, and the text rows never are.
 5. With one slug or none, the page does not call the server. It shows the one phone state with "Browse phones".
 
 ### Posting a review
@@ -60,9 +60,9 @@ ReviewsSection on the phone page calls `addReview(slug, { rating, text })` from 
 
 1. The person must be logged in. When `useAuth().user` is null, send them to `/login?next=/phones/<slug>` instead of posting.
 2. `addReview` calls `api.post('/phones/<slug>/reviews', { rating, text })`. The interceptor adds the token.
-3. On the server, `requireAuth` loads the user, `validate.js` checks that `rating` is 1 to 5 and `text` is not empty, and the controller stores the review with the user's name as the author. The model judges the sentiment; when the model is not configured, the rating decides it.
+3. On the server, `requireAuth` loads the user. The controller checks that `rating` is a whole number from 1 to 5 and that `text` has 3 to 1000 characters, and that this person has not reviewed this phone before. It stores the review with the user's name as the author. For now the stars set the sentiment: 4 or 5 is positive, 3 is neutral, 1 or 2 is negative.
 4. You get `{ review }`. Put it at the top of the list, then call `getReviews(slug)` and `getReviewSummary(slug)` again so the count and the summary are fresh.
-5. A 400 from validation or a 401 from a missing token arrives as a thrown Error with the server's message. Show it under the form.
+5. A 400 from a bad rating or text, a 401 from a missing token or a 409 from a second review of the same phone arrives as a thrown Error with the server's message. Show it under the form.
 
 ## The mock switch
 

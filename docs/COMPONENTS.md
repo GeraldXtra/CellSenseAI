@@ -9,7 +9,7 @@ They live in `client/src/components/shared/`. Import them with a relative path, 
 | Component | What it does | Props |
 | --- | --- | --- |
 | Layout | The shell around every page: Navbar, the page content, Footer, ChatLauncher and ChatWindow. `App.jsx` puts every route inside it. You never render it yourself. | none |
-| Navbar | The top bar: the logo mark and "CellSense AI", the links Browse, Compare, Recommend, Assistant and Dashboard, "Log in" or the user's name with the account menu. Under 768px it collapses to the logo, a search icon and a menu icon. | none |
+| Navbar | The top bar: the logo mark and "CellSense AI", the links Browse, Compare, Recommend, Assistant and Dashboard, and "Log in" for a visitor. For a logged in user it shows the user's name with the chevron icon on its right; a click on the name or the chevron opens the account menu. Under 768px it collapses to the logo, a search icon and a menu icon, and the menu panel holds the same links plus Log in or Log out. | none |
 | AccountMenu | The small dropdown under the user's name with Dashboard and Log out. | `onClose` |
 | Footer | The five column footer with the three bottom lines and "Nigeria / English". | none |
 | ChatLauncher | The fixed button at the bottom right that opens ChatWindow, the small floating chat, over the page. It is a button, not a link: it calls `openWindow()` and never changes the page. Hidden on the Assistant page and while the window is open. Focus comes back to it when the window closes. | none |

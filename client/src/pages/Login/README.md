@@ -8,15 +8,15 @@ Owner: Osakue. Branch: `osakue`. Files: `Login.jsx` and `Login.css` in this fold
 
 ## Routes
 
-Path: `/login`, with an optional `?next=<path>`. Read `next` with `useSearchParams`. ProtectedRoute sends a logged out person here with `next` set to the page they asked for. After a successful login, go to `next`, or to `/dashboard` when there is no `next`. Example: `http://localhost:5173/login?next=/dashboard`. A person who is already logged in and opens `/login` goes straight to `/dashboard`.
+Path: `/login`, with an optional `?next=<path>`. Read `next` with `useSearchParams`. ProtectedRoute sends a logged out person here with `next` set to the page they asked for. After a successful login, go to `next`, or to the Home page `/` when there is no `next`. Example: `http://localhost:5173/login?next=/dashboard`. A person who is already logged in and opens `/login` goes straight to `next`, or to `/` when there is no `next`.
 
 Where every click on this page leads, from `docs/ROUTES.md`:
 
 | What | Leads to |
 | --- | --- |
-| "Log in" button | `login({ email, password })` from `useAuth`, then `next` or `/dashboard` |
+| "Log in" button | `login({ email, password })` from `useAuth`, then `next` or `/` |
 | "Forgot password?" | `/forgot-password` |
-| "Create an account" | `/register` |
+| "Create an account" | `/register`, with the same `?next=` when there is one |
 
 ## Designs to match
 
@@ -42,15 +42,15 @@ From `log-in.png`. The page body is the grey band, and the card floats in the mi
 
 ## Mock data until the backend is ready
 
-The endpoint answers 404 today, so `login` throws "Could not reach the server" or "Not found". Build the page against that: the form, the error line and the redirect. To see the logged in state and the dashboard, ask me for a test token when you get there. There is nothing to swap later, because `useAuth().login` is already the real call.
+No mock data here. `POST /api/auth/login` is live, so `useAuth().login` is the real call and there is nothing to swap later. Start the server as in `docs/INSTALLATION.md`, create an account on the Create account page or with `POST /api/auth/register`, and log in with it. `login` throws an Error with the server's message: "Email and password are required" when a field is empty, "Wrong email or password" when the two do not match an account, and "Could not reach the server. Check that it is running." when the server is off. Build the form, the error line and the redirect against those.
 
 ## The states to handle
 
 - Idle: the form as in the design.
 - Submitting: the button disabled with the label "Logging in".
-- Error: the server message in `--cs-error` under the button, for example "Wrong email or password." The fields keep their values.
+- Error: the server message in `--cs-error` under the button, for example "Wrong email or password". The fields keep their values.
 - Bad input: an empty email or password shows the field with `is-invalid` and a short line under it; the form does not submit.
-- Already logged in: redirect to `/dashboard`.
+- Already logged in: redirect to `next`, or to `/` when there is no `next`.
 
 ## Done checklist
 

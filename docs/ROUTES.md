@@ -4,7 +4,7 @@ Ibrahim, Osakue, this is the complete route map: every path in `App.jsx`, every 
 
 Two notes that apply everywhere:
 
-- `?next=` on `/login`: when a logged out person opens a page that needs login, ProtectedRoute sends them to `/login?next=<the page they asked for>`. After login, the Login page sends them back to `next`. Without `next` it goes to `/dashboard`.
+- `?next=` on `/login` and `/register`: when a logged out person opens a page that needs login, ProtectedRoute sends them to `/login?next=<the page they asked for>`. After Log in or Create account, the page sends the person to the page in `next`. Without `next` it goes to the Home page, `/`. The links between Log in and Create account keep `?next=`, so it is not lost when a new person creates an account first.
 - Log out (in the account menu) clears the token and the user and stays on the page. If that page is `/dashboard`, ProtectedRoute then sends the person to `/login?next=/dashboard`.
 
 ## Table 1: frontend routes
@@ -23,7 +23,7 @@ All routes sit inside `<Route element={<Layout />}>`, so every page gets the sha
 | `/assistant`             | none                                                       | `http://localhost:5173/assistant`                                                          | Assistant                        | Osakue  | No             |
 | `/dashboard`             | none                                                       | `http://localhost:5173/dashboard`                                                          | Dashboard, inside ProtectedRoute | Osakue  | Yes            |
 | `/login`                 | `?next=` optional                                          | `http://localhost:5173/login?next=/dashboard`                                              | Login                            | Osakue  | No             |
-| `/register`              | none                                                       | `http://localhost:5173/register`                                                           | Register                         | Osakue  | No             |
+| `/register`              | `?next=` optional                                          | `http://localhost:5173/register`                                                           | Register                         | Osakue  | No             |
 | `/forgot-password`       | none                                                       | `http://localhost:5173/forgot-password`                                                    | ForgotPassword                   | Osakue  | No             |
 | `/reset-password/:token` | `:token` from the email link                               | `http://localhost:5173/reset-password/abc123`                                              | ResetPassword                    | Osakue  | No             |
 | `/about`                 | anchors `#about`, `#askme`, `#how-prices-work`, `#contact` | `http://localhost:5173/about#how-prices-work`                                              | About                            | Ibrahim | No             |
@@ -166,16 +166,16 @@ Brand options: Any (sent as an empty string), Samsung, Apple, OnePlus, Xiaomi, V
 
 | What                | What it does          | Leads to                                                  |
 | ------------------- | --------------------- | --------------------------------------------------------- |
-| "Log in" button     | Logs in               | `login({ email, password })`, then `next` or `/dashboard` |
+| "Log in" button     | Logs in               | `login({ email, password })`, then `next`, or `/` when there is no `next` |
 | "Forgot password?"  | Opens Forgot password | `/forgot-password`                                        |
-| "Create an account" | Opens Create account  | `/register`                                               |
+| "Create an account" | Opens Create account  | `/register`, with the same `?next=` when there is one     |
 
 ### Create account (Osakue)
 
 | What                    | What it does                    | Leads to                                                 |
 | ----------------------- | ------------------------------- | -------------------------------------------------------- |
-| "Create account" button | Creates the account and logs in | `register({ name, email, password })`, then `/dashboard` |
-| "Log in"                | Opens Log in                    | `/login`                                                 |
+| "Create account" button | Creates the account and logs in | `register({ name, email, password })`, then `next`, or `/` when there is no `next` |
+| "Log in"                | Opens Log in                    | `/login`, with the same `?next=` when there is one       |
 
 ### Forgot password (Osakue)
 
@@ -206,6 +206,8 @@ No clicks of its own. The footer links land on its four anchors.
 ## Table 3: backend endpoints per page
 
 Every path sits under `/api`. The service function in brackets is what the page calls. What comes back is the `data` part of the envelope. (login) means the token is required; `api.js` adds it.
+
+Live today: the three auth calls `POST /auth/register`, `POST /auth/login` and `GET /auth/me`, every `/phones` call in the table, and `POST /ai/search`. Still to come, and answering 404 until I build them: `POST /ai/chat`, `POST /ai/recommend`, the three `/users/me` calls and the two password reset calls. [API.md](API.md) has the Status of each one.
 
 | Page                  | Method and path                                                       | Query or body                                                                                                             | What comes back                                                         |
 | --------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |

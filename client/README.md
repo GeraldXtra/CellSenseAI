@@ -23,15 +23,15 @@ The `/api` calls go through the Vite proxy to the server on port 5000, so start 
 | `index.html` | Gerald | The one HTML page with the favicon links and the root div. |
 | `vite.config.js` | Gerald | The React plugin, port 5173 and the proxy for `/api`. |
 | `public/brand/` | Gerald | The logo mark, the favicons and the horizontal logo. |
-| `src/main.jsx` | Gerald | Loads Bootstrap, `theme.css` and `global.css`, then renders App inside the router and the two providers. |
+| `src/main.jsx` | Gerald | Loads Bootstrap, `theme.css` and `global.css`, then renders App inside the router and the three providers. |
 | `src/App.jsx` | Gerald | The route table. Every page sits inside Layout. |
 | `src/styles/theme.css` | Gerald | Every colour, spacing, font size, radius and shadow, plus the shared classes. See [`docs/STYLING.md`](../docs/STYLING.md). |
 | `src/styles/global.css` | Gerald | The body defaults, the page shell, the top bar, the footer, the phone card and the breakpoints. |
 | `src/services/` | Gerald | `api.js` and one file per endpoint group. Pages call these and nothing else. See [`docs/DATA-FLOW.md`](../docs/DATA-FLOW.md). |
-| `src/context/` | Gerald | `AuthContext.jsx` (the logged in user) and `CompareContext.jsx` (the compare list). |
+| `src/context/` | Gerald | `AuthContext.jsx` (the logged in user), `CompareContext.jsx` (the compare list) and `ChatContext.jsx` (the assistant conversation). |
 | `src/hooks/` | Gerald | `useAsync.js`, which gives a page its loading, data and error state. |
 | `src/data/` | Gerald | `mockPhones.js`, the sample phones, reviews and summary used until an endpoint is ready. |
-| `src/components/shared/` | Gerald | Layout, Navbar, AccountMenu, Footer, ChatLauncher, PhoneImage, PhoneCard, Loader, EmptyState, ProtectedRoute. See [`docs/COMPONENTS.md`](../docs/COMPONENTS.md). |
+| `src/components/shared/` | Gerald | Layout, Navbar, AccountMenu, Footer, ChatLauncher, ChatWindow, PhoneImage, PhoneCard, Loader, EmptyState, ProtectedRoute. See [`docs/COMPONENTS.md`](../docs/COMPONENTS.md). |
 | `src/components/ibrahim/` | Ibrahim | SearchBar, UnderstoodChips, FilterStrip, BrandTabs, SortSelect, SpecTable, PriceHistoryChart, NoticeBar. |
 | `src/components/osakue/` | Osakue | CompareTable, CompareSlots, AddPhoneDialog, RecommendForm, ChatThread, ChatInput, ReviewsSection, AuthCard. |
 | `src/pages/Home/` | Ibrahim | Home. |

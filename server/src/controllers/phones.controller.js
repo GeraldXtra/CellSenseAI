@@ -2,6 +2,7 @@
 import { Phone } from "../models/Phone.js";
 import { Review } from "../models/Review.js";
 import { ok, httpError } from "../utils/http.js";
+import { User } from "../models/User.js";
 import {
   buildPhoneFilter,
   buildSort,
@@ -81,7 +82,30 @@ export async function comparePhones(req, res) {
 
 export async function getPhone(req, res) {
   const phone = await findPhone(req.params.slug);
-  return ok(res, { phone });
+
+  if (req.user) {
+    await User.updateOne(
+      { _id: req.user._id },
+      { $pull: { recentlyViewed: { phone: phone._id } } },
+    );
+    await User.updateOne(
+      { _id: req.user._id },
+      {
+        $push: {
+          recentlyViewed: {
+            $each: [{ phone: phone._id, viewedAt: new Date() }],
+            $position: 0,
+            $slice: 20,
+          },
+        },
+      },
+    );
+  }
+
+  const isFavourite = Boolean(
+    req.user?.favourites.some((id) => id.equals(phone._id)),
+  );
+  return ok(res, { phone, isFavourite });
 }
 
 export async function getPriceTrend(req, res) {

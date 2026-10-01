@@ -87,11 +87,11 @@ Everything in `server/` is mine. You do not need to open it to build your pages;
 | `server/package.json` | Gerald | The server packages and the scripts dev, start, seed and prices. |
 | `server/.env.example` | Gerald | Every server setting with an empty value. The real `.env` is never committed. |
 | `server/README.md` | Gerald | How to run the server, the scripts, the keys and the folder map. |
-| `server/data/phones.json` | Gerald | The sample phones the seed script loads. |
+| `server/data/phones.json` | Gerald | The six sample phones the seed script loads. |
 | `server/data/README.md` | Gerald | What `phones.json` is. |
-| `server/scripts/seed.js` | Gerald | Loads `phones.json` into the database. |
-| `server/scripts/runPriceUpdate.js` | Gerald | Runs the price updater once. |
-| `server/src/index.js` | Gerald | Builds the Express app, mounts the routers and starts the server. |
+| `server/scripts/seed.js` | Gerald | Loads `phones.json` into the database. Only I run it, and never on the shared database. |
+| `server/scripts/runPriceUpdate.js` | Gerald | Will run the price updater once. A placeholder for now. |
+| `server/src/index.js` | Gerald | Builds the Express app, adds the rate limit, mounts the auth, phones and AI routers and starts the server. |
 | `server/src/config/env.js` | Gerald | Reads every setting once and exports a frozen object. |
 | `server/src/config/db.js` | Gerald | Connects to MongoDB Atlas. |
 | `server/src/models/Phone.js` | Gerald | The phones collection. |
@@ -101,24 +101,25 @@ Everything in `server/` is mine. You do not need to open it to build your pages;
 | `server/src/routes/auth.routes.js` | Gerald | The `/api/auth` router. |
 | `server/src/routes/phones.routes.js` | Gerald | The `/api/phones` router. |
 | `server/src/routes/ai.routes.js` | Gerald | The `/api/ai` router. |
-| `server/src/routes/users.routes.js` | Gerald | The `/api/users` router. |
-| `server/src/controllers/auth.controller.js` | Gerald | Register, login, me, forgot password, reset password. |
-| `server/src/controllers/phones.controller.js` | Gerald | List, compare, detail, price trend, reviews. |
-| `server/src/controllers/ai.controller.js` | Gerald | Search, chat, recommend. |
-| `server/src/controllers/users.controller.js` | Gerald | Dashboard and favourites. |
-| `server/src/services/ai.service.js` | Gerald | The one file that calls the model. |
+| `server/src/routes/users.routes.js` | Gerald | The `/api/users` router. A placeholder until I build the dashboard. |
+| `server/src/controllers/auth.controller.js` | Gerald | Register, login and me. Forgot password and reset password come later. |
+| `server/src/controllers/phones.controller.js` | Gerald | List, compare, detail, price trend, reviews and the review summary. |
+| `server/src/controllers/ai.controller.js` | Gerald | Search. Chat and recommend come later. |
+| `server/src/controllers/users.controller.js` | Gerald | Dashboard and favourites. A placeholder for now. |
+| `server/src/services/ai.service.js` | Gerald | The one file that calls the model. Today it turns a search sentence into filters. |
 | `server/src/services/phoneQuery.js` | Gerald | Turns the query params into one MongoDB query. |
-| `server/src/services/recommend.service.js` | Gerald | Builds the shortlist and asks the model to rank it. |
+| `server/src/services/recommend.service.js` | Gerald | Will build the shortlist and ask the model to rank it. A placeholder for now. |
 | `server/src/services/price.service.js` | Gerald | Computes the trend and the best time to buy note. |
-| `server/src/services/review.service.js` | Gerald | Stores reviews and asks the model for the sentiment and the summary. |
-| `server/src/services/mail.service.js` | Gerald | Sends the password reset email with Nodemailer. |
+| `server/src/services/review.service.js` | Gerald | Sets the sentiment of a review from its stars and writes the star based summary. |
+| `server/src/services/mail.service.js` | Gerald | Will send the password reset email with Nodemailer. A placeholder for now. |
 | `server/src/middleware/auth.js` | Gerald | requireAuth and optionalAuth. |
-| `server/src/middleware/validate.js` | Gerald | Checks bodies and queries with zod. |
+| `server/src/middleware/validate.js` | Gerald | Will check bodies and queries with zod. A placeholder for now; the controllers check their own input. |
 | `server/src/middleware/error.js` | Gerald | The not found answer and the error handler. |
-| `server/src/jobs/priceUpdater.js` | Gerald | The nightly price job. |
+| `server/src/jobs/priceUpdater.js` | Gerald | The nightly price job. A placeholder for now. |
 | `server/src/utils/http.js` | Gerald | The response envelope helpers. |
 | `server/src/utils/jwt.js` | Gerald | Signs and verifies the tokens. |
 | `server/src/utils/password.js` | Gerald | Hashes and checks passwords. |
+| `server/src/utils/slug.js` | Gerald | Builds a phone slug from the brand and the model, such as `samsung-galaxy-s24`. The seed script uses it. |
 
 ## The rule
 

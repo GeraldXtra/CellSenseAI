@@ -15,7 +15,7 @@ export function errorHandler(err, req, res, next) {
   if (err.name === "ValidationError" || err.name === "CastError") status = 400;
   if (err.code === 11000) {
     status = 409;
-    message: "That value is already taken";
+    message = "That value is already taken";
   }
 
   if (status >= 500) console.error(err);

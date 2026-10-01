@@ -24,4 +24,6 @@ const reviewSchema = new Schema(
   { timestamps: true },
 );
 
+reviewSchema.index({ phone: 1, user: 1 }, { unique: true });
+
 export const Review = mongoose.model("Review", reviewSchema);
