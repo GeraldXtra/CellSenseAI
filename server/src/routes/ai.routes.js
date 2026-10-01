@@ -1,8 +1,8 @@
 // aiRoutes: the Express router for /api/ai. Owner: Gerald.
 import { Router } from "express";
 import rateLimit from "express-rate-limit";
-import { search } from "../controllers/ai.controller.js";
 import { optionalAuth } from "../middleware/auth.js";
+import { search, chat, recommend } from "../controllers/ai.controller.js";
 
 export const aiRoutes = Router();
 
@@ -20,3 +20,5 @@ aiRoutes.use(
 );
 
 aiRoutes.post("/search", optionalAuth, search);
+aiRoutes.post("/chat", chat);
+aiRoutes.post("/recommend", optionalAuth, recommend);

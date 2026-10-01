@@ -17,7 +17,7 @@ const MINIMUMS = {
   minRefresh: "specs.refreshRate",
 };
 
-function escapeRegex(text) {
+export function escapeRegex(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
