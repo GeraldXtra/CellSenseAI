@@ -9,6 +9,7 @@ import { ok } from "./utils/http.js";
 import { authRoutes } from "./routes/auth.routes.js";
 import { phonesRoutes } from "./routes/phones.routes.js";
 import { aiRoutes } from "./routes/ai.routes.js";
+import { usersRoutes } from "./routes/users.routes.js";
 import { notFound, errorHandler } from "./middleware/error.js";
 
 const app = express();
@@ -33,6 +34,7 @@ app.get("/api/health", (req, res) => ok(res, { status: "up" }));
 app.use("/api/auth", authRoutes);
 app.use("/api/phones", phonesRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/users", usersRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

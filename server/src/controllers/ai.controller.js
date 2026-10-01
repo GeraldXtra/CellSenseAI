@@ -1,4 +1,3 @@
-// aiController: the request handleimport { Phone } from '../models/Phone.js'
 import { Phone } from "../models/Phone.js";
 import { User } from "../models/User.js";
 import { SearchLog } from "../models/SearchLog.js";
