@@ -46,6 +46,15 @@ const phoneSchema = new Schema(
       },
     ],
     aiSummary: { type: String, default: "" },
+    reviewSummary: {
+      text: { type: String, default: "" },
+      sentiment: {
+        type: String,
+        enum: ["positive", "neutral", "negative"],
+        default: "neutral",
+      },
+      count: { type: Number, default: 0 },
+    },
     source: { type: String, enum: ["seed", "ai", "admin"], default: "seed" },
   },
   { timestamps: true },

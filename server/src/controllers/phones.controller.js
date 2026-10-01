@@ -4,6 +4,12 @@ import { Review } from "../models/Review.js";
 import { ok, httpError } from "../utils/http.js";
 import { User } from "../models/User.js";
 import {
+  isAIConfigured,
+  writePhoneSummary,
+  summariseReviews,
+  judgeSentiment,
+} from "../services/ai.service.js";
+import {
   buildPhoneFilter,
   buildSort,
   buildPage,
@@ -28,6 +34,25 @@ const COMPARE_ROWS = [
 async function findPhone(slug) {
   const phone = await Phone.findOne({ slug }).lean();
   if (!phone) throw httpError(404, "Phone not found");
+  return phone;
+}
+
+async function ensureSummary(phone) {
+  if (phone.aiSummary || !isAIConfigured()) return phone;
+  try {
+    const summary = await writePhoneSummary(phone);
+    if (summary) {
+      await Phone.updateOne(
+        { _id: phone._id },
+        { $set: { aiSummary: summary } },
+      );
+      return { ...phone, aiSummary: summary };
+    }
+  } catch (err) {
+    console.error(
+      `Could not write the summary for ${phone.slug}: ${err.message}`,
+    );
+  }
   return phone;
 }
 
@@ -81,7 +106,8 @@ export async function comparePhones(req, res) {
 }
 
 export async function getPhone(req, res) {
-  const phone = await findPhone(req.params.slug);
+  let phone = await findPhone(req.params.slug);
+  phone = await ensureSummary(phone);
 
   if (req.user) {
     await User.updateOne(
@@ -141,13 +167,22 @@ export async function addReview(req, res) {
   const already = await Review.exists({ phone: phone._id, user: req.user._id });
   if (already) throw httpError(409, "You have already reviewed this phone");
 
+  let sentiment = sentimentFromRating(rating);
+  if (isAIConfigured()) {
+    try {
+      sentiment = (await judgeSentiment(text)) || sentiment;
+    } catch (err) {
+      console.error(`Review mood fell back to the stars: ${err.message}`);
+    }
+  }
+
   const review = await Review.create({
     phone: phone._id,
     user: req.user._id,
     author: req.user.name,
     rating,
     text,
-    sentiment: sentimentFromRating(rating),
+    sentiment,
   });
   return ok(res, { review }, 201);
 }
@@ -155,7 +190,38 @@ export async function addReview(req, res) {
 export async function getReviewSummary(req, res) {
   const phone = await findPhone(req.params.slug);
   const reviews = await Review.find({ phone: phone._id })
-    .select("rating")
+    .select("rating text")
+    .sort({ createdAt: -1 })
     .lean();
-  return ok(res, summaryFromRatings(reviews.map((r) => r.rating)));
+  if (!reviews.length) return ok(res, summaryFromRatings([]));
+
+  const saved = phone.reviewSummary;
+  if (saved?.text && saved.count === reviews.length) {
+    return ok(res, { summary: saved.text, sentiment: saved.sentiment });
+  }
+
+  if (isAIConfigured()) {
+    try {
+      const result = await summariseReviews(reviews.slice(0, 30));
+      if (result) {
+        await Phone.updateOne(
+          { _id: phone._id },
+          {
+            $set: {
+              reviewSummary: {
+                text: result.summary,
+                sentiment: result.sentiment,
+                count: reviews.length,
+              },
+            },
+          },
+        );
+        return ok(res, result);
+      }
+    } catch (err) {
+      console.error(`Review summary fell back to the stars: ${err.message}`);
+    }
+  }
+
+  return ok(res, summaryFromRatings(reviews.map((review) => review.rating)));
 }

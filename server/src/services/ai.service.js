@@ -272,3 +272,65 @@ export async function rankShortlist(phones, needsText) {
       reason: pick.reason.trim().slice(0, 300),
     }));
 }
+
+const SENTIMENTS = ["positive", "neutral", "negative"];
+
+const SUMMARY_RULES = `You write a short summary of a phone for a shopping website.
+Use only the facts given. Write one or two plain sentences, at most 40 words, about who the phone suits and its strongest and weakest points.
+Do not mention the price. Write plain text only, with no markdown and no quotation marks.`;
+
+export async function writePhoneSummary(phone) {
+  const reply = await askModel(
+    [
+      { role: "system", content: SUMMARY_RULES },
+      { role: "user", content: phoneLine(phone) },
+    ],
+    { temperature: 0.3 },
+  );
+  return reply
+    .replace(/^["']|["']$/g, "")
+    .trim()
+    .slice(0, 400);
+}
+
+const REVIEWS_RULES = `You summarise what buyers say about a phone, for a shopping website.
+You get reviews, each with a star rating out of 5 and the text.
+Write one or two plain sentences, at most 40 words, about what people like and dislike. Do not invent anything that is not in the reviews.
+Then judge the overall mood as positive, neutral or negative.
+Reply with one JSON object and nothing else, in this shape:
+{"summary":"Buyers like the camera and the bright screen but say the battery is average.","sentiment":"positive"}`;
+
+export async function summariseReviews(reviews) {
+  const text = reviews
+    .map((review, i) => `${i + 1}. ${review.rating} of 5: ${review.text}`)
+    .join("\n");
+  const reply = await askModel(
+    [
+      { role: "system", content: REVIEWS_RULES },
+      { role: "user", content: text },
+    ],
+    { temperature: 0.2 },
+  );
+  const raw = readJson(reply);
+  if (!raw || typeof raw.summary !== "string" || !raw.summary.trim())
+    return null;
+  return {
+    summary: raw.summary.trim().slice(0, 400),
+    sentiment: SENTIMENTS.includes(raw.sentiment) ? raw.sentiment : "neutral",
+  };
+}
+
+const SENTIMENT_RULES =
+  "You judge the mood of one phone review. Reply with exactly one word: positive, neutral or negative.";
+
+export async function judgeSentiment(text) {
+  const reply = await askModel(
+    [
+      { role: "system", content: SENTIMENT_RULES },
+      { role: "user", content: text },
+    ],
+    { temperature: 0 },
+  );
+  const word = reply.toLowerCase().match(/positive|neutral|negative/);
+  return word ? word[0] : null;
+}
