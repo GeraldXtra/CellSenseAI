@@ -12,6 +12,7 @@ const NUMBER_FILTERS = [
   "minRefresh",
 ];
 const SORTS = ["newest", "priceAsc", "priceDesc", "camera", "battery"];
+const CATEGORIES = ["budget", "midrange", "flagship", "gaming", "camera"];
 
 const SEARCH_PROMPT = `You turn a shopper's request for a phone into search filters for a phone database.
 Reply with one JSON object and nothing else.
@@ -108,7 +109,7 @@ function cleanFilters(raw) {
     }
   }
   if (raw.has5G === true) filters.has5G = true;
-  if (typeof raw.category === "string") filters.category = raw.category;
+  if (CATEGORIES.includes(raw.category)) filters.category = raw.category;
   if (SORTS.includes(raw.sort)) filters.sort = raw.sort;
   if (typeof raw.keywords === "string" && raw.keywords.trim())
     filters.q = raw.keywords.trim();
@@ -125,8 +126,6 @@ export async function parseSearchQuery(query) {
   );
   return cleanFilters(readJson(reply) || {});
 }
-
-const CATEGORIES = ["budget", "midrange", "flagship", "gaming", "camera"];
 
 const LOOKUP_PROMPT = `You are a phone specifications reference. The user names a phone.
 If it is a real phone model that you know well, reply with one JSON object and nothing else, in exactly this shape:

@@ -12,8 +12,8 @@ CellSense AI is a responsive single page web application we are building for ASK
 | Node 20 with Express 5 | Server | Receives every request from the browser on port 5000, reads and writes the database and calls the model when a feature needs it. |
 | MongoDB Atlas with Mongoose | Cloud database | Stores phones, users, reviews and search logs as documents. Mongoose defines the shape of each document. |
 | JWT with bcrypt | Server | Handles login. Passwords are stored as bcrypt hashes. A logged in user carries a JWT token. |
-| OpenAI compatible chat API | External service | The pre trained language model we integrate. It runs the language parts of search, the assistant, recommendations, phone summaries, comparison verdicts and review summaries. |
-| `node-cron` | Server | Runs the price updater once a day. |
+| OpenAI compatible chat API | External service | The pre trained language model we integrate: Groq with the model `openai/gpt-oss-120b`. It runs the language parts of search, the lookup of a phone we do not have, the assistant, the recommendation ranking, phone summaries, review summaries and review sentiment. |
+| `node-cron` | Server | Runs the price check once a day, at 02:00 Lagos time, from our price list. |
 | Nodemailer | Server | Sends the password reset email. |
 
 The client also has `axios`, `recharts` and `react-icons` installed. `client/.env.example` holds `VITE_API_URL=`. We leave it empty so the browser uses the Vite proxy, which passes `/api` requests to port 5000.
@@ -23,7 +23,7 @@ The client also has `axios`, `recharts` and `react-icons` installed. `client/.en
 1. We already know React, Express and MongoDB. We spend our time on the features, not on learning new tools.
 2. Phone specs are uneven from one model to the next. Documents in MongoDB fit this better than fixed table columns.
 3. MongoDB Atlas is a shared cloud database. Three people work on the same data.
-4. Any provider with an OpenAI compatible chat endpoint works. We switch provider by changing two lines in `server/.env`. The settings are `AI_BASE_URL`, `AI_API_KEY` and `AI_MODEL`.
+4. Any provider with an OpenAI compatible chat endpoint works. The settings are `AI_BASE_URL`, `AI_API_KEY` and `AI_MODEL` in `server/.env`. We switch provider by changing the address and the key, and the model name when the new provider uses another one.
 
 ## Site map
 
@@ -77,6 +77,7 @@ All values live in `client/src/styles/theme.css`. Nobody types a hex code or a p
 |---|---|
 | `--cs-page-bg` | `#ffffff` |
 | `--cs-band-bg` | `#f5f5f7` |
+| `--cs-empty-bg` | `#ededf0` |
 | `--cs-card-bg` | `#ffffff` |
 | `--cs-field-bg` | `#ffffff` |
 | `--cs-line` | `#e5e5ea` |
@@ -90,9 +91,9 @@ All values live in `client/src/styles/theme.css`. Nobody types a hex code or a p
 | `--cs-price-note` | `#e8632b` |
 | `--cs-error` | `#c0392b` |
 | `--cs-error-bg` | `#fbeae7` |
-| `--cs-overlay` | `rgba(29,29,31,0.4)` |
-| `--cs-focus-ring` | `0 0 0 3px rgba(29,29,31,0.25)` |
-| `--cs-shadow-float` | `0 8px 24px rgba(29,29,31,0.08)` |
+| `--cs-overlay` | `rgba(29, 29, 31, 0.4)` |
+| `--cs-focus-ring` | `0 0 0 3px rgba(29, 29, 31, 0.25)` |
+| `--cs-shadow-float` | `0 8px 24px rgba(29, 29, 31, 0.08)` |
 
 ### Font and type sizes
 
@@ -147,6 +148,9 @@ All values live in `client/src/styles/theme.css`. Nobody types a hex code or a p
 
 | Variable | Value |
 |---|---|
+| `--cs-brand-mark` | `28px` |
+| `--cs-menu-w` | `160px` |
+| `--cs-icon-lg` | `24px` |
 | `--cs-container` | `1200px` |
 | `--cs-topbar-h` | `56px` |
 | `--cs-control-h` | `44px` |
@@ -155,6 +159,10 @@ All values live in `client/src/styles/theme.css`. Nobody types a hex code or a p
 | `--cs-auth-card-w` | `440px` |
 | `--cs-dialog-w` | `640px` |
 | `--cs-launcher-size` | `56px` |
+| `--cs-chat-w` | `380px` |
+| `--cs-chat-h` | `560px` |
+| `--cs-chat-thumb-h` | `80px` |
+| `--cs-chat-dot` | `8px` |
 | `--cs-icon` | `18px` |
 
 ### Layers and transition
@@ -226,12 +234,12 @@ The full field list is in [`DATA-MODEL.md`](DATA-MODEL.md). We have four collect
 
 | Collection | What it holds |
 |---|---|
-| phones | One document per phone: slug, brand, model, image, category, release year, specs, current price, price history, summary and source. |
+| phones | One document per phone: slug, brand, model, picture path, category, release year, specs, current price with the date it was checked, price history, summary, saved review summary and source. |
 | users | Name, email, password hash, role, favourites, recently viewed phones, search history, recommendations and the pending password reset. |
-| reviews | A rating from 1 to 5, the text, the author, an optional user id and the sentiment for one phone. |
-| searchlogs | The query, the filters, the result count and the user when logged in. |
+| reviews | The phone, the user id, the author name, a rating from 1 to 5, the text and the sentiment. One review per user per phone. |
+| searchlogs | The query, the filters, the source (direct or the model), the result count and the user when logged in. |
 
-Units: RAM and storage in GB, cameras in megapixels, battery in mAh, display size in inches, refresh rate in Hz, prices in USD unless the currency field says otherwise.
+Units: RAM and storage in GB, cameras in megapixels, battery in mAh, display size in inches, refresh rate in Hz, prices in US dollars.
 
 ## API
 
@@ -249,11 +257,13 @@ Failure:
 { "ok": false, "error": { "message": "..." } }
 ```
 
-The endpoints sit in four groups: Auth (`/api/auth`, including the two password reset endpoints), Phones (`/api/phones`), AI (`/api/ai`) and Users (`/api/users`), plus `GET /api/health`. Protected routes need `Authorization: Bearer <token>`. Endpoints not built yet answer 404. Right now only `GET /api/health` works.
+The endpoints sit in four groups: Auth (`/api/auth`, including the two password reset endpoints), Phones (`/api/phones`), AI (`/api/ai`) and Users (`/api/users`), plus `GET /api/health`. Every endpoint is live. Protected routes need `Authorization: Bearer <token>`. An address with no route answers 404 with "No route for", the method and the path.
 
 ## AI integration
 
-We integrate a pre trained language model through an OpenAI compatible API. The model does the natural language understanding for smart search and the assistant, ranks the recommendation shortlist and explains its choices, writes the plain English spec summaries and summarises reviews. The recommendation system is our own shortlist rules (budget, brand, needs) plus that ranking. Price prediction is a trend calculation from stored price history (falling, rising or stable, with a best time to buy note), not a forecast model. We do not train, build or design any machine learning or NLP model.
+We integrate a pre trained language model through an OpenAI compatible API. The model does the natural language understanding for smart search and the assistant, supplies the specifications of a phone we do not have, ranks the recommendation shortlist and explains its choices, writes the plain English spec summaries, summarises reviews and judges their sentiment. The recommendation system is our own shortlist rules (budget, brand, needs) plus that ranking. Price prediction is a trend calculation from stored price history (falling, rising or stable, with a best time to buy note), not a forecast model. We do not train, build or design any machine learning or NLP model.
+
+The site still runs without the model. With the three AI settings empty, search matches words directly, recommendations come with reasons from our own rules, review summaries and review sentiment come from the stars, and the assistant answers that the AI features are not set up.
 
 | Term in the brief | Where it lives in the site | How we implement it |
 | --- | --- | --- |
@@ -267,9 +277,9 @@ We integrate a pre trained language model through an OpenAI compatible API. The 
 
 1. Login uses email and password. A successful login returns a JWT token that expires after seven days (`JWT_EXPIRES_IN=7d`). The browser sends it as `Authorization: Bearer <token>`. Protected routes reject requests without a valid token.
 2. Passwords are hashed with bcrypt before they are stored. The users collection holds `passwordHash`, never the plain password.
-3. Password reset uses a random token that is only ever stored as a hash, with an expiry one hour ahead. The reply to a reset request is the same whether or not the email exists.
+3. Password reset uses a random token that is only ever stored as a hash, with an expiry one hour ahead, and works once. The reply to a reset request is the same whether or not the email exists.
 4. `helmet` sets safe HTTP headers on every response from Express.
-5. CORS is limited to the client origin in `CLIENT_ORIGIN`, which is `http://localhost:5173` in development. Only pages served from that origin may call the API from a browser.
-6. Rate limiting caps how many requests one client can send to `/api` in a window. The limit is 300 requests per 15 minutes.
+5. CORS is limited to the client origin in `CLIENT_ORIGIN`, which `server/.env.example` sets to `http://localhost:5173` for development. Only pages served from that origin may call the API from a browser.
+6. Rate limiting caps what one address can send: 300 requests every 15 minutes to `/api`, 20 requests every minute to the AI routes, and 5 password reset requests every 15 minutes.
 7. API keys and mail passwords live only in `server/.env`. The repo holds `server/.env.example`, where every secret is left empty. The real `server/.env` is not in the submission zip. The browser never sees the model key, because only the backend calls the model.
-8. Auth, validation and error handling middleware sit in `server/src/middleware` (`auth.js`, `validate.js` and `error.js`).
+8. The login middleware and the error handler sit in `server/src/middleware` (`auth.js` and `error.js`). Each controller checks its own input and answers 400 with a clear message.

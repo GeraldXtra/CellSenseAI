@@ -16,11 +16,13 @@ if (mongoose.connection.readyState !== 1) {
   process.exit(1);
 }
 
-let saved = 0;
+let added = 0;
+let updated = 0;
+
 for (const item of phones) {
   const slug = Slugify(`${item.brand} ${item.model}`);
   const history = (
-    item.priceHistory || [{ price: item.price, data: new Date() }]
+    item.priceHistory || [{ price: item.price, date: new Date() }]
   ).map((point) => ({
     price: point.price,
     date: new Date(point.date),
@@ -28,19 +30,33 @@ for (const item of phones) {
   }));
   const last = history[history.length - 1];
 
-  await Phone.findOneAndUpdate(
+  const set = {
+    brand: item.brand,
+    model: item.model,
+    category: item.category,
+    releaseYear: item.releaseYear,
+    specs: item.specs,
+  };
+  if (item.imageUrl) set.imageUrl = item.imageUrl;
+  if (item.aiSummary) set.aiSummary = item.aiSummary;
+
+  const result = await Phone.updateOne(
     { slug },
     {
-      ...item,
-      slug,
-      price: { current: item.price, currency: "USD", updatedAt: last.date },
-      priceHistory: history,
-      source: "seed",
+      $set: set,
+      $setOnInsert: {
+        slug,
+        price: { current: item.price, currency: "USD", updatedAt: last.date },
+        priceHistory: history,
+        source: "seed",
+      },
     },
     { upsert: true, runValidators: true },
   );
-  saved += 1;
+
+  if (result.upsertedCount) added += 1;
+  else updated += 1;
 }
 
-console.log(`Seeded ${saved} phones`);
+console.log(`Seed: ${added} phones added, ${updated} updated`);
 await mongoose.disconnect();

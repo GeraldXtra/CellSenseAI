@@ -1,6 +1,6 @@
 # Ownership
 
-Ibrahim, Osakue, this is one table of every folder and file in `client/` and `server/`, who owns it, and what it is for. Shared files are marked "changed only by Gerald". `node_modules`, `dist` and the lock files are left out.
+Ibrahim, Osakue, this is one table of every folder and file in `client/` and `server/`, who owns it, and what it is for. Shared files are marked "shared, changed only by Gerald". `node_modules`, `dist`, the lock files and the real `.env` files are left out.
 
 ## client/
 
@@ -20,26 +20,27 @@ Ibrahim, Osakue, this is one table of every folder and file in `client/` and `se
 | `client/public/brand/favicon-mark.png` | shared, changed only by Gerald | The logo mark used in the top bar. |
 | `client/public/brand/favicon-mark-transparent.png` | shared, changed only by Gerald | The logo mark with a transparent background. |
 | `client/public/brand/logo-horizontal.png` | shared, changed only by Gerald | The logo with the name, for the report and the video. |
-| `client/src/main.jsx` | shared, changed only by Gerald | The entry point: loads Bootstrap and the styles, renders App inside the router and the providers. |
+| `client/public/phones/` | shared, changed only by Gerald | Where the phone pictures go: one PNG per phone, named after its slug, such as `samsung-galaxy-s24.png`. The site serves them at `/phones/`, the path in each phone's `imageUrl`. |
+| `client/src/main.jsx` | shared, changed only by Gerald | The entry point: loads Bootstrap and the styles, and renders App inside the router and the three providers. |
 | `client/src/App.jsx` | shared, changed only by Gerald | The route table. Every page sits inside Layout. |
 | `client/src/styles/theme.css` | shared, changed only by Gerald | Every colour, spacing, font size, radius and shadow, the Bootstrap hooks and the shared classes. |
-| `client/src/styles/global.css` | shared, changed only by Gerald | The body defaults, the page shell, the top bar, the footer, the phone card, the chat window and the breakpoints. |
+| `client/src/styles/global.css` | shared, changed only by Gerald | The page shell, the top bar, the footer, the chat window, the loader, the empty box, the card grid, the phone card, the phone picture and the breakpoints. |
 | `client/src/services/api.js` | shared, changed only by Gerald | The axios instance, the token storage, the auth header and the envelope unwrapping. |
 | `client/src/services/phones.service.js` | shared, changed only by Gerald | listPhones, getPhone, comparePhones, getPriceTrend, getReviews, addReview, getReviewSummary. |
 | `client/src/services/ai.service.js` | shared, changed only by Gerald | searchPhones, chat, recommend. |
 | `client/src/services/auth.service.js` | shared, changed only by Gerald | register, login, me, forgotPassword, resetPassword. |
 | `client/src/services/users.service.js` | shared, changed only by Gerald | getDashboard, addFavourite, removeFavourite. |
-| `client/src/context/AuthContext.jsx` | shared, changed only by Gerald | The logged in user, loading, login, register, logout, and the useAuth hook. |
-| `client/src/context/CompareContext.jsx` | shared, changed only by Gerald | The compare list of up to three slugs in localStorage, the `?ids=` reader, and the useCompare hook. |
-| `client/src/context/ChatContext.jsx` | shared, changed only by Gerald | The chat messages, the loading flag, the open state of the chat window, the send action, and the useChat hook. |
+| `client/src/context/AuthContext.jsx` | shared, changed only by Gerald | The logged in user, the loading flag, login, register, logout, and the useAuth hook. |
+| `client/src/context/CompareContext.jsx` | shared, changed only by Gerald | The compare list of up to three slugs kept in the browser, the `?ids=` reader, and the useCompare hook. |
+| `client/src/context/ChatContext.jsx` | shared, changed only by Gerald | The chat messages, the loading flag, the error, the open state of the chat window, the send action, and the useChat hook. |
 | `client/src/hooks/useAsync.js` | shared, changed only by Gerald | Runs an async function and gives data, loading, error and reload. |
-| `client/src/data/mockPhones.js` | shared, changed only by Gerald | The six sample phones, the brands, the three sample reviews and the sample review summary. |
+| `client/src/data/mockPhones.js` | shared, changed only by Gerald | Six sample phones, the brands, three sample reviews and a sample review summary, only for building a page before you connect it. |
 | `client/src/components/shared/Layout.jsx` | shared, changed only by Gerald | The shell: Navbar, the page, Footer, ChatLauncher, ChatWindow. |
 | `client/src/components/shared/Navbar.jsx` | shared, changed only by Gerald | The top bar and its collapsed form under 768px. |
 | `client/src/components/shared/AccountMenu.jsx` | shared, changed only by Gerald | The Dashboard and Log out dropdown. |
-| `client/src/components/shared/Footer.jsx` | shared, changed only by Gerald | The five column footer. |
+| `client/src/components/shared/Footer.jsx` | shared, changed only by Gerald | The footer with its five columns. |
 | `client/src/components/shared/ChatLauncher.jsx` | shared, changed only by Gerald | The fixed button that opens the floating chat window. |
-| `client/src/components/shared/ChatWindow.jsx` | shared, changed only by Gerald | The small floating chat window at the bottom right, with the same conversation as the Assistant page. |
+| `client/src/components/shared/ChatWindow.jsx` | shared, changed only by Gerald | The floating chat window over every page but `/assistant`, with the same conversation as the Assistant page. It started in `client/src/components/osakue/` and moved here, so it is mine now. |
 | `client/src/components/shared/PhoneImage.jsx` | shared, changed only by Gerald | The phone picture or the grey placeholder, and the phoneName helper. |
 | `client/src/components/shared/PhoneCard.jsx` | shared, changed only by Gerald | The product card, and the specLine helper. |
 | `client/src/components/shared/Loader.jsx` | shared, changed only by Gerald | The spinner with a label. |
@@ -57,8 +58,8 @@ Ibrahim, Osakue, this is one table of every folder and file in `client/` and `se
 | `client/src/components/osakue/CompareSlots.jsx` | Osakue | The slots above the compare table. |
 | `client/src/components/osakue/AddPhoneDialog.jsx` | Osakue | The Add a phone dialog. |
 | `client/src/components/osakue/RecommendForm.jsx` | Osakue | The recommendation form. |
-| `client/src/components/osakue/ChatThread.jsx` | Osakue | The chat bubbles, the phones under a reply and the typing dots on Assistant. |
-| `client/src/components/osakue/ChatInput.jsx` | Osakue | The chat text field and send button on Assistant. |
+| `client/src/components/osakue/ChatThread.jsx` | Osakue | The chat bubbles, the phones under a reply and the typing dots on the Assistant page. |
+| `client/src/components/osakue/ChatInput.jsx` | Osakue | The chat text field and send button on the Assistant page. |
 | `client/src/components/osakue/ReviewsSection.jsx` | Osakue | The reviews block placed on Phone detail. |
 | `client/src/components/osakue/AuthCard.jsx` | Osakue | The card on the four account pages. |
 | `client/src/pages/Home/` (Home.jsx, Home.css, README.md) | Ibrahim | The Home page. |
@@ -74,9 +75,11 @@ Ibrahim, Osakue, this is one table of every folder and file in `client/` and `se
 | `client/src/pages/Register/` (Register.jsx, Register.css, README.md) | Osakue | The Create account page. |
 | `client/src/pages/ForgotPassword/` (ForgotPassword.jsx, ForgotPassword.css, README.md) | Osakue | The Forgot password page. |
 | `client/src/pages/ResetPassword/` (ResetPassword.jsx, ResetPassword.css, README.md) | Osakue | The Reset password page. |
-| `client/src/pages/NotFound/` (NotFound.jsx, NotFound.css, README.md) | shared, changed only by Gerald | The Page not found page, already built. |
+| `client/src/pages/NotFound/` (NotFound.jsx, NotFound.css, README.md) | shared, changed only by Gerald | The Page not found page, finished. |
 
 The README in each page folder is mine too: I wrote it for the owner of the page. If it is wrong or unclear, tell me and I fix it.
+
+A branch that still holds `client/src/components/osakue/ChatWindow.jsx` from the first skeleton loses it at the next sync with `develop`, which is what we want.
 
 ## server/
 
@@ -85,41 +88,42 @@ Everything in `server/` is mine. You do not need to open it to build your pages;
 | Path | Owner | What it is for |
 | --- | --- | --- |
 | `server/package.json` | Gerald | The server packages and the scripts dev, start, seed and prices. |
-| `server/.env.example` | Gerald | Every server setting with an empty value. The real `.env` is never committed. |
+| `server/.env.example` | Gerald | Every server setting but `NODE_ENV`. Only the port, the token lifetime, the client origin and the price check schedule have values; the rest are empty. The real `.env` is never committed. |
 | `server/README.md` | Gerald | How to run the server, the scripts, the keys and the folder map. |
-| `server/data/phones.json` | Gerald | The six sample phones the seed script loads. |
+| `server/data/phones.json` | Gerald | The 60 phones the seed loads, 12 each for Samsung, Apple, OnePlus, Xiaomi and Vivo. |
+| `server/data/prices.json` | Gerald | The price list: a check date and a price per slug, read by the nightly price check and `npm run prices`. |
 | `server/data/README.md` | Gerald | What `phones.json` is. |
-| `server/scripts/seed.js` | Gerald | Loads `phones.json` into the database. Only I run it, and never on the shared database. |
-| `server/scripts/runPriceUpdate.js` | Gerald | Will run the price updater once. A placeholder for now. |
-| `server/src/index.js` | Gerald | Builds the Express app, adds the rate limit, mounts the auth, phones and AI routers and starts the server. |
+| `server/scripts/seed.js` | Gerald | `npm run seed`: adds the phones that are missing and refreshes the names, category, release year, specs, image paths and, where the file has one, the summary of the others. It never changes a price. Only I run it. |
+| `server/scripts/runPriceUpdate.js` | Gerald | `npm run prices`: runs the price check once. Only I run it. |
+| `server/src/index.js` | Gerald | Builds the Express app, adds the rate limit, mounts the auth, phones, AI and users routers, starts the nightly price check and starts the server. |
 | `server/src/config/env.js` | Gerald | Reads every setting once and exports a frozen object. |
 | `server/src/config/db.js` | Gerald | Connects to MongoDB Atlas. |
 | `server/src/models/Phone.js` | Gerald | The phones collection. |
-| `server/src/models/User.js` | Gerald | The users collection, including favourites, history and the password reset. |
+| `server/src/models/User.js` | Gerald | The users collection, with favourites, recently viewed phones, search history, recommendations and the password reset. |
 | `server/src/models/Review.js` | Gerald | The reviews collection. |
 | `server/src/models/SearchLog.js` | Gerald | The searchlogs collection. |
-| `server/src/routes/auth.routes.js` | Gerald | The `/api/auth` router. |
+| `server/src/routes/auth.routes.js` | Gerald | The `/api/auth` router, with the limit on forgot password. |
 | `server/src/routes/phones.routes.js` | Gerald | The `/api/phones` router. |
-| `server/src/routes/ai.routes.js` | Gerald | The `/api/ai` router. |
-| `server/src/routes/users.routes.js` | Gerald | The `/api/users` router. A placeholder until I build the dashboard. |
-| `server/src/controllers/auth.controller.js` | Gerald | Register, login and me. Forgot password and reset password come later. |
+| `server/src/routes/ai.routes.js` | Gerald | The `/api/ai` router, with the limit of 20 requests a minute. |
+| `server/src/routes/users.routes.js` | Gerald | The `/api/users` router: the dashboard and the favourites. |
+| `server/src/controllers/auth.controller.js` | Gerald | Register, login, me, forgot password and reset password. |
 | `server/src/controllers/phones.controller.js` | Gerald | List, compare, detail, price trend, reviews and the review summary. |
-| `server/src/controllers/ai.controller.js` | Gerald | Search. Chat and recommend come later. |
-| `server/src/controllers/users.controller.js` | Gerald | Dashboard and favourites. A placeholder for now. |
-| `server/src/services/ai.service.js` | Gerald | The one file that calls the model. Today it turns a search sentence into filters. |
+| `server/src/controllers/ai.controller.js` | Gerald | Search, chat and recommend. |
+| `server/src/controllers/users.controller.js` | Gerald | The dashboard and the favourites. |
+| `server/src/services/ai.service.js` | Gerald | The one file that calls the model: search filters, the lookup of a phone we do not have, chat replies, the ranking, the phone summary, the review summary and the review mood. |
 | `server/src/services/phoneQuery.js` | Gerald | Turns the query params into one MongoDB query. |
-| `server/src/services/recommend.service.js` | Gerald | Will build the shortlist and ask the model to rank it. A placeholder for now. |
-| `server/src/services/price.service.js` | Gerald | Computes the trend and the best time to buy note. |
-| `server/src/services/review.service.js` | Gerald | Sets the sentiment of a review from its stars and writes the star based summary. |
-| `server/src/services/mail.service.js` | Gerald | Will send the password reset email with Nodemailer. A placeholder for now. |
+| `server/src/services/recommend.service.js` | Gerald | The needs, the shortlist with its score, and the reasons from our rules. |
+| `server/src/services/price.service.js` | Gerald | The trend and the best time to buy note. |
+| `server/src/services/review.service.js` | Gerald | The review mood from the stars and the star based summary. |
+| `server/src/services/mail.service.js` | Gerald | Sends the password reset email with Nodemailer, or prints the link when mail is not set up. |
 | `server/src/middleware/auth.js` | Gerald | requireAuth and optionalAuth. |
-| `server/src/middleware/validate.js` | Gerald | Will check bodies and queries with zod. A placeholder for now; the controllers check their own input. |
+| `server/src/middleware/validate.js` | Gerald | An empty validate function that no route uses. The controllers check their own input. |
 | `server/src/middleware/error.js` | Gerald | The not found answer and the error handler. |
-| `server/src/jobs/priceUpdater.js` | Gerald | The nightly price job. A placeholder for now. |
+| `server/src/jobs/priceUpdater.js` | Gerald | The nightly price check from `server/data/prices.json`. |
 | `server/src/utils/http.js` | Gerald | The response envelope helpers. |
 | `server/src/utils/jwt.js` | Gerald | Signs and verifies the tokens. |
-| `server/src/utils/password.js` | Gerald | Hashes and checks passwords. |
-| `server/src/utils/slug.js` | Gerald | Builds a phone slug from the brand and the model, such as `samsung-galaxy-s24`. The seed script uses it. |
+| `server/src/utils/password.js` | Gerald | Hashes and checks passwords, and makes and hashes the reset tokens. |
+| `server/src/utils/slug.js` | Gerald | Builds a phone slug from the brand and the model, with a plus sign written as plus, such as `samsung-galaxy-s24-plus`. The seed and the search lookup use it. |
 
 ## The rule
 

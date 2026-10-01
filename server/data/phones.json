@@ -4,7 +4,7 @@
     "model": "Galaxy S24",
     "category": "flagship",
     "releaseYear": 2024,
-    "imageUrl": "",
+    "imageUrl": "/phones/samsung-galaxy-s24.png",
     "specs": {
       "processor": "Exynos 2400",
       "ram": 8,
@@ -20,122 +20,134 @@
     },
     "price": 699,
     "priceHistory": [
-      { "price": 749, "date": "2026-06-01" },
-      { "price": 729, "date": "2026-07-01" },
-      { "price": 719, "date": "2026-08-01" },
-      { "price": 699, "date": "2026-09-01" }
+      {
+        "price": 749,
+        "date": "2026-06-01"
+      },
+      {
+        "price": 729,
+        "date": "2026-07-01"
+      },
+      {
+        "price": 719,
+        "date": "2026-08-01"
+      },
+      {
+        "price": 699,
+        "date": "2026-09-01"
+      }
     ],
     "aiSummary": "A compact flagship with a bright 120Hz screen and a strong main camera. Battery is average for the size."
   },
   {
-    "brand": "Apple",
-    "model": "iPhone 15",
-    "category": "flagship",
-    "releaseYear": 2023,
-    "imageUrl": "",
-    "specs": {
-      "processor": "A16 Bionic",
-      "ram": 6,
-      "storage": 128,
-      "mainCamera": 48,
-      "frontCamera": 12,
-      "battery": 3349,
-      "displaySize": 6.1,
-      "displayType": "OLED",
-      "refreshRate": 60,
-      "os": "iOS 17",
-      "has5G": true
-    },
-    "price": 699,
-    "priceHistory": [
-      { "price": 729, "date": "2026-06-01" },
-      { "price": 719, "date": "2026-07-01" },
-      { "price": 699, "date": "2026-08-01" },
-      { "price": 699, "date": "2026-09-01" }
-    ],
-    "aiSummary": ""
-  },
-  {
-    "brand": "OnePlus",
-    "model": "12",
+    "brand": "Samsung",
+    "model": "Galaxy S24+",
     "category": "flagship",
     "releaseYear": 2024,
-    "imageUrl": "",
+    "imageUrl": "/phones/samsung-galaxy-s24-plus.png",
     "specs": {
-      "processor": "Snapdragon 8 Gen 3",
+      "processor": "Exynos 2400",
       "ram": 12,
       "storage": 256,
       "mainCamera": 50,
-      "frontCamera": 32,
-      "battery": 5400,
-      "displaySize": 6.82,
+      "frontCamera": 12,
+      "battery": 4900,
+      "displaySize": 6.7,
       "displayType": "AMOLED",
       "refreshRate": 120,
       "os": "Android 14",
       "has5G": true
     },
-    "price": 699,
+    "price": 899,
     "priceHistory": [
-      { "price": 699, "date": "2026-06-01" },
-      { "price": 699, "date": "2026-07-01" },
-      { "price": 699, "date": "2026-08-01" },
-      { "price": 699, "date": "2026-09-01" }
+      {
+        "price": 899,
+        "date": "2026-10-01"
+      }
     ],
     "aiSummary": ""
   },
   {
-    "brand": "Xiaomi",
-    "model": "Redmi Note 13 Pro",
-    "category": "midrange",
+    "brand": "Samsung",
+    "model": "Galaxy S24 Ultra",
+    "category": "flagship",
     "releaseYear": 2024,
-    "imageUrl": "",
+    "imageUrl": "/phones/samsung-galaxy-s24-ultra.png",
     "specs": {
-      "processor": "Snapdragon 7s Gen 2",
-      "ram": 8,
+      "processor": "Snapdragon 8 Gen 3",
+      "ram": 12,
       "storage": 256,
       "mainCamera": 200,
-      "frontCamera": 16,
-      "battery": 5100,
-      "displaySize": 6.67,
+      "frontCamera": 12,
+      "battery": 5000,
+      "displaySize": 6.8,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 1199,
+    "priceHistory": [
+      {
+        "price": 1199,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Samsung",
+    "model": "Galaxy S23",
+    "category": "flagship",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/samsung-galaxy-s23.png",
+    "specs": {
+      "processor": "Snapdragon 8 Gen 2",
+      "ram": 8,
+      "storage": 128,
+      "mainCamera": 50,
+      "frontCamera": 12,
+      "battery": 3900,
+      "displaySize": 6.1,
       "displayType": "AMOLED",
       "refreshRate": 120,
       "os": "Android 13",
       "has5G": true
     },
-    "price": 299,
+    "price": 599,
     "priceHistory": [
-      { "price": 319, "date": "2026-06-01" },
-      { "price": 309, "date": "2026-07-01" },
-      { "price": 299, "date": "2026-08-01" },
-      { "price": 299, "date": "2026-09-01" }
+      {
+        "price": 599,
+        "date": "2026-10-01"
+      }
     ],
     "aiSummary": ""
   },
   {
-    "brand": "Vivo",
-    "model": "V30",
-    "category": "camera",
-    "releaseYear": 2024,
-    "imageUrl": "",
+    "brand": "Samsung",
+    "model": "Galaxy S23 FE",
+    "category": "midrange",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/samsung-galaxy-s23-fe.png",
     "specs": {
-      "processor": "Snapdragon 7 Gen 3",
+      "processor": "Exynos 2200",
       "ram": 8,
-      "storage": 256,
+      "storage": 128,
       "mainCamera": 50,
-      "frontCamera": 50,
-      "battery": 5000,
-      "displaySize": 6.78,
+      "frontCamera": 10,
+      "battery": 4500,
+      "displaySize": 6.4,
       "displayType": "AMOLED",
       "refreshRate": 120,
-      "os": "Android 14",
+      "os": "Android 13",
       "has5G": true
     },
-    "price": 399,
+    "price": 499,
     "priceHistory": [
-      { "price": 379, "date": "2026-06-01" },
-      { "price": 389, "date": "2026-07-01" },
-      { "price": 399, "date": "2026-08-01" },
-      { "price": 399, "date": "2026-09-01" }
+      {
+        "price": 499,
+        "date": "2026-10-01"
+      }
     ],
     "aiSummary": ""
   },
@@ -144,7 +156,7 @@
     "model": "Galaxy A15 5G",
     "category": "budget",
     "releaseYear": 2024,
-    "imageUrl": "",
+    "imageUrl": "/phones/samsung-galaxy-a15-5g.png",
     "specs": {
       "processor": "Dimensity 6100+",
       "ram": 4,
@@ -160,10 +172,1582 @@
     },
     "price": 199,
     "priceHistory": [
-      { "price": 219, "date": "2026-06-01" },
-      { "price": 209, "date": "2026-07-01" },
-      { "price": 199, "date": "2026-08-01" },
-      { "price": 199, "date": "2026-09-01" }
+      {
+        "price": 219,
+        "date": "2026-06-01"
+      },
+      {
+        "price": 209,
+        "date": "2026-07-01"
+      },
+      {
+        "price": 199,
+        "date": "2026-08-01"
+      },
+      {
+        "price": 199,
+        "date": "2026-09-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Samsung",
+    "model": "Galaxy A25 5G",
+    "category": "budget",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/samsung-galaxy-a25-5g.png",
+    "specs": {
+      "processor": "Exynos 1280",
+      "ram": 6,
+      "storage": 128,
+      "mainCamera": 50,
+      "frontCamera": 13,
+      "battery": 5000,
+      "displaySize": 6.5,
+      "displayType": "Super AMOLED",
+      "refreshRate": 120,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 249,
+    "priceHistory": [
+      {
+        "price": 249,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Samsung",
+    "model": "Galaxy A35 5G",
+    "category": "midrange",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/samsung-galaxy-a35-5g.png",
+    "specs": {
+      "processor": "Exynos 1380",
+      "ram": 8,
+      "storage": 128,
+      "mainCamera": 50,
+      "frontCamera": 13,
+      "battery": 5000,
+      "displaySize": 6.6,
+      "displayType": "Super AMOLED",
+      "refreshRate": 120,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 349,
+    "priceHistory": [
+      {
+        "price": 349,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Samsung",
+    "model": "Galaxy A55 5G",
+    "category": "midrange",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/samsung-galaxy-a55-5g.png",
+    "specs": {
+      "processor": "Exynos 1480",
+      "ram": 8,
+      "storage": 128,
+      "mainCamera": 50,
+      "frontCamera": 32,
+      "battery": 5000,
+      "displaySize": 6.6,
+      "displayType": "Super AMOLED",
+      "refreshRate": 120,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 449,
+    "priceHistory": [
+      {
+        "price": 449,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Samsung",
+    "model": "Galaxy Z Flip5",
+    "category": "flagship",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/samsung-galaxy-z-flip5.png",
+    "specs": {
+      "processor": "Snapdragon 8 Gen 2",
+      "ram": 8,
+      "storage": 256,
+      "mainCamera": 12,
+      "frontCamera": 10,
+      "battery": 3700,
+      "displaySize": 6.7,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 13",
+      "has5G": true
+    },
+    "price": 899,
+    "priceHistory": [
+      {
+        "price": 899,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Samsung",
+    "model": "Galaxy Z Fold5",
+    "category": "flagship",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/samsung-galaxy-z-fold5.png",
+    "specs": {
+      "processor": "Snapdragon 8 Gen 2",
+      "ram": 12,
+      "storage": 256,
+      "mainCamera": 50,
+      "frontCamera": 10,
+      "battery": 4400,
+      "displaySize": 7.6,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 13",
+      "has5G": true
+    },
+    "price": 1599,
+    "priceHistory": [
+      {
+        "price": 1599,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Samsung",
+    "model": "Galaxy A05s",
+    "category": "budget",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/samsung-galaxy-a05s.png",
+    "specs": {
+      "processor": "Snapdragon 680",
+      "ram": 4,
+      "storage": 64,
+      "mainCamera": 50,
+      "frontCamera": 13,
+      "battery": 5000,
+      "displaySize": 6.7,
+      "displayType": "LCD",
+      "refreshRate": 90,
+      "os": "Android 13",
+      "has5G": false
+    },
+    "price": 139,
+    "priceHistory": [
+      {
+        "price": 139,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Apple",
+    "model": "iPhone 15",
+    "category": "flagship",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/apple-iphone-15.png",
+    "specs": {
+      "processor": "A16 Bionic",
+      "ram": 6,
+      "storage": 128,
+      "mainCamera": 48,
+      "frontCamera": 12,
+      "battery": 3349,
+      "displaySize": 6.1,
+      "displayType": "OLED",
+      "refreshRate": 60,
+      "os": "iOS 17",
+      "has5G": true
+    },
+    "price": 699,
+    "priceHistory": [
+      {
+        "price": 729,
+        "date": "2026-06-01"
+      },
+      {
+        "price": 719,
+        "date": "2026-07-01"
+      },
+      {
+        "price": 699,
+        "date": "2026-08-01"
+      },
+      {
+        "price": 699,
+        "date": "2026-09-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Apple",
+    "model": "iPhone 15 Plus",
+    "category": "flagship",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/apple-iphone-15-plus.png",
+    "specs": {
+      "processor": "A16 Bionic",
+      "ram": 6,
+      "storage": 128,
+      "mainCamera": 48,
+      "frontCamera": 12,
+      "battery": 4383,
+      "displaySize": 6.7,
+      "displayType": "OLED",
+      "refreshRate": 60,
+      "os": "iOS 17",
+      "has5G": true
+    },
+    "price": 799,
+    "priceHistory": [
+      {
+        "price": 799,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Apple",
+    "model": "iPhone 15 Pro",
+    "category": "flagship",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/apple-iphone-15-pro.png",
+    "specs": {
+      "processor": "A17 Pro",
+      "ram": 8,
+      "storage": 128,
+      "mainCamera": 48,
+      "frontCamera": 12,
+      "battery": 3274,
+      "displaySize": 6.1,
+      "displayType": "OLED",
+      "refreshRate": 120,
+      "os": "iOS 17",
+      "has5G": true
+    },
+    "price": 899,
+    "priceHistory": [
+      {
+        "price": 899,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Apple",
+    "model": "iPhone 15 Pro Max",
+    "category": "flagship",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/apple-iphone-15-pro-max.png",
+    "specs": {
+      "processor": "A17 Pro",
+      "ram": 8,
+      "storage": 256,
+      "mainCamera": 48,
+      "frontCamera": 12,
+      "battery": 4441,
+      "displaySize": 6.7,
+      "displayType": "OLED",
+      "refreshRate": 120,
+      "os": "iOS 17",
+      "has5G": true
+    },
+    "price": 1099,
+    "priceHistory": [
+      {
+        "price": 1099,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Apple",
+    "model": "iPhone 14",
+    "category": "flagship",
+    "releaseYear": 2022,
+    "imageUrl": "/phones/apple-iphone-14.png",
+    "specs": {
+      "processor": "A15 Bionic",
+      "ram": 6,
+      "storage": 128,
+      "mainCamera": 12,
+      "frontCamera": 12,
+      "battery": 3279,
+      "displaySize": 6.1,
+      "displayType": "OLED",
+      "refreshRate": 60,
+      "os": "iOS 16",
+      "has5G": true
+    },
+    "price": 599,
+    "priceHistory": [
+      {
+        "price": 599,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Apple",
+    "model": "iPhone 14 Plus",
+    "category": "flagship",
+    "releaseYear": 2022,
+    "imageUrl": "/phones/apple-iphone-14-plus.png",
+    "specs": {
+      "processor": "A15 Bionic",
+      "ram": 6,
+      "storage": 128,
+      "mainCamera": 12,
+      "frontCamera": 12,
+      "battery": 4325,
+      "displaySize": 6.7,
+      "displayType": "OLED",
+      "refreshRate": 60,
+      "os": "iOS 16",
+      "has5G": true
+    },
+    "price": 699,
+    "priceHistory": [
+      {
+        "price": 699,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Apple",
+    "model": "iPhone 13",
+    "category": "flagship",
+    "releaseYear": 2021,
+    "imageUrl": "/phones/apple-iphone-13.png",
+    "specs": {
+      "processor": "A15 Bionic",
+      "ram": 4,
+      "storage": 128,
+      "mainCamera": 12,
+      "frontCamera": 12,
+      "battery": 3240,
+      "displaySize": 6.1,
+      "displayType": "OLED",
+      "refreshRate": 60,
+      "os": "iOS 15",
+      "has5G": true
+    },
+    "price": 499,
+    "priceHistory": [
+      {
+        "price": 499,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Apple",
+    "model": "iPhone SE (2022)",
+    "category": "midrange",
+    "releaseYear": 2022,
+    "imageUrl": "/phones/apple-iphone-se-2022.png",
+    "specs": {
+      "processor": "A15 Bionic",
+      "ram": 4,
+      "storage": 64,
+      "mainCamera": 12,
+      "frontCamera": 7,
+      "battery": 2018,
+      "displaySize": 4.7,
+      "displayType": "LCD",
+      "refreshRate": 60,
+      "os": "iOS 15",
+      "has5G": true
+    },
+    "price": 399,
+    "priceHistory": [
+      {
+        "price": 399,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Apple",
+    "model": "iPhone 16",
+    "category": "flagship",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/apple-iphone-16.png",
+    "specs": {
+      "processor": "A18",
+      "ram": 8,
+      "storage": 128,
+      "mainCamera": 48,
+      "frontCamera": 12,
+      "battery": 3561,
+      "displaySize": 6.1,
+      "displayType": "OLED",
+      "refreshRate": 60,
+      "os": "iOS 18",
+      "has5G": true
+    },
+    "price": 799,
+    "priceHistory": [
+      {
+        "price": 799,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Apple",
+    "model": "iPhone 16 Plus",
+    "category": "flagship",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/apple-iphone-16-plus.png",
+    "specs": {
+      "processor": "A18",
+      "ram": 8,
+      "storage": 128,
+      "mainCamera": 48,
+      "frontCamera": 12,
+      "battery": 4674,
+      "displaySize": 6.7,
+      "displayType": "OLED",
+      "refreshRate": 60,
+      "os": "iOS 18",
+      "has5G": true
+    },
+    "price": 899,
+    "priceHistory": [
+      {
+        "price": 899,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Apple",
+    "model": "iPhone 16 Pro",
+    "category": "flagship",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/apple-iphone-16-pro.png",
+    "specs": {
+      "processor": "A18 Pro",
+      "ram": 8,
+      "storage": 128,
+      "mainCamera": 48,
+      "frontCamera": 12,
+      "battery": 3582,
+      "displaySize": 6.3,
+      "displayType": "OLED",
+      "refreshRate": 120,
+      "os": "iOS 18",
+      "has5G": true
+    },
+    "price": 999,
+    "priceHistory": [
+      {
+        "price": 999,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Apple",
+    "model": "iPhone 16 Pro Max",
+    "category": "flagship",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/apple-iphone-16-pro-max.png",
+    "specs": {
+      "processor": "A18 Pro",
+      "ram": 8,
+      "storage": 256,
+      "mainCamera": 48,
+      "frontCamera": 12,
+      "battery": 4685,
+      "displaySize": 6.9,
+      "displayType": "OLED",
+      "refreshRate": 120,
+      "os": "iOS 18",
+      "has5G": true
+    },
+    "price": 1199,
+    "priceHistory": [
+      {
+        "price": 1199,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "OnePlus",
+    "model": "12",
+    "category": "flagship",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/oneplus-12.png",
+    "specs": {
+      "processor": "Snapdragon 8 Gen 3",
+      "ram": 12,
+      "storage": 256,
+      "mainCamera": 50,
+      "frontCamera": 32,
+      "battery": 5400,
+      "displaySize": 6.82,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 699,
+    "priceHistory": [
+      {
+        "price": 699,
+        "date": "2026-06-01"
+      },
+      {
+        "price": 699,
+        "date": "2026-07-01"
+      },
+      {
+        "price": 699,
+        "date": "2026-08-01"
+      },
+      {
+        "price": 699,
+        "date": "2026-09-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "OnePlus",
+    "model": "12R",
+    "category": "gaming",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/oneplus-12r.png",
+    "specs": {
+      "processor": "Snapdragon 8 Gen 2",
+      "ram": 8,
+      "storage": 128,
+      "mainCamera": 50,
+      "frontCamera": 16,
+      "battery": 5500,
+      "displaySize": 6.78,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 499,
+    "priceHistory": [
+      {
+        "price": 499,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "OnePlus",
+    "model": "11",
+    "category": "flagship",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/oneplus-11.png",
+    "specs": {
+      "processor": "Snapdragon 8 Gen 2",
+      "ram": 8,
+      "storage": 128,
+      "mainCamera": 50,
+      "frontCamera": 16,
+      "battery": 5000,
+      "displaySize": 6.7,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 13",
+      "has5G": true
+    },
+    "price": 599,
+    "priceHistory": [
+      {
+        "price": 599,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "OnePlus",
+    "model": "11R",
+    "category": "midrange",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/oneplus-11r.png",
+    "specs": {
+      "processor": "Snapdragon 8+ Gen 1",
+      "ram": 8,
+      "storage": 128,
+      "mainCamera": 50,
+      "frontCamera": 16,
+      "battery": 5000,
+      "displaySize": 6.74,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 13",
+      "has5G": true
+    },
+    "price": 449,
+    "priceHistory": [
+      {
+        "price": 449,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "OnePlus",
+    "model": "Nord 3",
+    "category": "midrange",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/oneplus-nord-3.png",
+    "specs": {
+      "processor": "Dimensity 9000",
+      "ram": 8,
+      "storage": 128,
+      "mainCamera": 50,
+      "frontCamera": 16,
+      "battery": 5000,
+      "displaySize": 6.74,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 13",
+      "has5G": true
+    },
+    "price": 399,
+    "priceHistory": [
+      {
+        "price": 399,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "OnePlus",
+    "model": "Nord CE 3",
+    "category": "midrange",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/oneplus-nord-ce-3.png",
+    "specs": {
+      "processor": "Snapdragon 782G",
+      "ram": 8,
+      "storage": 128,
+      "mainCamera": 50,
+      "frontCamera": 16,
+      "battery": 5000,
+      "displaySize": 6.7,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 13",
+      "has5G": true
+    },
+    "price": 299,
+    "priceHistory": [
+      {
+        "price": 299,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "OnePlus",
+    "model": "Nord CE 3 Lite",
+    "category": "budget",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/oneplus-nord-ce-3-lite.png",
+    "specs": {
+      "processor": "Snapdragon 695",
+      "ram": 8,
+      "storage": 128,
+      "mainCamera": 108,
+      "frontCamera": 16,
+      "battery": 5000,
+      "displaySize": 6.72,
+      "displayType": "LCD",
+      "refreshRate": 120,
+      "os": "Android 13",
+      "has5G": true
+    },
+    "price": 229,
+    "priceHistory": [
+      {
+        "price": 229,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "OnePlus",
+    "model": "Nord 4",
+    "category": "midrange",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/oneplus-nord-4.png",
+    "specs": {
+      "processor": "Snapdragon 7+ Gen 3",
+      "ram": 8,
+      "storage": 128,
+      "mainCamera": 50,
+      "frontCamera": 16,
+      "battery": 5500,
+      "displaySize": 6.74,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 399,
+    "priceHistory": [
+      {
+        "price": 399,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "OnePlus",
+    "model": "Nord CE 4",
+    "category": "midrange",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/oneplus-nord-ce-4.png",
+    "specs": {
+      "processor": "Snapdragon 7 Gen 3",
+      "ram": 8,
+      "storage": 128,
+      "mainCamera": 50,
+      "frontCamera": 16,
+      "battery": 5500,
+      "displaySize": 6.7,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 299,
+    "priceHistory": [
+      {
+        "price": 299,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "OnePlus",
+    "model": "10 Pro",
+    "category": "flagship",
+    "releaseYear": 2022,
+    "imageUrl": "/phones/oneplus-10-pro.png",
+    "specs": {
+      "processor": "Snapdragon 8 Gen 1",
+      "ram": 8,
+      "storage": 128,
+      "mainCamera": 48,
+      "frontCamera": 32,
+      "battery": 5000,
+      "displaySize": 6.7,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 12",
+      "has5G": true
+    },
+    "price": 499,
+    "priceHistory": [
+      {
+        "price": 499,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "OnePlus",
+    "model": "Open",
+    "category": "flagship",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/oneplus-open.png",
+    "specs": {
+      "processor": "Snapdragon 8 Gen 2",
+      "ram": 16,
+      "storage": 512,
+      "mainCamera": 48,
+      "frontCamera": 32,
+      "battery": 4805,
+      "displaySize": 7.82,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 13",
+      "has5G": true
+    },
+    "price": 1499,
+    "priceHistory": [
+      {
+        "price": 1499,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "OnePlus",
+    "model": "Nord N30 5G",
+    "category": "budget",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/oneplus-nord-n30-5g.png",
+    "specs": {
+      "processor": "Snapdragon 695",
+      "ram": 8,
+      "storage": 128,
+      "mainCamera": 108,
+      "frontCamera": 16,
+      "battery": 5000,
+      "displaySize": 6.72,
+      "displayType": "LCD",
+      "refreshRate": 120,
+      "os": "Android 13",
+      "has5G": true
+    },
+    "price": 249,
+    "priceHistory": [
+      {
+        "price": 249,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Xiaomi",
+    "model": "Redmi Note 13 Pro",
+    "category": "midrange",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/xiaomi-redmi-note-13-pro.png",
+    "specs": {
+      "processor": "Snapdragon 7s Gen 2",
+      "ram": 8,
+      "storage": 256,
+      "mainCamera": 200,
+      "frontCamera": 16,
+      "battery": 5100,
+      "displaySize": 6.67,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 13",
+      "has5G": true
+    },
+    "price": 299,
+    "priceHistory": [
+      {
+        "price": 319,
+        "date": "2026-06-01"
+      },
+      {
+        "price": 309,
+        "date": "2026-07-01"
+      },
+      {
+        "price": 299,
+        "date": "2026-08-01"
+      },
+      {
+        "price": 299,
+        "date": "2026-09-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Xiaomi",
+    "model": "14",
+    "category": "flagship",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/xiaomi-14.png",
+    "specs": {
+      "processor": "Snapdragon 8 Gen 3",
+      "ram": 12,
+      "storage": 256,
+      "mainCamera": 50,
+      "frontCamera": 32,
+      "battery": 4610,
+      "displaySize": 6.36,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 849,
+    "priceHistory": [
+      {
+        "price": 849,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Xiaomi",
+    "model": "14 Ultra",
+    "category": "camera",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/xiaomi-14-ultra.png",
+    "specs": {
+      "processor": "Snapdragon 8 Gen 3",
+      "ram": 16,
+      "storage": 512,
+      "mainCamera": 50,
+      "frontCamera": 32,
+      "battery": 5000,
+      "displaySize": 6.73,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 1299,
+    "priceHistory": [
+      {
+        "price": 1299,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Xiaomi",
+    "model": "13T",
+    "category": "midrange",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/xiaomi-13t.png",
+    "specs": {
+      "processor": "Dimensity 8200 Ultra",
+      "ram": 8,
+      "storage": 256,
+      "mainCamera": 50,
+      "frontCamera": 20,
+      "battery": 5000,
+      "displaySize": 6.67,
+      "displayType": "AMOLED",
+      "refreshRate": 144,
+      "os": "Android 13",
+      "has5G": true
+    },
+    "price": 549,
+    "priceHistory": [
+      {
+        "price": 549,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Xiaomi",
+    "model": "13T Pro",
+    "category": "gaming",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/xiaomi-13t-pro.png",
+    "specs": {
+      "processor": "Dimensity 9200+",
+      "ram": 12,
+      "storage": 256,
+      "mainCamera": 50,
+      "frontCamera": 20,
+      "battery": 5000,
+      "displaySize": 6.67,
+      "displayType": "AMOLED",
+      "refreshRate": 144,
+      "os": "Android 13",
+      "has5G": true
+    },
+    "price": 749,
+    "priceHistory": [
+      {
+        "price": 749,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Xiaomi",
+    "model": "13",
+    "category": "flagship",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/xiaomi-13.png",
+    "specs": {
+      "processor": "Snapdragon 8 Gen 2",
+      "ram": 8,
+      "storage": 256,
+      "mainCamera": 50,
+      "frontCamera": 32,
+      "battery": 4500,
+      "displaySize": 6.36,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 13",
+      "has5G": true
+    },
+    "price": 699,
+    "priceHistory": [
+      {
+        "price": 699,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Xiaomi",
+    "model": "Redmi Note 13",
+    "category": "budget",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/xiaomi-redmi-note-13.png",
+    "specs": {
+      "processor": "Snapdragon 685",
+      "ram": 6,
+      "storage": 128,
+      "mainCamera": 108,
+      "frontCamera": 16,
+      "battery": 5000,
+      "displaySize": 6.67,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 13",
+      "has5G": false
+    },
+    "price": 199,
+    "priceHistory": [
+      {
+        "price": 199,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Xiaomi",
+    "model": "Redmi Note 13 Pro+",
+    "category": "midrange",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/xiaomi-redmi-note-13-pro-plus.png",
+    "specs": {
+      "processor": "Dimensity 7200 Ultra",
+      "ram": 8,
+      "storage": 256,
+      "mainCamera": 200,
+      "frontCamera": 16,
+      "battery": 5000,
+      "displaySize": 6.67,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 13",
+      "has5G": true
+    },
+    "price": 399,
+    "priceHistory": [
+      {
+        "price": 399,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Xiaomi",
+    "model": "Redmi 13C",
+    "category": "budget",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/xiaomi-redmi-13c.png",
+    "specs": {
+      "processor": "Helio G85",
+      "ram": 4,
+      "storage": 128,
+      "mainCamera": 50,
+      "frontCamera": 8,
+      "battery": 5000,
+      "displaySize": 6.74,
+      "displayType": "LCD",
+      "refreshRate": 90,
+      "os": "Android 13",
+      "has5G": false
+    },
+    "price": 119,
+    "priceHistory": [
+      {
+        "price": 119,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Xiaomi",
+    "model": "Poco X6 Pro",
+    "category": "gaming",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/xiaomi-poco-x6-pro.png",
+    "specs": {
+      "processor": "Dimensity 8300 Ultra",
+      "ram": 8,
+      "storage": 256,
+      "mainCamera": 64,
+      "frontCamera": 16,
+      "battery": 5000,
+      "displaySize": 6.67,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 329,
+    "priceHistory": [
+      {
+        "price": 329,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Xiaomi",
+    "model": "Poco F6",
+    "category": "gaming",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/xiaomi-poco-f6.png",
+    "specs": {
+      "processor": "Snapdragon 8s Gen 3",
+      "ram": 8,
+      "storage": 256,
+      "mainCamera": 50,
+      "frontCamera": 20,
+      "battery": 5000,
+      "displaySize": 6.67,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 399,
+    "priceHistory": [
+      {
+        "price": 399,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Xiaomi",
+    "model": "Redmi Note 12",
+    "category": "budget",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/xiaomi-redmi-note-12.png",
+    "specs": {
+      "processor": "Snapdragon 685",
+      "ram": 4,
+      "storage": 128,
+      "mainCamera": 50,
+      "frontCamera": 13,
+      "battery": 5000,
+      "displaySize": 6.67,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 13",
+      "has5G": false
+    },
+    "price": 169,
+    "priceHistory": [
+      {
+        "price": 169,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Vivo",
+    "model": "V30",
+    "category": "camera",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/vivo-v30.png",
+    "specs": {
+      "processor": "Snapdragon 7 Gen 3",
+      "ram": 8,
+      "storage": 256,
+      "mainCamera": 50,
+      "frontCamera": 50,
+      "battery": 5000,
+      "displaySize": 6.78,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 399,
+    "priceHistory": [
+      {
+        "price": 379,
+        "date": "2026-06-01"
+      },
+      {
+        "price": 389,
+        "date": "2026-07-01"
+      },
+      {
+        "price": 399,
+        "date": "2026-08-01"
+      },
+      {
+        "price": 399,
+        "date": "2026-09-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Vivo",
+    "model": "V30 Pro",
+    "category": "camera",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/vivo-v30-pro.png",
+    "specs": {
+      "processor": "Dimensity 8200",
+      "ram": 12,
+      "storage": 256,
+      "mainCamera": 50,
+      "frontCamera": 50,
+      "battery": 5000,
+      "displaySize": 6.78,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 499,
+    "priceHistory": [
+      {
+        "price": 499,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Vivo",
+    "model": "V29",
+    "category": "camera",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/vivo-v29.png",
+    "specs": {
+      "processor": "Snapdragon 778G",
+      "ram": 8,
+      "storage": 256,
+      "mainCamera": 50,
+      "frontCamera": 50,
+      "battery": 4600,
+      "displaySize": 6.78,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 13",
+      "has5G": true
+    },
+    "price": 399,
+    "priceHistory": [
+      {
+        "price": 399,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Vivo",
+    "model": "V27",
+    "category": "camera",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/vivo-v27.png",
+    "specs": {
+      "processor": "Dimensity 7200",
+      "ram": 8,
+      "storage": 128,
+      "mainCamera": 50,
+      "frontCamera": 50,
+      "battery": 4600,
+      "displaySize": 6.78,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 13",
+      "has5G": true
+    },
+    "price": 349,
+    "priceHistory": [
+      {
+        "price": 349,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Vivo",
+    "model": "X100",
+    "category": "camera",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/vivo-x100.png",
+    "specs": {
+      "processor": "Dimensity 9300",
+      "ram": 12,
+      "storage": 256,
+      "mainCamera": 50,
+      "frontCamera": 32,
+      "battery": 5000,
+      "displaySize": 6.78,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 749,
+    "priceHistory": [
+      {
+        "price": 749,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Vivo",
+    "model": "X100 Pro",
+    "category": "camera",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/vivo-x100-pro.png",
+    "specs": {
+      "processor": "Dimensity 9300",
+      "ram": 16,
+      "storage": 512,
+      "mainCamera": 50,
+      "frontCamera": 32,
+      "battery": 5400,
+      "displaySize": 6.78,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 999,
+    "priceHistory": [
+      {
+        "price": 999,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Vivo",
+    "model": "Y27",
+    "category": "budget",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/vivo-y27.png",
+    "specs": {
+      "processor": "Helio G85",
+      "ram": 6,
+      "storage": 128,
+      "mainCamera": 50,
+      "frontCamera": 8,
+      "battery": 5000,
+      "displaySize": 6.64,
+      "displayType": "LCD",
+      "refreshRate": 90,
+      "os": "Android 13",
+      "has5G": false
+    },
+    "price": 179,
+    "priceHistory": [
+      {
+        "price": 179,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Vivo",
+    "model": "Y36",
+    "category": "budget",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/vivo-y36.png",
+    "specs": {
+      "processor": "Snapdragon 680",
+      "ram": 8,
+      "storage": 128,
+      "mainCamera": 50,
+      "frontCamera": 16,
+      "battery": 5000,
+      "displaySize": 6.64,
+      "displayType": "LCD",
+      "refreshRate": 90,
+      "os": "Android 13",
+      "has5G": false
+    },
+    "price": 199,
+    "priceHistory": [
+      {
+        "price": 199,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Vivo",
+    "model": "Y17s",
+    "category": "budget",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/vivo-y17s.png",
+    "specs": {
+      "processor": "Helio G85",
+      "ram": 4,
+      "storage": 128,
+      "mainCamera": 50,
+      "frontCamera": 8,
+      "battery": 5000,
+      "displaySize": 6.56,
+      "displayType": "LCD",
+      "refreshRate": 60,
+      "os": "Android 13",
+      "has5G": false
+    },
+    "price": 129,
+    "priceHistory": [
+      {
+        "price": 129,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Vivo",
+    "model": "T2 5G",
+    "category": "midrange",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/vivo-t2-5g.png",
+    "specs": {
+      "processor": "Snapdragon 695",
+      "ram": 6,
+      "storage": 128,
+      "mainCamera": 64,
+      "frontCamera": 16,
+      "battery": 4500,
+      "displaySize": 6.38,
+      "displayType": "AMOLED",
+      "refreshRate": 90,
+      "os": "Android 13",
+      "has5G": true
+    },
+    "price": 219,
+    "priceHistory": [
+      {
+        "price": 219,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Vivo",
+    "model": "V40",
+    "category": "camera",
+    "releaseYear": 2024,
+    "imageUrl": "/phones/vivo-v40.png",
+    "specs": {
+      "processor": "Snapdragon 7 Gen 3",
+      "ram": 8,
+      "storage": 256,
+      "mainCamera": 50,
+      "frontCamera": 50,
+      "battery": 5500,
+      "displaySize": 6.78,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 14",
+      "has5G": true
+    },
+    "price": 449,
+    "priceHistory": [
+      {
+        "price": 449,
+        "date": "2026-10-01"
+      }
+    ],
+    "aiSummary": ""
+  },
+  {
+    "brand": "Vivo",
+    "model": "X90",
+    "category": "flagship",
+    "releaseYear": 2023,
+    "imageUrl": "/phones/vivo-x90.png",
+    "specs": {
+      "processor": "Dimensity 9200",
+      "ram": 12,
+      "storage": 256,
+      "mainCamera": 50,
+      "frontCamera": 32,
+      "battery": 4810,
+      "displaySize": 6.78,
+      "displayType": "AMOLED",
+      "refreshRate": 120,
+      "os": "Android 13",
+      "has5G": true
+    },
+    "price": 599,
+    "priceHistory": [
+      {
+        "price": 599,
+        "date": "2026-10-01"
+      }
     ],
     "aiSummary": ""
   }

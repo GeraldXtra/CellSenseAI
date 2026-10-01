@@ -32,7 +32,7 @@ Three reasons.
 
 1. Change one line and the whole site follows. If we decide the grey bands should be a shade darker, I change `--cs-band-bg` once and every band on every page changes.
 2. Three people's pages look the same. If each of us typed our own greys and paddings, the site would look like three sites. With the variables, your card and my card have the same corner, the same border and the same padding.
-3. It is the rule for a pull request. Point 2 of the checklist is "no hex codes or pixel values outside theme.css". I check it on every review.
+3. It is the rule for a pull request. Point 3 of the checklist in [TEAM-GUIDE.md](TEAM-GUIDE.md) is "no hex codes or pixel values outside theme.css". I check it on every review.
 
 ## The variables
 
@@ -41,7 +41,7 @@ One row per variable, in the same order as the file. The last column says where 
 | Variable | Value | What it is for | Where you see it |
 | --- | --- | --- | --- |
 | `--cs-page-bg` | `#ffffff` | The white page background | `home-page.png`, the hero area and the "Ask the assistant" band |
-| `--cs-band-bg` | `#f5f5f7` | The light grey section bands, the search field fill, chips, the notice bar, the assistant reply bubble, the winning compare cell, the check icon circle | `home-page.png` the "Compare side by side" band; `search-result.png` the chips; `search-added-by-assistant.png` the notice bar; `assistant.png` the reply bubble; `compare.png` the bold cells; `reset-password-saved.png` the circle |
+| `--cs-band-bg` | `#f5f5f7` | The light grey section bands, the search field fill, chips, the notice bar, the assistant reply bubble, the winning compare cell, the check icon circle, and the grey box PhoneImage draws when a phone has no picture | `home-page.png` the "Compare side by side" band; `search-result.png` the chips; `search-added-by-assistant.png` the notice bar; `assistant.png` the reply bubble; `compare.png` the bold cells; `reset-password-saved.png` the circle |
 | `--cs-empty-bg` | `#ededf0` | The empty boxes that EmptyState draws, a shade darker than the bands so they still show on a grey band | `compare-one-phone.png` the "Add at least one more phone to compare." box; `dashboard-new-account.png` the boxes under Recently viewed and Recommended for you |
 | `--cs-brand-mark` | `28px` | The height of the logo mark in the top bar | `mobile-topbar.png` the mark left of "CellSense AI"; every page, the top bar |
 | `--cs-card-bg` | `#ffffff` | Cards, dialogs, the account menu, product cards | `search-result.png` the three cards; `compare-add-phone.png` the dialog; `home-page-logged-in.png` the account menu |
@@ -58,11 +58,11 @@ One row per variable, in the same order as the file. The last column says where 
 | `--cs-price-note` | `#e8632b` | Only the orange "Price has been falling" line and its arrow | `phone-detail.png` under the price |
 | `--cs-error` | `#c0392b` | Form field error text, and the text of the error bubble in the chat | Not in the designs. The state to build on Log in when the password is wrong, and in the chat when a send fails. |
 | `--cs-error-bg` | `#fbeae7` | Form field error background, and the error bubble in the chat | Same as above |
-| `--cs-overlay` | `rgba(29,29,31,0.4)` | The dimmed page behind a dialog | `compare-add-phone.png` the page behind the dialog |
-| `--cs-focus-ring` | `0 0 0 3px rgba(29,29,31,0.25)` | Keyboard focus on inputs and buttons | Not in a still image. Press Tab on any page. |
-| `--cs-shadow-float` | `0 8px 24px rgba(29,29,31,0.08)` | The account menu, the dialog, the assistant launcher and the chat window; nothing else has a shadow | `home-page-logged-in.png` the account menu; `compare-add-phone.png` the dialog; every page, the launcher; `assistant-window.png` the window |
+| `--cs-overlay` | `rgba(29, 29, 31, 0.4)` | The dimmed page behind a dialog | `compare-add-phone.png` the page behind the dialog |
+| `--cs-focus-ring` | `0 0 0 3px rgba(29, 29, 31, 0.25)` | Keyboard focus on inputs and buttons | Not in a still image. Press Tab on any page. |
+| `--cs-shadow-float` | `0 8px 24px rgba(29, 29, 31, 0.08)` | The account menu, the menu panel under 768px, the dialog, the assistant launcher and the chat window; nothing else has a shadow | `home-page-logged-in.png` the account menu; `compare-add-phone.png` the dialog; every page, the launcher; `assistant-window.png` the window |
 | `--cs-font` | `-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif` | The one font for everything | Every page |
-| `--cs-size-hero` | `3.5rem` | The Home headline only | `home-page.png` "Find a phone by budget, camera, battery and brand" |
+| `--cs-size-hero` | `3.5rem` | The Home headline and the Page not found heading | `home-page.png` "Find a phone by budget, camera, battery and brand"; `page-not-found.png` "Page not found" |
 | `--cs-size-page-title` | `2.75rem` | Page headings such as Compare, Your dashboard, Log in, and the price on the phone page | `compare.png` "Compare"; `dashboard.png` "Your dashboard"; `log-in.png` "Log in"; `phone-detail.png` "$699" |
 | `--cs-icon-lg` | `24px` | The larger icons: the one in the launcher, the search and menu icons in the top bar under 768px, and the loading spinner | `mobile-topbar.png` the search and menu icons; every page, the icon in the launcher |
 | `--cs-size-section-title` | `2rem` | Tech specs, Price history, Reviews, Recently viewed, Browse by brand | `phone-detail.png` "Tech specs"; `dashboard.png` "Recently viewed"; `home-page.png` "Browse by brand" |
@@ -70,7 +70,7 @@ One row per variable, in the same order as the file. The last column says where 
 | `--cs-size-card-title` | `1.25rem` | Phone names on cards and in the compare columns | `search-result.png` "Xiaomi Redmi Note 13 Pro"; `compare.png` "Galaxy S24" above the column |
 | `--cs-size-body` | `1rem` | Paragraphs, inputs, buttons, table cells | `about.png` the paragraphs; `log-in.png` the fields and the button |
 | `--cs-size-small` | `0.875rem` | Spec lines, chips, filter labels, footer links, review dates | `search-result.png` "8 GB, 256 GB, 200 MP, 5100 mAh", the chips and the filter labels; every page, the footer links |
-| `--cs-size-tiny` | `0.75rem` | The Estimated label, the three copyright lines, the chart caption | `search-added-by-assistant.png` "Estimated"; every page, the copyright lines; `phone-detail.png` "Sample data. Real points come from the nightly price check." |
+| `--cs-size-tiny` | `0.75rem` | The Estimated label, the three copyright lines, the chart caption, the grey line under the chat window title | `search-added-by-assistant.png` "Estimated"; every page, the copyright lines; `phone-detail.png` the caption under the chart; `assistant-window.png` "Answers from the same phone data as the site." |
 | `--cs-weight-regular` | `400` | Body text | Every paragraph |
 | `--cs-weight-medium` | `500` | Buttons, links in the top bar, phone names on cards | `home-page.png` the top bar links |
 | `--cs-weight-bold` | `600` | Headings, the bold winning cell, the footer column titles | `compare.png` the bold cells |
@@ -89,13 +89,13 @@ One row per variable, in the same order as the file. The last column says where 
 | `--cs-space-16` | `64px` | Section band top and bottom | `home-page.png` above and below "Compare side by side" |
 | `--cs-space-20` | `80px` | Hero top | `home-page.png` between the top bar and the headline |
 | `--cs-radius-chip` | `6px` | Chips, the Estimated label, small labels | `search-result.png` the chips; `search-added-by-assistant.png` "Estimated" |
-| `--cs-radius-control` | `10px` | Buttons, inputs, selects, the launcher, chat bubbles and suggestion chips | `home-page.png` the Search button and the search field; every page, the launcher; `assistant.png` the bubbles |
-| `--cs-radius-card` | `16px` | Cards, dialogs, the account menu | `search-result.png` the cards; `compare-add-phone.png` the dialog |
+| `--cs-radius-control` | `10px` | Buttons, inputs, selects, the launcher, the account menu, chat bubbles, the phone rows in the chat window and suggestion chips | `home-page.png` the Search button and the search field; every page, the launcher; `assistant.png` the bubbles |
+| `--cs-radius-card` | `16px` | Cards, dialogs, the chat window, the grey box of a phone with no picture | `search-result.png` the cards; `compare-add-phone.png` the dialog; `assistant-window.png` the window |
 | `--cs-container` | `1200px` | The widest the page content gets | Every page at 1280px |
 | `--cs-topbar-h` | `56px` | The height of the top bar | Every page, the top bar |
 | `--cs-control-h` | `44px` | Buttons and inputs | `log-in.png` the fields and the button |
 | `--cs-search-h` | `48px` | The big search field | `home-page.png` the search field |
-| `--cs-card-image-h` | `220px` | The picture area of a product card | `search-result.png` the picture on a card |
+| `--cs-card-image-h` | `220px` | The picture area of a product card, and the height of the grey box PhoneImage draws when a phone has no picture | `search-result.png` the picture on a card |
 | `--cs-auth-card-w` | `440px` | Log in, Create account, Forgot password and Reset password cards | `log-in.png` the card |
 | `--cs-dialog-w` | `640px` | The Add a phone dialog | `compare-add-phone.png` the dialog |
 | `--cs-launcher-size` | `56px` | The assistant launcher | Every page, the launcher |
@@ -143,10 +143,10 @@ Use the space variables like this. Do not pick by eye.
 | `.cs-subheading` | The centred sub line in ink soft | Under every page heading |
 | `.cs-card` | A white card with the card radius and no shadow | Cards everywhere: the reviews cards, the recommend form, the auth cards, the dashboard cards |
 | `.cs-chip` | A grey chip with a slot for the x (`.cs-chip-remove` for the button) | Search results |
-| `.cs-link-chevron` | An ink link with a small right chevron | Home, the See details links, Open compare, Ask the assistant, Browse phones |
-| `.cs-price` | The price in block title size, bold | Every card, the phone page |
-| `.cs-price-note` | The small orange line with the arrow | Phone detail |
-| `.cs-notice` | The grey bar with the info icon | Search results |
+| `.cs-link-chevron` | An ink link laid out for a small right chevron after its text. You put the `FiChevronRight` icon inside the link. | Home, the See details links, Open compare, Ask the assistant, Browse phones |
+| `.cs-price` | The price in block title size, bold | Every card. The phone page shows its price larger, in `--cs-size-page-title`. |
+| `.cs-price-note` | The small orange line, laid out for an arrow icon before its text. You put the icon inside. | Phone detail |
+| `.cs-notice` | The grey bar, laid out for an info icon before its text. You put the icon inside. | Search results |
 | `.cs-estimated` | The tiny Estimated label | Search results, and any card of a phone with source `ai` |
 | `.cs-table-wrap` | A box that scrolls sideways with the first column stuck | Compare, Tech specs on a phone |
 | `.cs-cell-best` | Bold on the light grey, for the winning cell | Compare |
@@ -165,6 +165,34 @@ Use the space variables like this. Do not pick by eye.
 | `.cs-grid` | The card grid: one column on phones, two on tablets, three at 1280px, with `--cs-space-6` gaps. Use it for every list of PhoneCards | Search results, Browse, Recommend, Dashboard, the cards under an assistant reply |
 
 Buttons use the Bootstrap classes `btn btn-primary` (near black) and `btn btn-outline-primary` (ink outline, as "Save to favourites"). Inputs use `form-control`, selects `form-select`, checkboxes `form-check-input`. The theme restyles all of them, so you get the right shape for free.
+
+## How a phone picture is sized and shown
+
+Every phone picture on the site comes from PhoneImage. The files go in `client/public/phones/`, one PNG per phone named after its slug, and `imageUrl` holds the path, such as `/phones/samsung-galaxy-s24.png`. PhoneImage draws one of two things, and both carry the class `.cs-phone-image` plus the class you pass in `className`.
+
+The picture is an `<img>` with the phone name as its alt text, loaded only when it scrolls into view. `.cs-phone-image` gives it `display: block`, `max-width: 100%`, `max-height: 100%` and `object-fit: contain`. So the picture keeps its own proportions and is never cropped. `.cs-phone-image` sets no height, so on its own the picture shows at the size of the file, no wider than the box around it. It only fits a height when the box has one and the picture gets `height: 100%`, which is what the shared parts below do.
+
+The grey placeholder takes the place of the picture when `imageUrl` is empty or the file does not load. It is a `div` with the classes `.cs-phone-image` and `.cs-phone-placeholder`, shaped like a phone standing up:
+
+| Property | Value |
+| --- | --- |
+| Height | `--cs-card-image-h` |
+| Width | from `aspect-ratio: 9 / 19`, so about half the height |
+| Fill | `--cs-band-bg` |
+| Border | `1px solid` `--cs-line` |
+| Corners | `--cs-radius-card` |
+| Padding | `--cs-space-3` |
+| Text | the phone name, centred, in `--cs-size-small` and `--cs-ink-soft`; a name too long for the box is cut off |
+
+Where the shared parts put a picture:
+
+| Place | The box around it | The picture | The placeholder |
+| --- | --- | --- | --- |
+| PhoneCard | `.cs-phone-card-image`: a centred box `--cs-card-image-h` tall, with `--cs-space-2` under it. It links to the phone page. | `height: 100%`, so it fills the height of the box and takes its width from its proportions, never wider than the card. | The same `height: 100%`, so the full size above, centred in the box. |
+| A phone row in the chat window | `.cs-chat-phone-thumb`: a centred box `--cs-chat-thumb-h` tall with a 4 to 5 shape, left of the name and price. | `height: 100%`, so it fills the height of the thumb. | The same `height: 100%`, so it is as tall as the thumb and keeps the 9 to 19 shape, with no padding and `--cs-radius-chip` corners. |
+| Page not found | none: `NotFound.jsx` passes `notfound-phone` as the `className` | none, there is no phone | The empty grey phone, with no name. `.notfound-phone` in `NotFound.css` replaces its height and shape: three quarters of `--cs-card-image-h` wide and one and a half times it tall, turned 12 degrees to the left. |
+
+On your own pages, size a picture the same way: put PhoneImage in a box whose height comes from a theme variable, and pass a `className` that gives the picture `height: 100%`. Never give the picture a pixel size, and never stretch it with a fixed width and height, because `object-fit: contain` is what keeps every phone in proportion.
 
 ## A right example and a wrong example
 

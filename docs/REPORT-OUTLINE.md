@@ -26,7 +26,7 @@ It comes from the `client/` and `server/` folders of the repo; [ARCHITECTURE.md]
 
 ### 6. Test data
 
-It comes from [TEST-DATA.md](TEST-DATA.md); the seed phones in `server/data/phones.json` are the test data.
+It comes from [TEST-DATA.md](TEST-DATA.md); the 60 phones in `server/data/phones.json` and the price list in `server/data/prices.json` are the test data.
 
 ### 7. Installation instructions
 
@@ -38,7 +38,7 @@ It comes from [ASSUMPTIONS.md](ASSUMPTIONS.md); the same fifteen assumptions mak
 
 ### 9. Demo video
 
-It does not come from a docs file. We record it after the build.
+It does not come from a docs file. We record it once every page is built.
 
 ## Submission checklist
 
@@ -50,4 +50,4 @@ We submit one zip file. It holds:
 4. The demo video, five to eight minutes long. It shows search, browse, a phone page, compare, a recommendation, the assistant, login, the dashboard and the password reset.
 5. The live URL, if we deploy the site. This item is optional.
 
-Who prepares each item and where it comes from is in [DELIVERABLES.md](DELIVERABLES.md). The order we build the remaining work in is in [ROADMAP.md](ROADMAP.md).
+Who prepares each item and where it comes from is in [DELIVERABLES.md](DELIVERABLES.md). What is done and what is left is in [ROADMAP.md](ROADMAP.md).
