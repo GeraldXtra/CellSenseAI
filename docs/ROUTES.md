@@ -131,7 +131,7 @@ All routes sit inside `<Route element={<Layout />}>`, so every page gets what La
 | Dialog text field | Searches by name as the person types | `listPhones({ q, limit: 5 })` |
 | Dialog "Add" | Adds that phone and closes the dialog. Disabled while `isFull` is true. | `useCompare().add(slug)` |
 | "Browse phones" (one phone state and empty state) | Opens Browse | `/browse` |
-| "Ask the assistant" (verdict card) | Opens the assistant | `/assistant` |
+| "Ask the assistant" (verdict card) | Opens the assistant with a question that names the phones on the page | `/assistant?q=<the question>` |
 
 ### Recommend (Osakue)
 

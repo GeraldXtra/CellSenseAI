@@ -197,7 +197,7 @@ All endpoints sit under `/api`, so `GET /phones` is served at `/api/phones`. Eve
 
 * Route: `/dashboard` (login)
 * Designs: `dashboard.png`, `dashboard-new-account.png`
-* Must have: the heading and "Signed in as <name>", Recently viewed, Favourites, Search history, Recommended for you, and the empty state of each block. The footer links to `/dashboard#favourites` and `/dashboard#search-history`, so give those two blocks the ids `favourites` and `search-history`, and draw them while the data loads, because Layout looks for the id only once, when the page first draws.
+* Must have: the heading and "Signed in as <name>", Recently viewed, Favourites, Search history, Recommended for you, and the empty state of each block. The footer links to `/dashboard#favourites` and `/dashboard#search-history`, so give those two blocks the ids `favourites` and `search-history`, and draw them while the data loads, because Layout looks for the id only once, when the page first draws. When the page opens straight from the address, ProtectedRoute is still checking the login at that moment, so also scroll the block into view yourself once the data has loaded.
 * Calls: `getDashboard()` (login) returns `{ recentlyViewed, favourites, searchHistory, recommendations }`. `removeFavourite(slug)` (login) returns `{ favourites }`; reload after it.
 
 ### Log in (Osakue)

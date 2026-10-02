@@ -112,7 +112,7 @@ T39 runs in round one and T40 in round two. In the other order, T39 would also g
 | ID | Endpoint or command | What it tests | AI | Input | Expected result | Actual result | Pass |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | T47 | `POST /api/ai/chat` | Without the model the assistant says so. | Empty | `{ "messages": [{ "role": "user", "content": "Which phone has the longest battery?" }] }` | 503. "The AI features are not set up yet". | | |
-| T48 | `POST /api/ai/chat` | The model answers from our data. | Filled | The same body as T47 | 200. `reply` is plain text of at most four sentences that names up to three of the four phones with the biggest battery in our data, 5500 mAh: the OnePlus 12R, the OnePlus Nord 4, the OnePlus Nord CE 4 and the Vivo V40. `phones` holds the phones the reply names, at most three. | | |
+| T48 | `POST /api/ai/chat` | The model answers from our data. | Filled | The same body as T47 | 200. `reply` is plain text of at most four sentences that names up to three of the four phones with the biggest battery in our data, 5500 mAh: the OnePlus 12R, the OnePlus Nord 4, the OnePlus Nord CE 4 and the Vivo V40. `phones` holds the phones the reply names, in the order it names them, at most three, all from the phones the model was given. | | |
 | T49 | `POST /api/ai/chat` | No question, no answer. | Either | `{ "messages": [] }` | 400. "Send a question to the assistant". | | |
 | T50 | `POST /api/ai/chat` | The last message must be from the user. | Either | `{ "messages": [{ "role": "assistant", "content": "Hello" }] }` | 400. "Send a question to the assistant". | | |
 

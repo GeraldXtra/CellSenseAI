@@ -97,10 +97,10 @@ The assistant has its own page at `/assistant`. A fixed button at the bottom rig
 
 The backend does the work in four steps.
 
-1. It keeps the last 12 messages and pulls related phones from MongoDB: the phones named in the recent messages, then phones inside a budget when the question mentions one, ordered by camera, battery or price when the question asks about that.
+1. It keeps the last 12 messages and pulls related phones from MongoDB: the phones named in the last four messages, then phones inside a budget when the question mentions one, ordered by camera, battery or price when the question asks about that. A phone counts as named by its full name, or by its model name on its own when that has a letter and a digit, such as Galaxy S24 or 12R. The longest names are matched first and blanked out, so Galaxy S24 Ultra is not also read as the Galaxy S24.
 2. It builds a prompt from three parts: our rules for the assistant, one line of data per phone with its guide price and the date it was checked, and the conversation.
 3. It sends the prompt to the model.
-4. It returns the reply plus the phones the reply names, at most three, as `{ reply, phones }`, so the window and the page can show the phones under the answer.
+4. It looks in the reply for the names of every phone in the same way, keeps only the phones it gave the model, at most three, in the order the reply names them, and returns them with the reply as `{ reply, phones }`, so the window and the page can show the phones under the answer.
 
 Nobody has to use the assistant. Every feature is reachable through search, filters and buttons.
 
@@ -172,7 +172,7 @@ The root holds `client/`, `server/`, `docs/`, `README.md`, `.gitignore` and `.gi
 - `server/src/models/`: the Mongoose models `Phone.js`, `User.js`, `Review.js` and `SearchLog.js`, one per collection.
 - `server/src/routes/`: one route file per URL group. Each maps a URL to its middleware and its controller.
 - `server/src/controllers/`: the code that runs for each route.
-- `server/src/middleware/`: `auth.js` checks the login token and `error.js` handles errors. Each controller checks its own input, and `validate.js` holds an empty function that no route uses.
+- `server/src/middleware/`: `auth.js` checks the login token and `error.js` handles errors. Each controller checks its own input.
 - `server/src/services/`: `ai.service.js` talks to the model, `phoneQuery.js` builds the phone query for MongoDB, `recommend.service.js` builds and scores the recommendation shortlist, `price.service.js` computes the trend, `review.service.js` gives the star based sentiment and summary, and `mail.service.js` sends the password reset email.
 - `server/src/utils/`: `http.js` for the envelope, `jwt.js` for the tokens, `password.js` for the hashes and the reset tokens, and `slug.js` for the phone slugs.
 - `server/src/jobs/`: `priceUpdater.js`, the nightly price check.

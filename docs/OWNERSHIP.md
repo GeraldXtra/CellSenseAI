@@ -88,7 +88,7 @@ Everything in `server/` is mine. You do not need to open it to build your pages;
 | Path | Owner | What it is for |
 | --- | --- | --- |
 | `server/package.json` | Gerald | The server packages and the scripts dev, start, seed and prices. |
-| `server/.env.example` | Gerald | Every server setting but `NODE_ENV`. Only the port, the token lifetime, the client origin and the price check schedule have values; the rest are empty. The real `.env` is never committed. |
+| `server/.env.example` | Gerald | Every server setting but `NODE_ENV`. Only the port, the token lifetime, the client origin, the price check schedule and the client address for the reset link have values; the rest are empty. The real `.env` is never committed. |
 | `server/README.md` | Gerald | How to run the server, the scripts, the keys and the folder map. |
 | `server/data/phones.json` | Gerald | The 60 phones the seed loads, 12 each for Samsung, Apple, OnePlus, Xiaomi and Vivo. |
 | `server/data/prices.json` | Gerald | The price list: a check date and a price per slug, read by the nightly price check and `npm run prices`. |
@@ -117,7 +117,6 @@ Everything in `server/` is mine. You do not need to open it to build your pages;
 | `server/src/services/review.service.js` | Gerald | The review mood from the stars and the star based summary. |
 | `server/src/services/mail.service.js` | Gerald | Sends the password reset email with Nodemailer, or prints the link when mail is not set up. |
 | `server/src/middleware/auth.js` | Gerald | requireAuth and optionalAuth. |
-| `server/src/middleware/validate.js` | Gerald | An empty validate function that no route uses. The controllers check their own input. |
 | `server/src/middleware/error.js` | Gerald | The not found answer and the error handler. |
 | `server/src/jobs/priceUpdater.js` | Gerald | The nightly price check from `server/data/prices.json`. |
 | `server/src/utils/http.js` | Gerald | The response envelope helpers. |

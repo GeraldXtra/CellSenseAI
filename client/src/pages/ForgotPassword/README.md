@@ -39,13 +39,22 @@ From `forget-password-sent.png`: the same card with the heading "Check your emai
 - Shared: Loader.
 - Yours: AuthCard.
 
-## Services to call
+## Data
 
-- `forgotPassword(email)` from `src/services/auth.service.js` returns `{ sent: true }`. Keep the email in state so "Send it again" can call it again.
+The endpoint is live. The exact contract for this page is in [`docs/DATA-FLOW.md`, Forgot password](../../../../docs/DATA-FLOW.md#forgot-password).
 
-## Mock data until the backend is ready
+- Service: `forgotPassword(email)` from `src/services/auth.service.js`, called when the form is sent. Keep the email in state so "Send it again" can call it again.
+- Contexts: none.
+- Reply: always the same for a valid email, whether or not it has an account:
 
-The endpoint answers 404 today. Build both states with a local flag, and wire the call so that a thrown error shows the error line. When the endpoint exists, the sent state appears on success. Nothing else to swap.
+```js
+{ sent: true }
+```
+
+Show the sent state when it comes back.
+
+- Messages: "Enter a valid email address", and "Too many reset requests. Try again in 15 minutes." after five requests in 15 minutes from one address.
+- On your laptop the mail settings are empty, so no email goes out: the server prints the reset link in its terminal. Copy it into the browser to test Reset password.
 
 ## The states to handle
 
@@ -62,7 +71,7 @@ The endpoint answers 404 today. Build both states with a local flag, and wire th
 2. No hex codes or pixel values outside `client/src/styles/theme.css`.
 3. The page sits inside the shared layout and uses the shared components.
 4. The loading, empty and error states exist.
-5. Data comes from `src/services` or `src/data/mockPhones.js`, never from fetch or axios inside a page.
+5. Data comes from `src/services` as `docs/DATA-FLOW.md` says for this page, never from fetch or axios inside a page, and the page does not import `src/data/mockPhones.js`.
 6. No errors in the browser console.
 7. Screenshots at phone size and desktop size are attached to the pull request.
 8. Matches the image at 1280px.

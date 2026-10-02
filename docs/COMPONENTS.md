@@ -26,7 +26,7 @@ ChatWindow is mine. It does not use ChatThread or ChatInput: it draws its own bu
 
 1. The header has the title "CellSense assistant", the "Open full page" link to `/assistant`, which also closes the window, and an x labelled "Close the assistant". Under them sits the grey line "Answers from the same phone data as the site."
 2. Before the first message the thread shows "Ask about a phone, a price or a budget. I answer from the phones on this site." and three chips: "Best camera phone under $400?", "Compare Galaxy S24 and OnePlus 12" and "Which phone has the longest battery?". A chip sends its text.
-3. Each message is a bubble: the user's on the right in near black, replies on the left in grey. Under a reply, each phone it named gets a compact row with the picture, the name, the price and "See details".
+3. Each message is a bubble: the user's on the right in near black, replies on the left in grey. Under a reply, each phone in its `phones` gets a compact row with the picture, the name, the price and "See details": the phones the reply names, at most three, in the order it names them.
 4. While `loading` is true the thread shows the typing dots, and the field and the send button are disabled. A failed send shows `error` in a bubble in the error colours.
 5. The form has the field "Ask about a phone, a price or a budget" and a square send button labelled "Send". Enter sends. The text clears when the send worked and stays when it failed.
 6. Escape closes the window while the focus is inside it. The field gets the focus when the window opens, and the thread scrolls to the newest message.
@@ -88,7 +88,7 @@ On `/compare?ids=a,b,c` the slugs from the address go to the front of the list, 
 
 | Value | What it is |
 | --- | --- |
-| `messages` | The conversation, oldest first. A user message is `{ role: "user", content }`. A reply is `{ role: "assistant", content, phones }`, where `phones` holds the phones the reply named, at most three. |
+| `messages` | The conversation, oldest first. A user message is `{ role: "user", content }`. A reply is `{ role: "assistant", content, phones }`, where `phones` holds the phones the reply names, at most three, in the order it names them. The server takes them only from the phones it gave the model, as [API.md](API.md) explains. |
 | `loading` | `true` while a reply is on its way. |
 | `error` | The message of the last failed send, or `null`. The next send clears it. |
 | `open` | `true` while the floating window is open. |
@@ -150,7 +150,7 @@ Ibrahim, you own eight. They live in `client/src/components/ibrahim/`.
 | UnderstoodChips | Search results | The "Understood as" label and one chip per filter, each with an x that removes that filter. Takes `filters` and `onRemove(key)`. |
 | FilterStrip | Search results, Browse | The brand checkboxes, the price min and max inputs, the feature checkboxes (5G, 120Hz display, 8GB RAM or more, 5000mAh or more) and the Apply button, with vertical hairlines between the groups. Takes `value`, `onChange` and `onApply`. |
 | BrandTabs | Browse | The tabs All, Samsung, Apple, OnePlus, Xiaomi, Vivo. The active tab is bold with an ink underline. Each tab is a link to `/browse` or `/browse/<brand>`. |
-| SortSelect | Search results, Browse | The "Sort by:" select with Newest, Price low to high and Price high to low, which send `newest`, `priceAsc` and `priceDesc`. The server also accepts `camera` and `battery`. Takes `value` and `onChange`. |
+| SortSelect | Search results, Browse | The "Sort by:" select. It always lists the five sorts the server accepts: Newest, Price low to high, Price high to low, Camera and Battery, which send `newest`, `priceAsc`, `priceDesc`, `camera` and `battery`. Takes `value` and `onChange`. |
 | SpecTable | Phone detail | The two column Tech specs table: Processor, RAM, Storage, Main camera, Front camera on the left; Battery, Display, Refresh rate, Operating system, 5G on the right. Takes `specs`. |
 | PriceHistoryChart | Phone detail | The recharts line chart of the price history with the dates on the x axis, the prices on the y axis and the caption "Guide prices. Each point is a price check." Takes `history`. |
 | NoticeBar | Search results | The full width grey bar with the info icon, shown when the model added a phone. Takes `children` for the text. |
