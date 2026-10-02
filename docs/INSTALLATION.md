@@ -116,11 +116,11 @@ Each line does this:
 | `MONGODB_URI` | The connection string from Step 4, on one line, with nothing around it. | The server runs without a database, and every page that needs data fails after about ten seconds. |
 | `JWT_SECRET` | The line from point 3. | Nobody can log in or create an account on this laptop. |
 | `JWT_EXPIRES_IN` | `7d`. Login tokens expire after seven days. | The server uses `7d`. |
-| `CLIENT_ORIGIN` | `http://localhost:5173`. CORS allows only this origin. | The server falls back to `http://localhost:5174`, which only matters when the client calls the backend address directly. |
+| `CLIENT_ORIGIN` | `http://localhost:5173`. CORS allows only this origin. | The server falls back to the same `http://localhost:5173`. |
 | `AI_BASE_URL`, `AI_API_KEY`, `AI_MODEL` | Empty on a teammate's laptop. See Turning on the AI features. | Search is direct only, the assistant answers "The AI features are not set up yet", recommendations come with plain reasons, review moods come from the stars, review summaries are star based unless the model already saved one, and a phone page shows a summary only when one is already stored. |
 | `PRICE_UPDATER_CRON` | `0 2 * * *`, which is 02:00 every day. | The server uses `0 2 * * *`. |
 | `MAIL_HOST`, `MAIL_PORT`, `MAIL_USER`, `MAIL_PASS`, `MAIL_FROM` | Empty on a teammate's laptop. See Turning on the reset email. | No email goes out, and the reset link is printed in the backend window. `MAIL_PORT` falls back to 587. |
-| `CLIENT_URL` | `http://localhost:5173`, the address at the start of the reset link. | The server falls back to `http://localhost:5174`, so the reset link would point at a port where nothing runs. |
+| `CLIENT_URL` | `http://localhost:5173`, the address at the start of the reset link. | The server falls back to the same `http://localhost:5173`. |
 
 `NODE_ENV` is not in the file. We leave it out, so the server runs in development mode and shows the real reason for an error. What each setting does in the server is explained in [BACKEND.md](BACKEND.md).
 
@@ -316,10 +316,6 @@ The health check works, but the phone list waits about ten seconds and then answ
 ### A sentence search finds nothing, or the assistant says the AI features are not set up
 
 The three AI lines are empty. Search then looks for every word in the brand and model names, so a sentence such as "phone under $400" finds nothing, while "samsung" or "galaxy s24" works. The assistant answers "The AI features are not set up yet". Both are expected on a teammate's laptop.
-
-### The reset link opens a page that does not load
-
-`CLIENT_URL` is empty, so the link starts with `http://localhost:5174`. Set `CLIENT_URL=http://localhost:5173` in `server/.env` and start the backend again, or change the port in the printed link to 5173.
 
 ### No reset link shows in the backend window
 

@@ -54,7 +54,7 @@ Collection `phones`, model `server/src/models/Phone.js`. One document per phone.
 | `specs.refreshRate` | number | Display refresh rate. |
 | `specs.os` | string | Operating system. |
 | `specs.has5G` | boolean | True when the phone supports 5G. The default is false. |
-| `price.current` | number | The current guide price. Guide prices are not live shop prices. Indexed, because the lists filter and sort on it. The schema does not mark it as required, but every phone the seed or the search lookup saves has one. |
+| `price.current` | number | Required. The current guide price. Guide prices are not live shop prices. Indexed, because the lists filter and sort on it. |
 | `price.currency` | string | The default is `USD`, and the backend writes no other value. |
 | `price.updatedAt` | date | The date the price was last checked. The default is the moment the phone is saved. The seed sets it to the date of the last price check in the file, and the price check sets it to the date of the price list. The phone page design shows it next to the price. |
 | `priceHistory` | array of objects | One entry per price check, oldest first. Each entry holds `price` (number, required), `date` (date, default now) and `source` (string, one of `seed`, `ai`, `api` or `manual`, default `seed`). The seed writes `seed` entries from the file. The price check appends a `manual` entry from the price list. A phone added by the model starts with one `ai` entry. The schema allows `api`, and no code writes it. The price trend is worked out from this array. |

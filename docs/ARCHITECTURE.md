@@ -172,7 +172,7 @@ The root holds `client/`, `server/`, `docs/`, `README.md`, `.gitignore` and `.gi
 - `server/src/models/`: the Mongoose models `Phone.js`, `User.js`, `Review.js` and `SearchLog.js`, one per collection.
 - `server/src/routes/`: one route file per URL group. Each maps a URL to its middleware and its controller.
 - `server/src/controllers/`: the code that runs for each route.
-- `server/src/middleware/`: `auth.js` checks the login token and `error.js` handles errors. Each controller checks its own input, and `validate.js` holds an empty function that no route uses.
+- `server/src/middleware/`: `auth.js` checks the login token and `error.js` handles errors. Each controller checks its own input.
 - `server/src/services/`: `ai.service.js` talks to the model, `phoneQuery.js` builds the phone query for MongoDB, `recommend.service.js` builds and scores the recommendation shortlist, `price.service.js` computes the trend, `review.service.js` gives the star based sentiment and summary, and `mail.service.js` sends the password reset email.
 - `server/src/utils/`: `http.js` for the envelope, `jwt.js` for the tokens, `password.js` for the hashes and the reset tokens, and `slug.js` for the phone slugs.
 - `server/src/jobs/`: `priceUpdater.js`, the nightly price check.

@@ -30,7 +30,7 @@ A route file only maps a method and a path to middleware and a controller functi
 | --- | --- |
 | `src/index.js` | Builds the Express app. Adds helmet, cors for `CLIENT_ORIGIN`, the JSON parser with a 1 MB limit, morgan, and the limit of 300 requests every 15 minutes on `/api`. Answers `GET /api/health`. Mounts the routers on `/api/auth`, `/api/phones`, `/api/ai` and `/api/users`, then `notFound` and `errorHandler`. Waits for the database, starts the nightly price check and listens on `PORT`. |
 | `src/config/env.js` | Reads every setting from `server/.env` once with dotenv, fills in the defaults and exports a frozen `env` object. No other file reads `process.env`. |
-| `src/config/db.js` | Connects Mongoose to `MONGODB_URI` as soon as the server loads the file. It prints "MongoDB connected:" with the database name, or "MongoDB connection failed:" with the reason, and the server keeps running either way. Its `connectDB` function prints a warning when `MONGODB_URI` is empty. |
+| `src/config/db.js` | `connectDB` connects Mongoose to `MONGODB_URI`, and `index.js` and both scripts wait for it before they go on. It prints "MongoDB connected:" with the database name, or "MongoDB connection failed:" with the reason, and the server keeps running either way. When `MONGODB_URI` is empty it prints a warning and does not connect. |
 | `src/models/Phone.js` | The phones collection, with a unique slug and an index on the brand and one on the current price. |
 | `src/models/User.js` | The users collection. It leaves `passwordHash` out of every query unless the code asks for it, and `toSafeJSON` returns only `_id`, `name`, `email` and `role`. |
 | `src/models/Review.js` | The reviews collection, with an index on the phone and a unique index on the phone and the user together. |
@@ -51,7 +51,6 @@ A route file only maps a method and a path to middleware and a controller functi
 | `src/services/mail.service.js` | Sends the password reset email with Nodemailer. |
 | `src/middleware/auth.js` | `requireAuth` and `optionalAuth`, which read the login token. |
 | `src/middleware/error.js` | `notFound` answers paths with no route. `errorHandler` turns every thrown error into the envelope. |
-| `src/middleware/validate.js` | Exports an empty `validate` function that no route uses. Each controller checks its own input. |
 | `src/jobs/priceUpdater.js` | `runPriceUpdate` records the prices from `data/prices.json`, and `startPriceUpdater` schedules it every night. |
 | `src/utils/http.js` | `ok` sends the success envelope. `httpError` makes an error that carries a status code. |
 | `src/utils/jwt.js` | `signToken` and `verifyToken`, both with `JWT_SECRET`. |
@@ -77,7 +76,7 @@ Take `GET /api/phones/samsung-galaxy-s24`, sent by the Phone detail page of a lo
 8. `optionalAuth` in `middleware/auth.js` reads the `Authorization: Bearer <token>` header, verifies the token with `JWT_SECRET`, loads the user from the database and puts it on `req.user`. Without a valid token `req.user` is empty and the request goes on as a visitor.
 9. `getPhone` in `phones.controller.js` runs. It asks the `Phone` model for the document with that slug and throws `httpError(404, "Phone not found")` when there is none. When the phone has no summary and the AI settings are filled, it asks `ai.service.js` to write one and stores it. It moves the phone to the top of the user's `recentlyViewed` and works out `isFavourite`.
 10. The controller answers through `ok` in `utils/http.js`, which sends `{ ok: true, data: { phone, isFavourite } }` with status 200.
-11. If anything throws along the way, Express 5 passes the error to `errorHandler` in `middleware/error.js`, also when it comes from an async function. `errorHandler` answers `{ ok: false, error: { message } }` with the status on the error, or 500. A value that Mongoose refuses gets 400, and a duplicate value in a unique field gets 409 with "That value is already taken". Every answer of 500 or more is printed to the terminal, and in production its message is replaced with "Something went wrong on the server."
+11. If anything throws along the way, Express 5 passes the error to `errorHandler` in `middleware/error.js`, also when it comes from an async function. `errorHandler` answers `{ ok: false, error: { message } }` with the status on the error, or 500. A value that Mongoose refuses gets 400, and a duplicate value in a unique field gets 409 with "That value is already taken". Every answer of 500 or more is printed to the terminal. In production the message of a plain 500 is replaced with "Something went wrong on the server.", while a 502 or 503 keeps its own message, so the person still sees it.
 12. If no route matches at all, `notFound` answers 404 with "No route for", the method and the path, in the same envelope. Under `/api/users`, `requireAuth` runs for every path first, so a request there without a valid token gets 401 even when the path does not exist.
 
 A route that needs login runs `requireAuth` in place of `optionalAuth`. For `POST /api/phones/samsung-galaxy-s24/reviews`, `requireAuth` throws `httpError(401, "Please log in")` when the token is missing, fake or expired, or when its account no longer exists, and the controller never runs.
@@ -96,16 +95,16 @@ CellSense API running on http://localhost:5000
 
 ## The settings
 
-`src/config/env.js` reads these once. `server/.env.example` lists all of them except `NODE_ENV`. Only `PORT`, `JWT_EXPIRES_IN`, `CLIENT_ORIGIN` and `PRICE_UPDATER_CRON` have values there; the rest are empty. The full file with the values we use is in [INSTALLATION.md](INSTALLATION.md).
+`src/config/env.js` reads these once. `server/.env.example` lists all of them except `NODE_ENV`. Only `PORT`, `JWT_EXPIRES_IN`, `CLIENT_ORIGIN`, `PRICE_UPDATER_CRON` and `CLIENT_URL` have values there; the rest are empty. The full file with the values we use is in [INSTALLATION.md](INSTALLATION.md).
 
 | Setting | Default in `env.js` | What it is for | What happens when it is empty |
 | --- | --- | --- | --- |
 | `PORT` | `5000` | The port the server listens on. | The default is used. The client proxy expects 5000. |
-| `NODE_ENV` | `development` | Development or production. Not in `.env.example`. | Development: an answer of 500 or more shows the real message, and with no mail settings the reset link is printed in the terminal. In production those answers say "Something went wrong on the server." and a missing mail setup is printed as an error without the link. |
+| `NODE_ENV` | `development` | Development or production. Not in `.env.example`. | Development: an answer of 500 or more shows the real message, and with no mail settings the reset link is printed in the terminal. In production a plain 500 says "Something went wrong on the server." while a 502 or 503 keeps its own message, and a missing mail setup is printed as an error without the link. |
 | `MONGODB_URI` | empty | The MongoDB Atlas connection string. | The server starts and prints a warning. The health check works, and every route that touches the database waits about ten seconds and answers 500. `npm run seed` and `npm run prices` stop with a message, and the nightly price check fails when it runs. |
 | `JWT_SECRET` | empty | Signs and verifies the login tokens. | Register saves the account and then answers 500, because no token can be signed. Login with the right password answers 500 for the same reason. Every route that needs login answers 401, and the optional routes run as for a visitor. |
 | `JWT_EXPIRES_IN` | `7d` | How long a token lasts. | The default is used: seven days. |
-| `CLIENT_ORIGIN` | `http://localhost:5174` | The one origin CORS allows. `.env.example` sets `http://localhost:5173`, the client's port. | The default 5174 is not the client's port. Through the Vite proxy nothing changes, because the browser calls the client's own address. A client that calls the backend address directly gets a CORS error on every call. |
+| `CLIENT_ORIGIN` | `http://localhost:5173` | The one origin CORS allows. `.env.example` sets the same value, the client's port. | The default is used: the client on port 5173. |
 | `AI_BASE_URL` | empty | The base address of the OpenAI compatible chat endpoint. The service adds `/chat/completions`. We use Groq at `https://api.groq.com/openai/v1`. | When any of the three AI settings is empty the model is never called. Search stays direct, chat answers 503 with "The AI features are not set up yet", recommendations use the reasons from our rules, phone summaries are not written, review moods come from the stars, and review summaries are star based unless the model saved one earlier for the same number of reviews. |
 | `AI_API_KEY` | empty | The provider key, sent as `Authorization: Bearer <key>`. | As for `AI_BASE_URL`. |
 | `AI_MODEL` | empty | The model name. We use `openai/gpt-oss-120b`. | As for `AI_BASE_URL`. |
@@ -115,7 +114,7 @@ CellSense API running on http://localhost:5000
 | `MAIL_USER` | empty | The SMTP user name. | As for `MAIL_HOST`. |
 | `MAIL_PASS` | empty | The SMTP password. | As for `MAIL_HOST`. |
 | `MAIL_FROM` | empty | The sender address of the email. | `MAIL_USER` is used as the sender. |
-| `CLIENT_URL` | `http://localhost:5174` | The site address at the start of the reset link. | The default 5174 is not the client's port, so the link would open the wrong address. We always set it, to `http://localhost:5173` in development. |
+| `CLIENT_URL` | `http://localhost:5173` | The site address at the start of the reset link. `.env.example` sets the same value. | The default is used, so the link opens the client on port 5173. |
 
 ## The models
 
