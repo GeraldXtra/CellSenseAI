@@ -1,4 +1,4 @@
-// Sample values for development until the backend answers. Owner: Gerald.
+// Sample values only for building a page before it is connected; connected pages read from the database through the services. Owner: Gerald.
 const CHECKED_AT = '2026-09-22T02:00:00.000Z'
 
 function history(first, second, last) {

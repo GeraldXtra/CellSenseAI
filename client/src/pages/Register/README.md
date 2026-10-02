@@ -8,13 +8,13 @@ Owner: Osakue. Branch: `osakue`. Files: `Register.jsx` and `Register.css` in thi
 
 ## Routes
 
-Path: `/register`, with an optional `?next=<path>`. Read `next` with `useSearchParams`. Example: `http://localhost:5173/register`. After a successful register, go to `next`, or to the Home page `/` when there is no `next`. A person who is already logged in goes straight to `next`, or to `/` when there is no `next`.
+Path: `/register`, with an optional `?next=<path>`. Read `next` with `useSearchParams`. Example: `http://localhost:5173/register`. After a successful register, go to `next` when it is an address inside our site (it starts with a single `/`), otherwise to the Home page `/`, with `replace: true`. A person who is already logged in goes to `/`.
 
 Where every click on this page leads, from `docs/ROUTES.md`:
 
 | What | Leads to |
 | --- | --- |
-| "Create account" button | `register({ name, email, password })` from `useAuth`, then `next` or `/` |
+| "Create account" button | `register({ name, email, password })` from `useAuth`, then `next` when it is inside our site, otherwise `/` |
 | "Log in" | `/login`, with the same `?next=` when there is one |
 
 ## Designs to match
@@ -35,21 +35,27 @@ From `create-account.png`. The page body is the grey band with the card in the m
 - Shared: Loader.
 - Yours: AuthCard.
 
-## Services to call
+## Data
 
-- `register({ name, email, password })` from `useAuth()`. It stores the token and sets the user, so the top bar shows the name at once.
+The endpoint is live. The exact contract for this page and Log in is in [`docs/DATA-FLOW.md`, Log in and Create account](../../../../docs/DATA-FLOW.md#log-in-and-create-account).
 
-## Mock data until the backend is ready
+- Context: `useAuth()` from `src/context/AuthContext.jsx`, for `register`, and for `user` and `loading` to send a person who is already logged in to `/`.
+- Service: none called by the page. `register({ name, email, password })` from the context calls `register` in `src/services/auth.service.js`, stores the token and sets the user, so the top bar shows the name at once. Do not call `auth.service.js` yourself.
+- Reply: the server answers `{ token, user }` with status 201; the context keeps the token, and `register` resolves to the user:
 
-No mock data here. `POST /api/auth/register` is live, so `useAuth().register` is the real call and there is nothing to swap later. Start the server as in `docs/INSTALLATION.md`. `register` throws an Error with the server's message: "Name, email and password are required.", "Enter a valid email address.", "Password must be at least 8 characters." or "An account with that email already exists." Build the form, the error line and the redirect against those.
+```js
+{ _id, name: "Test User", email: "test.user@example.com", role: "user" }
+```
+
+- Messages: `register` throws an error with the server's message: "Name, email and password are required", "Enter a valid email address", "Password must be at least 8 characters" or "An account with that email already exists", and "Could not reach the server. Check that it is running." when the server is off. Build the form, the error line and the redirect against those. To test, start the server as `docs/INSTALLATION.md` says.
 
 ## The states to handle
 
 - Idle: the form as in the design.
 - Submitting: the button disabled with the label "Creating your account".
-- Error: the server message in `--cs-error` under the button, for example "An account with that email already exists."
+- Error: the server message in `--cs-error` under the button, for example "An account with that email already exists".
 - Bad input: an empty name, an email without an @, or a password under 8 characters shows the field with `is-invalid` and a short line; the form does not submit.
-- Already logged in: redirect to `next`, or to `/` when there is no `next`.
+- Already logged in: redirect to `/`.
 
 ## Done checklist
 
@@ -57,7 +63,7 @@ No mock data here. `POST /api/auth/register` is live, so `useAuth().register` is
 2. No hex codes or pixel values outside `client/src/styles/theme.css`.
 3. The page sits inside the shared layout and uses the shared components.
 4. The loading, empty and error states exist.
-5. Data comes from `src/services` or `src/data/mockPhones.js`, never from fetch or axios inside a page.
+5. Data comes from `src/services` as `docs/DATA-FLOW.md` says for this page, never from fetch or axios inside a page, and the page does not import `src/data/mockPhones.js`.
 6. No errors in the browser console.
 7. Screenshots at phone size and desktop size are attached to the pull request.
 8. Matches the image at 1280px.

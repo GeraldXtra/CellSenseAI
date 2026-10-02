@@ -38,21 +38,27 @@ From `reset-password-saved.png`: the card holds a FiCheck icon in a circle of `-
 - Shared: Loader.
 - Yours: AuthCard.
 
-## Services to call
+## Data
 
-- `resetPassword(token, password)` from `src/services/auth.service.js` returns `{ ok: true }`. When the token is invalid or older than one hour, the server answers 400 and the call throws with the server message.
+The endpoint is live. The exact contract for this page is in [`docs/DATA-FLOW.md`, Reset password](../../../../docs/DATA-FLOW.md#reset-password).
 
-## Mock data until the backend is ready
+- Service: `resetPassword(token, password)` from `src/services/auth.service.js`, called when the form is sent, with the token from the address.
+- Contexts: none. The person is not logged in automatically; the saved state sends them to Log in.
+- Reply:
 
-The endpoint answers 404 today. Build the three states with a local flag, and wire the call so that a thrown error shows the invalid link state. Nothing else to swap.
+```js
+{ ok: true }
+```
+
+- Messages: "Password must be at least 8 characters", "This reset link is not complete. Open the link from the email again." and "This reset link is invalid or has expired. Ask for a new one." A link works once and for one hour, so a used or old link gets the last one.
 
 ## The states to handle
 
 - Idle: the form.
 - Submitting: the button disabled with the label "Saving".
 - Saved: `reset-password-saved.png`.
-- Invalid link: the card with the heading "This link is invalid or has expired." and the sub line "Reset links work for one hour.", then a `btn btn-primary` "Request a new link" to `/forgot-password`. Show it when the server answers 400.
-- Error: any other failure shows the server message in `--cs-error` under the button.
+- Invalid link: when the call fails with "This reset link is invalid or has expired. Ask for a new one.", the card shows that message and a `btn btn-primary` "Request a new link" to `/forgot-password`.
+- Error: any other failure shows the server message in `--cs-error` under the button, such as "This reset link is not complete. Open the link from the email again."
 - Bad input: a password under 8 characters, or two passwords that differ, shows the field with `is-invalid` and a short line ("At least 8 characters." or "The two passwords do not match."); the form does not submit.
 
 ## Done checklist
@@ -61,7 +67,7 @@ The endpoint answers 404 today. Build the three states with a local flag, and wi
 2. No hex codes or pixel values outside `client/src/styles/theme.css`.
 3. The page sits inside the shared layout and uses the shared components.
 4. The loading, empty and error states exist.
-5. Data comes from `src/services` or `src/data/mockPhones.js`, never from fetch or axios inside a page.
+5. Data comes from `src/services` as `docs/DATA-FLOW.md` says for this page, never from fetch or axios inside a page, and the page does not import `src/data/mockPhones.js`.
 6. No errors in the browser console.
 7. Screenshots at phone size and desktop size are attached to the pull request.
 8. Matches the image at 1280px.
