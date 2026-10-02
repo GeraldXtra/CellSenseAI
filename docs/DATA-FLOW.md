@@ -73,7 +73,7 @@ Three things you do not call directly:
 - The chat goes through `useChat()`; `send(text)` calls the server for you.
 - `me()` runs by itself when the site opens.
 
-A phone object always has `slug`, `brand`, `model`, `category`, `releaseYear`, `specs` (`processor`, `ram`, `storage`, `mainCamera`, `frontCamera`, `battery`, `displaySize`, `displayType`, `refreshRate`, `os`, `has5G`), `price` (`current`, `currency`, `updatedAt`), `imageUrl`, `source` and, from `getPhone` only, `priceHistory` and `aiSummary`. A phone with `source` equal to `ai` was added by the model: show the "Estimated" label on its price, which PhoneCard does by itself.
+A phone object always has `slug`, `brand`, `model`, `category`, `releaseYear`, `specs` (`processor`, `ram`, `storage`, `mainCamera`, `frontCamera`, `battery`, `displaySize`, `displayType`, `refreshRate`, `os`, `has5G`), `price` (`current`, `currency`, `updatedAt`), `imageUrl` and `source`. Most replies also carry `priceHistory` and `aiSummary`; the phones inside a chat reply and a recommendation leave them out, so read those two only on Phone detail, where this document says to. A phone with `source` equal to `ai` was added by the model: show the "Estimated" label on its price, which PhoneCard does by itself.
 
 ## Ibrahim's pages
 
@@ -85,7 +85,7 @@ A phone object always has `slug`, `brand`, `model`, `category`, `releaseYear`, `
 ### Search results
 
 - **Data:** read `q` from the address and call `searchPhones(q)` with `[q]` as the list. You get `{ items, filters, source }`.
-- **The "Understood as" chips:** only when `source` is `ai`. Each key in `filters` becomes one chip: `maxPrice: 400` is "Max price $400", `minPrice: 200` is "Min price $200", `minCamera: 48` is "Camera 48MP or more", `minBattery: 5000` is "Battery 5000mAh or more", `minRam: 8` is "8GB RAM or more", `minRefresh: 120` is "120Hz display", `has5G: true` is "5G", `brand: Samsung` is "Samsung", `category: flagship` is "Flagship", `sort: camera` is "Sorted by camera", `q: Galaxy S24` is "Galaxy S24".
+- **The "Understood as" chips:** only when `source` is `ai`. Each key in `filters` becomes one chip: `maxPrice: 400` is "Max price $400", `minPrice: 200` is "Min price $200", `minCamera: 48` is "Camera 48MP or more", `minBattery: 5000` is "Battery 5000mAh or more", `minRam: 8` is "8GB RAM or more", `minStorage: 128` is "128GB storage or more", `minRefresh: 120` is "120Hz display", `has5G: true` is "5G", `brand: Samsung` is "Samsung", `category: flagship` is "Flagship", `sort: camera` is "Sorted by camera", `q: Galaxy S24` is "Galaxy S24".
 - **Removing a chip or applying the filter strip:** call `listPhones` with the filters that are left. It follows the same rules, so no new endpoint is needed. Put the filters in the address so the list reloads.
 - **No phones:** the empty state from `search-no-results.png`. The "Ask the assistant" button goes to `/assistant?q=<the query>`, and the Assistant page puts that text in its input.
 - **A phone the model added:** when any item has `source` equal to `ai`, show the NoticeBar from `search-added-by-assistant.png` above the cards. The Estimated label on the price appears by itself.
@@ -127,7 +127,7 @@ A phone object always has `slug`, `brand`, `model`, `category`, `releaseYear`, `
 
 ### About
 
-No data. Text and links only, with the four anchors `#about`, `#askme`, `#prices` and `#contact` the footer links to.
+No data. Text and links only, with the four anchors the footer links to: `#about`, `#askme`, `#how-prices-work` and `#contact`. Check `Footer.jsx` for the exact ids before you write them.
 
 ## Osakue's pages and components
 
@@ -145,9 +145,10 @@ No data. Text and links only, with the four anchors `#about`, `#askme`, `#prices
   - One slug: `getPhone(slug)` for the single column in `compare-one-phone.png`.
   - None: the empty state with Browse phones.
 - **Bold cells:** a cell is bold when `best[row]` includes that phone's slug. The rows in `best` are `price`, `ram`, `storage`, `mainCamera`, `frontCamera`, `battery`, `displaySize` and `refreshRate`. A row that is missing from `best` has no winner. Processor, display type and operating system are text and never bold. Bold what `best` says, not what `compare.png` shows: the image bolds both $699 prices by mistake, and the cheapest price wins.
-- **Remove:** `useCompare().remove(slug)`, and the address updates to the new `?ids=`.
+- **Remove:** `useCompare().remove(slug)`. The context does not touch the address, so keep it in step yourself: whenever `slugs` changes, write `?ids=` with `setSearchParams(slugs.length ? { ids: slugs.join(',') } : {}, { replace: true })`. Then a reload or a shared link always shows the same phones, after an add as well as a remove.
 - **Add a phone:** the dialog searches with `listPhones({ q: <what they typed>, limit: 5 })` and Add calls `useCompare().add(slug)`. The compare list holds at most three; `isFull` from `useCompare()` tells you when to disable Add.
-- **Errors:** "Choose at least two phones to compare" cannot happen if you follow the rule above, and "Could not find at least two of those phones" means a slug in a shared link is wrong; show it with EmptyState.
+- **The verdict card:** there is no verdict endpoint, so the card says "The assistant can tell you which of these phones suits you best." Its Ask the assistant link goes to `/assistant?q=` with a question that names the phones on the page, for example `Which should I buy: Samsung Galaxy S24, OnePlus 12 or Xiaomi Redmi Note 13 Pro?`. Build the names with `phoneName(phone)` and wrap the question in `encodeURIComponent`. Full names matter, because the assistant finds phones by their full names.
+- **Errors:** "Choose at least two phones to compare" cannot happen if you follow the rule above. "Could not find at least two of those phones" comes when fewer than two of the slugs exist; show it with EmptyState. One wrong slug among three is dropped quietly and the other two come back, so when `phones` is shorter than `slugs`, call `remove` for each slug that did not come back. Then the list, the address and the page agree.
 
 ### Recommend
 
@@ -168,7 +169,7 @@ No data. Text and links only, with the four anchors `#about`, `#askme`, `#prices
 - **Messages:** each is `{ role, content, phones }`. `role` is `user` or `assistant`. `phones` exists on replies and holds the phones the assistant named, at most three; draw them as PhoneCards under that bubble.
 - **Sending:** `send(text)` returns `true` on success and `false` on failure. Clear the input on `true`, keep the text on `false`. The server keeps the last 12 messages, so long conversations stay fast.
 - **Prefill:** when the address has `?q=`, put that text in the input.
-- **States:** the empty state with the three chips from `assistant-empty.png`, the typing dots while `loading` is true, and `error` as a reply bubble in the error colours. "The AI features are not set up yet" is what a laptop without the key sees. "Too many questions at once. Wait a minute and try again." comes after 20 messages in a minute from one address.
+- **States:** the empty state with the three chips from `assistant-empty.png`, the typing dots while `loading` is true, and `error` as a reply bubble in the error colours. "The AI features are not set up yet" is what a laptop without the key sees. "Too many questions at once. Wait a minute and try again." comes after 20 requests in a minute from one address, and searches and recommendations count towards the same 20.
 
 ### Dashboard
 
@@ -178,7 +179,7 @@ No data. Text and links only, with the four anchors `#about`, `#askme`, `#prices
   - `searchHistory`: `{ query, filters, at }` entries, newest first, at most 50;
   - `recommendations`: `{ phone, reason, at }` entries, the last three picks.
 - **Remove on a favourite:** `removeFavourite(slug)`, then `reload()`.
-- **A search history row** goes to `/search?q=<that query>`, with `at` formatted as a date.
+- **A search history row** goes to `/search?q=<that query>`. Show `at` as Today or Yesterday when it is, otherwise as the day and month, like 18 Sep, as in `dashboard.png`.
 - **A recommendation** is a PhoneCard with `reason` and `compare={false}`.
 - **A new account** has four empty lists, which is `dashboard-new-account.png`.
 - ProtectedRoute already sends a logged out visitor to log in, so the page never loads without a user.
@@ -208,13 +209,13 @@ It is mine. Every page gets it through Layout, and it shows the same conversatio
 
 ## Dates and names
 
-- Dates: `new Date(value).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })`.
+- Dates: `new Date(value).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })`, except the search history rows on the Dashboard, which follow the design as described there.
 - Names: `phoneName(phone)` from `PhoneImage.jsx`. Spec lines: `specLine(phone)` from `PhoneCard.jsx`. Use them everywhere so every page writes them the same way.
 - Prices: `phone.price.current`, never `phone.price`.
 
 ## Images
 
-`imageUrl` is empty on most phones for now, and PhoneImage shows a grey placeholder with the name. When the pictures arrive, `imageUrl` holds a path and PhoneImage shows the picture. Nothing changes on your pages.
+Every phone already has its picture path in `imageUrl`, but the files are not in `client/public/phones` yet, so PhoneImage shows a grey placeholder with the name. When the files arrive, the pictures show by themselves. Nothing changes on your pages.
 
 ## When something does not work
 

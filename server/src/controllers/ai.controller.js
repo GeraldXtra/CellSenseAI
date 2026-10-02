@@ -2,12 +2,12 @@ import { Phone } from "../models/Phone.js";
 import { User } from "../models/User.js";
 import { SearchLog } from "../models/SearchLog.js";
 import { ok, httpError } from "../utils/http.js";
+import { Slugify } from "../utils/slug.js";
 import {
   buildPhoneFilter,
   buildSort,
   escapeRegex,
 } from "../services/phoneQuery.js";
-import { Slugify } from "../utils/slug.js";
 import {
   isAIConfigured,
   parseSearchQuery,
@@ -21,6 +21,8 @@ import {
   describeNeeds,
   ruleReason,
 } from "../services/recommend.service.js";
+
+// Smart search
 
 const SENTENCE_WORDS =
   /\b(under|below|over|above|less|more|than|with|without|best|good|great|cheap|cheapest|budget|around|between|for|long|big|fast|gaming|camera|battery|selfie|selfies)\b/i;
@@ -119,6 +121,8 @@ export async function search(req, res) {
   return ok(res, { items, filters, source });
 }
 
+// Assistant chat
+
 const CHAT_LIMIT = 12;
 
 const FOCUS = [
@@ -136,15 +140,36 @@ const FOCUS = [
   },
 ];
 
-function mentions(text, phone) {
-  const lower = text.toLowerCase();
-  if (lower.includes(`${phone.brand} ${phone.model}`.toLowerCase()))
-    return true;
+function namesOf(phone) {
+  const full = `${phone.brand} ${phone.model}`.toLowerCase();
   const model = phone.model.toLowerCase();
-  if (model.length < 3 || !/[a-z]/.test(model)) return false;
-  return new RegExp(`(^|[^a-z0-9])${escapeRegex(model)}([^a-z0-9]|$)`).test(
-    lower,
-  );
+  const names = [full];
+  if (model.length >= 3 && /[a-z]/.test(model) && /\d/.test(model))
+    names.push(model);
+  return names;
+}
+
+function findMentioned(text, phones) {
+  let rest = text.toLowerCase();
+  const names = phones
+    .flatMap((phone) => namesOf(phone).map((name) => ({ name, phone })))
+    .sort((a, b) => b.name.length - a.name.length);
+  const found = new Map();
+  for (const { name, phone } of names) {
+    const pattern = new RegExp(
+      `(^|[^a-z0-9])(${escapeRegex(name)})(?![a-z0-9])`,
+      "g",
+    );
+    rest = rest.replace(pattern, (match, before, word, offset) => {
+      const at = offset + before.length;
+      const seen = found.get(phone.slug);
+      if (!seen || at < seen.at) found.set(phone.slug, { phone, at });
+      return before + " ".repeat(word.length);
+    });
+  }
+  return [...found.values()]
+    .sort((a, b) => a.at - b.at)
+    .map((entry) => entry.phone);
 }
 
 function readBudget(text) {
@@ -168,17 +193,14 @@ function cleanMessages(raw) {
     .map((m) => ({ role: m.role, content: m.content.trim().slice(0, 1000) }));
 }
 
-async function relatedPhones(messages) {
-  const all = await Phone.find()
-    .select("slug brand model category releaseYear specs price source imageUrl")
-    .lean();
+function relatedPhones(messages, all) {
   const recent = messages
     .slice(-4)
     .map((m) => m.content)
     .join(" ");
   const last = messages[messages.length - 1].content;
 
-  const named = all.filter((phone) => mentions(recent, phone));
+  const named = findMentioned(recent, all);
   const budget = readBudget(last);
   const focus = FOCUS.find((f) => f.words.test(last));
 
@@ -203,23 +225,23 @@ export async function chat(req, res) {
     throw httpError(400, "Send a question to the assistant");
   }
 
-  const candidates = await relatedPhones(messages);
+  const all = await Phone.find()
+    .select("slug brand model category releaseYear specs price source imageUrl")
+    .lean();
+  const candidates = relatedPhones(messages, all);
   const reply =
     (await answerChat(messages, candidates)) ||
     "I could not answer that. Try asking another way.";
 
-  const lower = reply.toLowerCase();
-  const phones = candidates
-    .filter((phone) => mentions(reply, phone))
-    .sort(
-      (a, b) =>
-        lower.indexOf(a.model.toLowerCase()) -
-        lower.indexOf(b.model.toLowerCase()),
-    )
+  const offered = new Set(candidates.map((phone) => phone.slug));
+  const phones = findMentioned(reply, all)
+    .filter((phone) => offered.has(phone.slug))
     .slice(0, 3);
 
   return ok(res, { reply, phones });
 }
+
+// Recommendations
 
 export async function recommend(req, res) {
   const needs = readNeeds(req.body);
