@@ -278,12 +278,12 @@ Without the AI settings every search stays direct and still answers 200. A sente
 
 Before it calls the model, the backend picks phones from the database as data for the answer:
 
-1. Every phone named in the last four messages, by its full name or by a model name of three characters or more that holds a letter.
+1. Every phone named in the last four messages, in the order they are named. The backend looks for each phone's full name, the brand and the model together, and for the model name on its own only when it has three characters or more with at least one letter and one digit, such as "Galaxy S24" or "12R". Capitals do not matter, and a name counts only as a whole word. The longest names are looked for first, and each name found is blanked out of the text before the shorter ones are looked for, so "Galaxy S24 Ultra" is not also read as the Galaxy S24.
 2. Then other phones until there are ten. When the last message holds a budget, only phones at or under it count. A budget is a dollar amount, or a number after under, below, less than, up to, max, maximum, around, about, budget of or budget is. They are ordered by main camera when the last message talks about the camera, photos, pictures or selfies, by battery when it talks about the battery or charging, by lowest price when it talks about price, cost, cheap or budget, and otherwise by release year, newest first.
 
 The model receives our rules, those phones with their guide prices and the dates they were checked, and the conversation. The rules tell it to answer only about phones, to use only the data for specs and prices, to say "guide price", to say when a phone is estimated, to keep to four sentences and three phones, and to write plain text.
 
-`reply` is the model's answer, or "I could not answer that. Try asking another way." when the model sends back nothing. `phones` holds the phones from the data that the reply names, in the order the reply names them, at most three. Each phone has `_id`, `slug`, `brand`, `model`, `category`, `releaseYear`, `specs`, `price`, `source` and `imageUrl`.
+`reply` is the model's answer, or "I could not answer that. Try asking another way." when the model sends back nothing. `phones` holds the phones the reply names, found the same way. The backend looks in the reply for the names of every phone in the database, longest first, then keeps only the phones it gave the model as data, at most three, in the order the reply names them. Matching every name first means a longer name the model was not given, such as Galaxy S24 Ultra, cannot be read as a shorter one it was given, such as the Galaxy S24. Each phone has `_id`, `slug`, `brand`, `model`, `category`, `releaseYear`, `specs`, `price`, `source` and `imageUrl`.
 
 Without the AI settings chat answers 503 with "The AI features are not set up yet".
 

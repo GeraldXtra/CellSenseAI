@@ -45,7 +45,7 @@ Top to bottom, from `search-result.png`. The whole page body sits on the grey ba
 
 `search-added-by-assistant.png`: the search bar with "Nothing Phone 2a", no chips and no strip, the heading "1 phone" with "for Nothing Phone 2a", then a full width NoticeBar: "This phone was not in our data. The assistant added its specifications. The price is an estimate until we check it.", then one PhoneCard centred. PhoneCard shows the "Estimated" label next to the price by itself, because the phone's `source` is `ai`. Show the NoticeBar whenever any item has `source` equal to `ai`.
 
-One note on the sort. The design shows "Sort by: Camera" because the model sorted the search by camera. The API accepts `newest`, `priceAsc`, `priceDesc`, `camera` and `battery`. Give SortSelect an `options` prop: here it offers all five, so the select can show the sort the search came back with; Browse uses the first three, as in its design.
+One note on the sort. The design shows "Sort by: Camera" because the model sorted the search by camera. SortSelect takes `value` and `onChange` and always lists the five sorts the server accepts, `newest`, `priceAsc`, `priceDesc`, `camera` and `battery`, so it can show the sort the search came back with.
 
 ## Components to use
 

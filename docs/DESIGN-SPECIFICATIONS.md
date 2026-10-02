@@ -191,7 +191,7 @@ All values live in `client/src/styles/theme.css`. Nobody types a hex code or a p
 1. Every page sits inside the shared layout: the top bar, the page content, the footer, the assistant launcher and the floating chat window.
 2. We use the shared components: Layout, Navbar, AccountMenu, Footer, ChatLauncher, ChatWindow, PhoneImage, PhoneCard, Loader, EmptyState and ProtectedRoute. We never make a second version of one.
 3. Buttons use the shared button classes, so every button has the same shape.
-4. Every page works at 375px, 768px and 1280px. The page never scrolls sideways. Wide tables scroll inside their own box. Under 768px the top bar collapses to the logo mark, a search icon and a menu icon.
+4. Every page works at 375px, 768px and 1280px. The page never scrolls sideways. Wide tables scroll inside their own box. Under 768px the top bar shows the logo mark with the name CellSense AI, a search icon and a menu icon.
 5. Every page handles three states: loading, empty and error.
 6. A page is done when it matches its image in `docs/ui/` at 1280px.
 
@@ -226,7 +226,7 @@ The finished designs live in `docs/ui/`, 26 images. The pages are built against 
 | `reset-password-saved.png` | Reset password after the new password was saved. |
 | `about.png` | About. |
 | `page-not-found.png` | Page not found. |
-| `mobile-topbar.png` | The top bar under 768px: the logo mark on the left, a search icon and a menu icon on the right. |
+| `mobile-topbar.png` | The top bar under 768px: the logo mark and the name CellSense AI on the left, a search icon and a menu icon on the right. |
 
 ## Data model
 

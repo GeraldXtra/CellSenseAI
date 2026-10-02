@@ -20,7 +20,7 @@ Where every click on this page leads, from `docs/ROUTES.md`:
 | Dialog text field | `listPhones({ q, limit: 5 })` as the person types |
 | Dialog "Add" | `useCompare().add(slug)`, then the dialog closes. Disabled while `isFull` is true. |
 | "Browse phones" (one phone state and empty state) | `/browse` |
-| "Ask the assistant" (verdict card) | `/assistant` |
+| "Ask the assistant" (verdict card) | `/assistant?q=` with a question that names the phones on the page |
 
 ## Designs to match
 
@@ -35,7 +35,7 @@ Top to bottom, from `compare.png`.
 1. White band: heading "Compare" in `.cs-heading`, sub line "Up to three phones. The bold value wins each row." with the word "bold" in `--cs-weight-bold`.
 2. CompareSlots: four slots in a row at 1280px. One slot per phone: the picture (PhoneImage), the model name in `--cs-size-card-title` ("Galaxy S24", "OnePlus 12", "Redmi Note 13 Pro": use `phone.model`, or `phoneName(phone)` when the model starts with a digit, because the OnePlus 12 is stored with the model "12"), and "Remove" under it in `--cs-ink-soft`. The remaining slots, up to a total of four, are dashed boxes (`--cs-line-strong`, `--cs-radius-card`) with a FiPlus icon and "Add a phone"; clicking one opens the dialog. With three phones there is one dashed slot; with fewer there are more, as in `compare-one-phone.png`.
 3. CompareTable inside `.cs-table-wrap`, with the Bootstrap `table` class so the hairlines come from the theme. The first column holds the labels in `--cs-ink-soft`: Price, Processor, RAM, Storage, Main camera, Front camera, Battery, Display, Refresh rate, Operating system. One column per phone. Values with units: "$699", "Exynos 2400", "8 GB", "256 GB", "50 MP", "12 MP", "4000 mAh", "6.2in", "120 Hz", "Android 14". A cell gets `.cs-cell-best` when `best` for its row includes that phone's slug. A row that is missing from `best` has no winner, and Processor and Operating system are text, so they are never marked. Mark what `best` says, not what `compare.png` shows: the design marks both $699 cells by mistake, and the cheapest price wins the price row. The other marked cells in the design, 12 GB, 200 MP, 32 MP, 5400 mAh and 6.82in, match what `best` gives for those three phones.
-4. Grey band with a white `.cs-card` centred: heading "Verdict" in `--cs-size-block-title`, a line in `--cs-ink-soft`, and the link "Ask the assistant" as a `.cs-link-chevron` to `/assistant`. The design's line says a verdict comes once the AI is connected, but the API has no verdict, so write "The assistant can tell you which of these phones suits you best." in its place.
+4. Grey band with a white `.cs-card` centred: heading "Verdict" in `--cs-size-block-title`, the line "The assistant can tell you which of these phones suits you best." in `--cs-ink-soft`, and the link "Ask the assistant" as a `.cs-link-chevron`. There is no verdict endpoint, so this line takes the place of the design's line about a verdict. The link goes to `/assistant?q=` with a question that names the phones on the page, for example `Which should I buy: Samsung Galaxy S24, OnePlus 12 or Xiaomi Redmi Note 13 Pro?`. Build the names with `phoneName(phone)` and wrap the question in `encodeURIComponent`. Full names matter, because the assistant finds phones by their full names.
 
 `compare-one-phone.png`: the heading and sub line, then four slots: the first a white `.cs-card` with the picture, the full name "Samsung Galaxy S24" (use `phoneName`), the spec line "8 GB, 256 GB, 50 MP, 4000 mAh" (use `specLine`) and an underlined "Remove"; the other three dashed with the plus in a grey circle and "Add a phone". Under the slots a `.cs-empty` box: "Add at least one more phone to compare." and a `btn btn-primary` "Browse phones". No table, no verdict.
 
@@ -72,7 +72,7 @@ The endpoints are live. The exact contract for this page is in [`docs/DATA-FLOW.
 
 - Reply of `getPhone`: `{ phone, isFavourite }`. You read `phone`.
 - Reply of `listPhones`: `{ items: [phone], total, page, pages }`, at most five phones.
-- Messages: "Could not find at least two of those phones" when fewer than two of the slugs exist, for example a shared link with two slugs and one of them wrong. When one of three slugs is wrong, the server leaves it out and answers with the other two, so draw the columns from `phones`, not from `slugs`, and take the missing slug out of the list with `useCompare().remove(slug)`. "Choose at least two phones to compare" cannot happen if you call `comparePhones` only with two or three slugs.
+- Messages: "Could not find at least two of those phones" when fewer than two of the slugs exist, for example a shared link with two slugs and one of them wrong. One wrong slug among three is dropped quietly and the other two come back, so when `phones` is shorter than `slugs`, call `useCompare().remove(slug)` for each slug that did not come back. Then the list, the address and the page agree. "Choose at least two phones to compare" cannot happen if you call `comparePhones` only with two or three slugs.
 
 ## The states to handle
 

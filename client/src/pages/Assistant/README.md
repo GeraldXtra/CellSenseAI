@@ -61,7 +61,7 @@ The chat endpoint is live. The exact contract for this page is in [`docs/DATA-FL
 ]
 ```
 
-`phones` holds the phones the reply named, at most three. Each carries `_id`, `slug`, `brand`, `model`, `category`, `releaseYear`, `specs`, `price`, `source` and `imageUrl`, which is all PhoneCard needs. `send(text)` returns `true` when the reply came back and `false` when it failed, so clear the field only when it returns `true`.
+`phones` holds the phones the reply names, at most three, in the order it names them; the server finds them by name and keeps only the phones it gave the model. Each carries `_id`, `slug`, `brand`, `model`, `category`, `releaseYear`, `specs`, `price`, `source` and `imageUrl`, which is all PhoneCard needs. `send(text)` returns `true` when the reply came back and `false` when it failed, so clear the field only when it returns `true`.
 
 - Messages: "The AI features are not set up yet" is what a laptop without the AI key sees. "Too many questions at once. Wait a minute and try again." comes after 20 requests to the AI routes in a minute from one address, and searches and recommendations count towards the same 20.
 
