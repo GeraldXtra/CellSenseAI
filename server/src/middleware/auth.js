@@ -13,7 +13,10 @@ async function userFromRequest(req) {
   } catch {
     return null;
   }
-  return User.findById(payload.sub);
+  const user = await User.findById(payload.sub);
+  if (!user) return null;
+  if ((payload.ver ?? 0) !== (user.tokenVersion ?? 0)) return null;
+  return user;
 }
 
 export async function requireAuth(req, res, next) {

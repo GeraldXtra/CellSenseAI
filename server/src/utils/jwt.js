@@ -10,9 +10,15 @@ function secret() {
 }
 
 export function signToken(user) {
-  return jwt.sign({ sub: user._id.toString(), role: user.role }, secret(), {
-    expiresIn: env.JWT_EXPIRES_IN,
-  });
+  return jwt.sign(
+    {
+      sub: user._id.toString(),
+      role: user.role,
+      ver: user.tokenVersion || 0,
+    },
+    secret(),
+    { expiresIn: env.JWT_EXPIRES_IN },
+  );
 }
 
 export function verifyToken(token) {

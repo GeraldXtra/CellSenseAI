@@ -43,12 +43,22 @@ const userSchema = new Schema(
       tokenHash: String,
       expiresAt: Date,
     },
+    emailVerifiedAt: Date,
+    passwordChangedAt: Date,
+    tokenVersion: { type: Number, default: 0 },
   },
   { timestamps: true },
 );
 
 userSchema.methods.toSafeJSON = function () {
-  return { _id: this._id, name: this.name, email: this.email, role: this.role };
+  return {
+    _id: this._id,
+    name: this.name,
+    email: this.email,
+    role: this.role,
+    emailVerified: Boolean(this.emailVerifiedAt),
+    createdAt: this.createdAt,
+  };
 };
 
 export const User = mongoose.model("User", userSchema);

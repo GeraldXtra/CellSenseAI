@@ -12,10 +12,8 @@ export const env = Object.freeze({
   AI_API_KEY: process.env.AI_API_KEY || "",
   AI_MODEL: process.env.AI_MODEL || "",
   PRICE_UPDATER_CRON: process.env.PRICE_UPDATER_CRON || "0 2 * * *",
-  MAIL_HOST: process.env.MAIL_HOST || "",
-  MAIL_PORT: +process.env.MAIL_PORT || 587,
-  MAIL_USER: process.env.MAIL_USER || "",
-  MAIL_PASS: process.env.MAIL_PASS || "",
+  TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY || "",
+  RESEND_API_KEY: process.env.RESEND_API_KEY || "",
   MAIL_FROM: process.env.MAIL_FROM || "",
   CLIENT_URL: process.env.CLIENT_URL || "http://localhost:5173",
 });
