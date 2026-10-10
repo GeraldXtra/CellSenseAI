@@ -22,7 +22,7 @@ CellSense AI is a responsive single page web application that answers those ques
 
 The AI parts work like this, and this is the only way we describe them: we integrate a pre trained language model through an OpenAI compatible API. The model turns a search sentence into filters, supplies the specs of a phone we do not have, answers the assistant's questions from our phone data, ranks the recommendation shortlist and explains its choices, writes the phone summaries, summarises reviews and judges their mood. We do not train or build a model. When you write about it in a README or a pull request, say "the model", "we call the model", "we use the model".
 
-Our stack: React 19 with Vite, React Router, Bootstrap 5 and plain CSS in `client/`; Node 20 with Express 5 in `server/`; MongoDB Atlas with Mongoose; JWT login with bcrypt; an OpenAI compatible chat API, which for us is Groq with the model `openai/gpt-oss-120b`; `node-cron` for the nightly price check; Nodemailer for the password reset email. The client runs on port 5173 and the server on port 5000. The docs live in `docs/`. [ARCHITECTURE.md](ARCHITECTURE.md) explains how the parts talk to each other.
+Our stack: React 19 with Vite, React Router, Bootstrap 5 and plain CSS in `client/`; Node 20 with Express 5 in `server/`; MongoDB Atlas with Mongoose; JWT login with bcrypt; an OpenAI compatible chat API, which for us is Groq with the model `openai/gpt-oss-120b`; `node-cron` for the nightly price check; Resend for the emails (the 6 digit code of a new account, the reset link and the notice that a password changed); Cloudflare Turnstile for the security check on Create account. The client runs on port 5173 and the server on port 5000. The docs live in `docs/`. [ARCHITECTURE.md](ARCHITECTURE.md) explains how the parts talk to each other.
 
 ## Who builds what
 
@@ -30,8 +30,8 @@ I am the lead. I own the repo, the backend, the database, the AI features, the s
 
 | Area | Owner | Branch | Where |
 | --- | --- | --- | --- |
-| Backend, database, AI features, price check, password reset, phone data and pictures | Gerald | `backend` | `server/`, `client/public/phones/` |
-| Shared client files: routes, theme, services, contexts, hooks, sample data, shared components including the chat window, Page not found | Gerald | `backend` | `client/src/App.jsx`, `client/src/main.jsx`, `client/src/styles/`, `client/src/services/`, `client/src/context/`, `client/src/hooks/`, `client/src/data/`, `client/src/components/shared/`, `client/src/pages/NotFound/` |
+| Backend, database, AI features, price check, email codes, password reset, emails, phone data and pictures | Gerald | `backend` | `server/`, `client/public/phones/` |
+| Shared client files: routes, theme, services, contexts, hooks, sample data, shared components including the chat window and the security check, Page not found, Verify email, Profile | Gerald | `backend` | `client/src/App.jsx`, `client/src/main.jsx`, `client/src/styles/`, `client/src/services/`, `client/src/context/`, `client/src/hooks/`, `client/src/data/`, `client/src/components/shared/`, `client/src/pages/NotFound/`, `client/src/pages/VerifyEmail/`, `client/src/pages/Profile/` |
 | Home, Search results, Browse, Phone detail, About | Ibrahim | `ibrahim` | `client/src/pages/Home/`, `SearchResults/`, `Browse/`, `PhoneDetail/`, `About/` and `client/src/components/ibrahim/` |
 | Compare, Recommend, Assistant, Dashboard, Log in, Create account, Forgot password, Reset password | Osakue | `osakue` | `client/src/pages/Compare/`, `Recommend/`, `Assistant/`, `Dashboard/`, `Login/`, `Register/`, `ForgotPassword/`, `ResetPassword/` and `client/src/components/osakue/` |
 | Documentation, diagrams, reviews and merges | Gerald | `backend` | `docs/` |
@@ -90,11 +90,31 @@ A commit message describes the change and nothing else: what changed, in plain w
 The backend is finished and every endpoint is live, so you build against real data from the start. [INSTALLATION.md](INSTALLATION.md) has every step and every line of the settings file. In short:
 
 1. Ask me for your own database user. I send you the connection string privately.
-2. In `server`, run `npm install`, copy `.env.example` to `.env`, and fill it as Step 5 of INSTALLATION.md shows: your connection string in `MONGODB_URI`, your own `JWT_SECRET`, and `CLIENT_URL=http://localhost:5173`. Leave the three `AI_` lines and the mail lines empty unless I give you a key.
+2. In `server`, run `npm install`, copy `.env.example` to `.env`, and fill it as Step 5 of INSTALLATION.md shows: your connection string in `MONGODB_URI`, your own `JWT_SECRET`, `TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA` and `CLIENT_URL=http://localhost:5173`. Leave the three `AI_` lines and `RESEND_API_KEY` empty unless I give you a key.
 3. Run `npm run dev` in `server` and wait for "MongoDB connected" and "CellSense API running on http://localhost:5000".
-4. In a second window, run `npm install` once and then `npm run dev` in `client`, and open `http://localhost:5173`.
+4. In a second window, run `npm install` once in `client`, copy `.env.example` to `.env` there too, and run `npm run dev`. Open `http://localhost:5173`.
 
-Without the AI lines the site still works, with four differences: search is direct only, the assistant answers "The AI features are not set up yet", recommendations come with plain reasons, and the review summary is star based. A reset link is printed in the server window, because the mail lines are empty. [DATA-FLOW.md](DATA-FLOW.md) says what each of these looks like on your pages.
+Without the AI lines the site still works, with four differences: search is direct only, the assistant answers "The AI features are not set up yet", recommendations come with plain reasons, and the review summary is star based. Without a Resend key no email goes out: the 6 digit code of a new account and a reset link are printed in the server window, and you copy them from there.
+
+### Two new lines if you set up before the email code
+
+Creating an account now needs the 6 digit code from the email and a Cloudflare Turnstile security check. If your `.env` files are older than that, add one line to each, exactly as written. Both are Cloudflare's test keys, not secrets.
+
+1. In `server/.env`, add:
+
+```
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+```
+
+2. In `client/.env`, add:
+
+```
+VITE_TURNSTILE_SITE_KEY=3x00000000000000000000FF
+```
+
+3. Stop both apps with Ctrl+C and start them again, the server first. Vite reads `client/.env` only when it starts.
+
+You need no Resend key. When you create an account on your laptop, the code prints in your server terminal as `Mail is not set up. Verification code for <email>: <code>`, and you type it on the Check your email page. The test site key always shows the "Verify you are human" box, so you tick it by hand. If `server/.env` still has the four old mail lines for a mail host, port, user and password, delete them; the server no longer reads them. [DATA-FLOW.md](DATA-FLOW.md) says what each of these looks like on your pages.
 
 Never run `npm run seed` or `npm run prices`. Both write to the database we share. Only I run them.
 
@@ -108,8 +128,8 @@ Read [DATA-FLOW.md](DATA-FLOW.md) before you connect a page to the backend. It i
 
 1. A page is done when it matches its image in `docs/ui/` at 1280px. Then it must also work at 375px and 768px. The page never scrolls sideways. Wide tables scroll inside their own box.
 2. Every colour, spacing, font size, corner radius and shadow comes from `client/src/styles/theme.css`. Never type a hex code or a pixel value into a component. If a value is missing, do not invent one: send me the image and the element and I add it to the theme.
-3. Use the shared components in `client/src/components/shared/`: Layout, Navbar, AccountMenu, Footer, ChatLauncher, ChatWindow, PhoneImage, PhoneCard, Loader, EmptyState and ProtectedRoute. Never make a second version of one. If a shared component needs a new prop, ask me.
-4. Shared files are changed only by me. That is everything in `client/src/styles/`, `client/src/services/`, `client/src/context/`, `client/src/hooks/`, `client/src/data/`, `client/src/components/shared/`, `client/src/pages/NotFound/` and `client/public/`, plus `App.jsx`, `main.jsx`, and the files at the top of `client/`: `index.html`, `vite.config.js`, `package.json`, `.env.example`, `.gitignore`, `.oxlintrc.json` and `README.md`. If you need something changed there, ask me and I do it on `backend`.
+3. Use the shared components in `client/src/components/shared/`: Layout, Navbar, AccountMenu, Footer, ChatLauncher, ChatWindow, PhoneImage, PhoneCard, Loader, EmptyState, ProtectedRoute and Turnstile. Never make a second version of one. If a shared component needs a new prop, ask me.
+4. Shared files are changed only by me. That is everything in `client/src/styles/`, `client/src/services/`, `client/src/context/`, `client/src/hooks/`, `client/src/data/`, `client/src/components/shared/`, `client/src/pages/NotFound/`, `client/src/pages/VerifyEmail/`, `client/src/pages/Profile/` and `client/public/`, plus `App.jsx`, `main.jsx`, and the files at the top of `client/`: `index.html`, `vite.config.js`, `package.json`, `.env.example`, `.gitignore`, `.oxlintrc.json` and `README.md`. If you need something changed there, ask me and I do it on `backend`.
 5. All data comes through the functions in `client/src/services/`. Never call `fetch` or `axios` inside a page or a component.
 6. The mock data file is only for building a page before you connect it. A connected page reads from the database through the services.
 7. Every page handles three states: loading, empty and error. `useAsync` in `client/src/hooks/useAsync.js` gives you all three.
@@ -211,17 +231,18 @@ All endpoints sit under `/api`, so `GET /phones` is served at `/api/phones`. Eve
 ### Create account (Osakue)
 
 * Route: `/register`, with `?next=` when the person came from a page that asked for login
-* Design: `create-account.png`
-* Must have: AuthCard with name, email and password (at least 8 characters), the Create account button and "Already have an account? Log in".
-* Calls: `register({ name, email, password })` from `useAuth()` stores the token and sets the user, the same way `login` does.
-* After Create account: go to the page in `next` when it is an address inside our site, otherwise to `/`, with `replace: true`.
+* Designs: `create-account.png`, `create-account-security-check.png`
+* Must have: AuthCard with name, email and password (at least 8 characters), my Turnstile security check between the password and the button, the Create account button, "Tick the security check to continue." under it while only the tick is missing, and "Already have an account? Log in".
+* Calls: `register({ name, email, password, turnstileToken })` from `useAuth()`. It does not log anyone in: the server emails a 6 digit code and answers `{ email, expiresInMinutes, resendAfterSeconds }`. After every error, change the Turnstile `resetKey`, because a token works once.
+* After Create account: go to `/verify-email?email=<email>`, with the same `next` when there is one. My Verify email page logs the person in and sends them on.
+* Osakue, I made these changes in your `Register.jsx` on `backend`; the list is in [OWNERSHIP.md](OWNERSHIP.md).
 
 ### Forgot password (Osakue)
 
 * Route: `/forgot-password`
 * Designs: `forget-password.png`, `forget-password-sent.png`
 * Must have: AuthCard with the email field, "Send reset link", "Back to log in", and the "Check your email" state with "Send it again".
-* Calls: `forgotPassword(email)` returns `{ sent: true }` whether or not the email has an account. On your laptop the link is printed in the server window, because the mail lines are empty.
+* Calls: `forgotPassword(email)` returns `{ sent: true }` whether or not the email has an account. On your laptop the link is printed in the server window, because `RESEND_API_KEY` is empty.
 
 ### Reset password (Osakue)
 
@@ -236,9 +257,21 @@ All endpoints sit under `/api`, so `GET /phones` is served at `/api/phones`. Eve
 * Design: `page-not-found.png`
 * Finished, in `client/src/pages/NotFound/`. Nobody else edits it.
 
+### Verify email (Gerald)
+
+* Route: `/verify-email?email=<email>`, with `&next=` from Create account
+* Design: `verify-email.png`
+* Finished, in `client/src/pages/VerifyEmail/`. The six boxes take the code from the email; the right code creates the account and logs the person in.
+
+### Profile (Gerald)
+
+* Route: `/profile` (login)
+* Design: `profile.png`
+* Finished, in `client/src/pages/Profile/`. The account summary, the name, the read only email, the password change, clearing the history, logging out other devices and deleting the account. The account menu, the phone menu and the footer link to it.
+
 ## The phone shape
 
-Every phone from the API has the shape below. Here is the Galaxy S24 as it looks after the price check of 1 October 2026. Units: RAM and storage in GB, cameras in megapixels, battery in mAh, display size in inches, refresh rate in Hz, prices in US dollars. All four collections are described in [DATA-MODEL.md](DATA-MODEL.md).
+Every phone from the API has the shape below. Here is the Galaxy S24 as it looks after the price check of 1 October 2026. Units: RAM and storage in GB, cameras in megapixels, battery in mAh, display size in inches, refresh rate in Hz, prices in US dollars. All five collections are described in [DATA-MODEL.md](DATA-MODEL.md).
 
 ```json
 {

@@ -1,6 +1,6 @@
 # The backend
 
-This document explains the CellSense AI backend for someone who has only written small Express apps. It maps the folders, says what each file does, follows one request from the moment it arrives to the moment the answer leaves, and describes every setting, the models, the services, the nightly price check and the scripts. Gerald builds and runs the backend. Every endpoint, with its exact replies and error messages, is in [API.md](API.md), and every field of the four models is in [DATA-MODEL.md](DATA-MODEL.md).
+This document explains the CellSense AI backend for someone who has only written small Express apps. It maps the folders, says what each file does, follows one request from the moment it arrives to the moment the answer leaves, and describes every setting, the models, the services, the nightly price check and the scripts. Gerald builds and runs the backend. Every endpoint, with its exact replies and error messages, is in [API.md](API.md), and every field of the five models is in [DATA-MODEL.md](DATA-MODEL.md).
 
 ## The folders in server/
 
@@ -32,29 +32,32 @@ A route file only maps a method and a path to middleware and a controller functi
 | `src/config/env.js` | Reads every setting from `server/.env` once with dotenv, fills in the defaults and exports a frozen `env` object. No other file reads `process.env`. |
 | `src/config/db.js` | `connectDB` connects Mongoose to `MONGODB_URI`, and `index.js` and both scripts wait for it before they go on. It prints "MongoDB connected:" with the database name, or "MongoDB connection failed:" with the reason, and the server keeps running either way. When `MONGODB_URI` is empty it prints a warning and does not connect. |
 | `src/models/Phone.js` | The phones collection, with a unique slug and an index on the brand and one on the current price. |
-| `src/models/User.js` | The users collection. It leaves `passwordHash` out of every query unless the code asks for it, and `toSafeJSON` returns only `_id`, `name`, `email` and `role`. |
+| `src/models/User.js` | The users collection. It leaves `passwordHash` out of every query unless the code asks for it, and `toSafeJSON` returns only `_id`, `name`, `email`, `role`, `emailVerified` and `createdAt`. It also keeps when the email was verified, when the password was last changed, and the token version. |
+| `src/models/PendingSignup.js` | The pendingsignups collection: the sign ups waiting for their email code, with a unique email and a TTL index on `expiresAt`, so MongoDB deletes an old one by itself. |
 | `src/models/Review.js` | The reviews collection, with an index on the phone and a unique index on the phone and the user together. |
 | `src/models/SearchLog.js` | The searchlogs collection. |
-| `src/routes/auth.routes.js` | `POST /register`, `POST /login`, `GET /me` behind `requireAuth`, `POST /forgot-password` behind its own limit of 5 requests every 15 minutes, and `POST /reset-password`. |
+| `src/routes/auth.routes.js` | `POST /register`, `POST /verify-email` and `POST /resend-code`, behind their own limits of 10, 20 and 5 requests every 15 minutes, then `POST /login`, `GET /me` behind `requireAuth`, `POST /forgot-password` behind its own limit of 5 requests every 15 minutes, and `POST /reset-password`. |
 | `src/routes/phones.routes.js` | The seven phone routes. `/compare` sits above `/:slug`, so the word compare is never read as a slug. The detail runs `optionalAuth` and posting a review runs `requireAuth`. |
 | `src/routes/ai.routes.js` | The limit of 20 requests every minute for the whole router, `POST /search` and `POST /recommend` behind `optionalAuth`, and `POST /chat`. |
-| `src/routes/users.routes.js` | `requireAuth` for the whole router, then `GET /me/dashboard`, `POST /me/favourites/:slug` and `DELETE /me/favourites/:slug`. |
-| `src/controllers/auth.controller.js` | Register, login, me, forgot password and reset password. |
+| `src/routes/users.routes.js` | `requireAuth` for the whole router, then `GET /me/dashboard`, `POST /me/favourites/:slug`, `DELETE /me/favourites/:slug`, `GET /me/profile`, `PATCH /me/profile`, `DELETE /me/search-history` and `DELETE /me/recently-viewed`, and `PATCH /me/password`, `POST /me/sign-out-others` and `DELETE /me`, which share one limit of 10 requests every 15 minutes. |
+| `src/controllers/auth.controller.js` | Register with the security check and the email code, verify email, resend code, login, me, forgot password and reset password. |
 | `src/controllers/phones.controller.js` | The list, comparison with the best value in each row, the detail with the recently viewed record and the summary written once, the price trend, the list of reviews, posting a review with its mood, and the review summary. |
 | `src/controllers/ai.controller.js` | Search with the direct match, the sentence rule, the model step, the lookup of a phone we do not have, the search log and the search history. Chat with the related phones. Recommend with the shortlist, the ranking and the save to the dashboard. |
-| `src/controllers/users.controller.js` | The dashboard, adding a favourite and removing one. |
+| `src/controllers/users.controller.js` | The dashboard, adding a favourite and removing one, and the Profile page: the profile with its counts, a name change, a password change, logging out the other devices, clearing the search history or the recently viewed list, and deleting the account. |
 | `src/services/phoneQuery.js` | Turns filters into one MongoDB query. Shared by the phone list and search. |
 | `src/services/price.service.js` | Works out the price trend and the best time to buy note. |
 | `src/services/review.service.js` | The review mood from the stars and the star based summary. |
 | `src/services/recommend.service.js` | Reads the needs, builds and scores the shortlist, and writes the reasons from our rules. |
 | `src/services/ai.service.js` | The one file that calls the model. |
-| `src/services/mail.service.js` | Sends the password reset email with Nodemailer. |
-| `src/middleware/auth.js` | `requireAuth` and `optionalAuth`, which read the login token. |
+| `src/services/mail.service.js` | Sends the verification code, the password reset email and the password changed notice through Resend, or prints the code and the link when mail is not set up. |
+| `src/services/turnstile.service.js` | Checks the Cloudflare Turnstile token from Create account with Cloudflare. |
+| `src/middleware/auth.js` | `requireAuth` and `optionalAuth`, which read the login token and refuse one whose version no longer matches the account. |
 | `src/middleware/error.js` | `notFound` answers paths with no route. `errorHandler` turns every thrown error into the envelope. |
 | `src/jobs/priceUpdater.js` | `runPriceUpdate` records the prices from `data/prices.json`, and `startPriceUpdater` schedules it every night. |
 | `src/utils/http.js` | `ok` sends the success envelope. `httpError` makes an error that carries a status code. |
-| `src/utils/jwt.js` | `signToken` and `verifyToken`, both with `JWT_SECRET`. |
-| `src/utils/password.js` | `hashPassword` and `checkPassword` with bcrypt at 10 rounds. `makeResetToken` makes a random reset token and `hashResetToken` hashes it with `sha256`. |
+| `src/utils/jwt.js` | `signToken` puts the user id, the role and the account's `tokenVersion` in the token, and `verifyToken` checks it, both with `JWT_SECRET`. |
+| `src/utils/password.js` | `hashPassword` and `checkPassword` with bcrypt at 10 rounds. `newPasswordProblem` checks a new password: at least 8 characters and at most 72 bytes. `makeResetToken` makes a random reset token and `hashResetToken` hashes it with `sha256`. `makeEmailCode` makes a random 6 digit code, `hashEmailCode` hashes the email and the code with HMAC SHA 256 keyed with `JWT_SECRET`, and `codesMatch` compares two hashes in constant time. |
+| `src/utils/name.js` | `nameProblem` checks that a name has 2 to 60 characters. Register and the name change use it. |
 | `src/utils/slug.js` | `Slugify` turns "Samsung Galaxy S24+" into `samsung-galaxy-s24-plus`. |
 | `scripts/seed.js` | `npm run seed`: loads `data/phones.json` into the database. |
 | `scripts/runPriceUpdate.js` | `npm run prices`: runs the price check once. |
@@ -73,13 +76,13 @@ Take `GET /api/phones/samsung-galaxy-s24`, sent by the Phone detail page of a lo
 5. The limit on `/api` counts the request. Past 300 in 15 minutes from one address it answers 429.
 6. `GET /api/health` is checked first. It does not match.
 7. The routers are checked in order: `/api/auth`, `/api/phones`, `/api/ai`, `/api/users`. The path starts with `/api/phones`, so `phones.routes.js` takes over. Inside it, `/` and `/compare` do not match, and `GET /:slug` matches with `slug` set to `samsung-galaxy-s24`.
-8. `optionalAuth` in `middleware/auth.js` reads the `Authorization: Bearer <token>` header, verifies the token with `JWT_SECRET`, loads the user from the database and puts it on `req.user`. Without a valid token `req.user` is empty and the request goes on as a visitor.
+8. `optionalAuth` in `middleware/auth.js` reads the `Authorization: Bearer <token>` header, verifies the token with `JWT_SECRET`, loads the user from the database, checks that the token's version equals the account's `tokenVersion` and puts the user on `req.user`. Without a valid token `req.user` is empty and the request goes on as a visitor.
 9. `getPhone` in `phones.controller.js` runs. It asks the `Phone` model for the document with that slug and throws `httpError(404, "Phone not found")` when there is none. When the phone has no summary and the AI settings are filled, it asks `ai.service.js` to write one and stores it. It moves the phone to the top of the user's `recentlyViewed` and works out `isFavourite`.
 10. The controller answers through `ok` in `utils/http.js`, which sends `{ ok: true, data: { phone, isFavourite } }` with status 200.
 11. If anything throws along the way, Express 5 passes the error to `errorHandler` in `middleware/error.js`, also when it comes from an async function. `errorHandler` answers `{ ok: false, error: { message } }` with the status on the error, or 500. A value that Mongoose refuses gets 400, and a duplicate value in a unique field gets 409 with "That value is already taken". Every answer of 500 or more is printed to the terminal. In production the message of a plain 500 is replaced with "Something went wrong on the server.", while a 502 or 503 keeps its own message, so the person still sees it.
 12. If no route matches at all, `notFound` answers 404 with "No route for", the method and the path, in the same envelope. Under `/api/users`, `requireAuth` runs for every path first, so a request there without a valid token gets 401 even when the path does not exist.
 
-A route that needs login runs `requireAuth` in place of `optionalAuth`. For `POST /api/phones/samsung-galaxy-s24/reviews`, `requireAuth` throws `httpError(401, "Please log in")` when the token is missing, fake or expired, or when its account no longer exists, and the controller never runs.
+A route that needs login runs `requireAuth` in place of `optionalAuth`. For `POST /api/phones/samsung-galaxy-s24/reviews`, `requireAuth` throws `httpError(401, "Please log in")` when the token is missing, fake or expired, when its account no longer exists, or when its version is older than the account's, and the controller never runs.
 
 The client never sees anything but the envelope. `client/src/services/api.js` returns `data` on success and throws an error with `error.message` on failure.
 
@@ -95,35 +98,34 @@ CellSense API running on http://localhost:5000
 
 ## The settings
 
-`src/config/env.js` reads these once. `server/.env.example` lists all of them except `NODE_ENV`. Only `PORT`, `JWT_EXPIRES_IN`, `CLIENT_ORIGIN`, `PRICE_UPDATER_CRON` and `CLIENT_URL` have values there; the rest are empty. The full file with the values we use is in [INSTALLATION.md](INSTALLATION.md).
+`src/config/env.js` reads these once. `server/.env.example` lists all of them except `NODE_ENV`. Only `PORT`, `JWT_EXPIRES_IN`, `CLIENT_ORIGIN`, `PRICE_UPDATER_CRON`, `TURNSTILE_SECRET_KEY`, `MAIL_FROM` and `CLIENT_URL` have values there; the rest are empty. The full file with the values we use is in [INSTALLATION.md](INSTALLATION.md).
 
 | Setting | Default in `env.js` | What it is for | What happens when it is empty |
 | --- | --- | --- | --- |
 | `PORT` | `5000` | The port the server listens on. | The default is used. The client proxy expects 5000. |
-| `NODE_ENV` | `development` | Development or production. Not in `.env.example`. | Development: an answer of 500 or more shows the real message, and with no mail settings the reset link is printed in the terminal. In production a plain 500 says "Something went wrong on the server." while a 502 or 503 keeps its own message, and a missing mail setup is printed as an error without the link. |
+| `NODE_ENV` | `development` | Development or production. Not in `.env.example`. | Development: an answer of 500 or more shows the real message, and with no mail settings the email codes and the reset link are printed in the terminal. In production a plain 500 says "Something went wrong on the server." while a 502 or 503 keeps its own message. Without mail settings, register and resend code answer 503, and forgot password prints an error without the link. |
 | `MONGODB_URI` | empty | The MongoDB Atlas connection string. | The server starts and prints a warning. The health check works, and every route that touches the database waits about ten seconds and answers 500. `npm run seed` and `npm run prices` stop with a message, and the nightly price check fails when it runs. |
-| `JWT_SECRET` | empty | Signs and verifies the login tokens. | Register saves the account and then answers 500, because no token can be signed. Login with the right password answers 500 for the same reason. Every route that needs login answers 401, and the optional routes run as for a visitor. |
+| `JWT_SECRET` | empty | Signs and verifies the login tokens. | Verify email creates the account and then answers 500, because no token can be signed. Login with the right password answers 500 for the same reason. The email codes are also hashed with this secret. Every route that needs login answers 401, and the optional routes run as for a visitor. |
 | `JWT_EXPIRES_IN` | `7d` | How long a token lasts. | The default is used: seven days. |
 | `CLIENT_ORIGIN` | `http://localhost:5173` | The one origin CORS allows. `.env.example` sets the same value, the client's port. | The default is used: the client on port 5173. |
 | `AI_BASE_URL` | empty | The base address of the OpenAI compatible chat endpoint. The service adds `/chat/completions`. We use Groq at `https://api.groq.com/openai/v1`. | When any of the three AI settings is empty the model is never called. Search stays direct, chat answers 503 with "The AI features are not set up yet", recommendations use the reasons from our rules, phone summaries are not written, review moods come from the stars, and review summaries are star based unless the model saved one earlier for the same number of reviews. |
 | `AI_API_KEY` | empty | The provider key, sent as `Authorization: Bearer <key>`. | As for `AI_BASE_URL`. |
 | `AI_MODEL` | empty | The model name. We use `openai/gpt-oss-120b`. | As for `AI_BASE_URL`. |
 | `PRICE_UPDATER_CRON` | `0 2 * * *` | When the nightly price check runs, in Lagos time. | The default is used: 02:00 every day. A value that is not a valid schedule turns the job off with a warning. |
-| `MAIL_HOST` | empty | The SMTP host for the password reset email. | When `MAIL_HOST`, `MAIL_USER` or `MAIL_PASS` is empty, no email is sent. Outside production the reset link is printed in the server terminal. |
-| `MAIL_PORT` | `587` | The SMTP port. Port 465 uses a secure connection from the start. | The default is used. |
-| `MAIL_USER` | empty | The SMTP user name. | As for `MAIL_HOST`. |
-| `MAIL_PASS` | empty | The SMTP password. | As for `MAIL_HOST`. |
-| `MAIL_FROM` | empty | The sender address of the email. | `MAIL_USER` is used as the sender. |
+| `TURNSTILE_SECRET_KEY` | empty | The secret key of the Cloudflare Turnstile widget, used to check the token Create account sends. `.env.example` holds Cloudflare's test secret `1x0000000000000000000000000000000AA`, which passes every check and accepts only the test token `XXXX.DUMMY.TOKEN.XXXX` that the test site keys give. | Register answers 503 with "The security check is not set up yet", so nobody can create an account. |
+| `RESEND_API_KEY` | empty | The Resend API key that sends every email. | No email is sent. Outside production the codes and the reset links are printed in the server terminal. In production register and resend code answer 503, and forgot password prints an error line. |
+| `MAIL_FROM` | empty | The sender of every email. `.env.example` sets `"CellSense AI <onboarding@resend.dev>"`. Resend sends from `onboarding@resend.dev` only to the email of the Resend account, so codes reach other people only from an address on a domain verified in Resend. | As for `RESEND_API_KEY`: mail counts as set up only when both are filled. |
 | `CLIENT_URL` | `http://localhost:5173` | The site address at the start of the reset link. `.env.example` sets the same value. | The default is used, so the link opens the client on port 5173. |
 
 ## The models
 
-The backend stores four collections in MongoDB Atlas through Mongoose. All four add `createdAt` and `updatedAt` by themselves.
+The backend stores five collections in MongoDB Atlas through Mongoose. All five add `createdAt` and `updatedAt` by themselves.
 
 | Model | Collection | What it holds |
 | --- | --- | --- |
 | `Phone` | phones | One document per phone: the slug, brand, model, picture path, category, release year, specs, current price with the date it was checked, the price history, the summary written by the model, the saved review summary and the source (`seed`, `ai` or `admin`). |
-| `User` | users | One document per account: name, email, the bcrypt hash of the password, role, favourites, recently viewed phones, search history, the last recommendations and a pending password reset. |
+| `User` | users | One document per account: name, email, the bcrypt hash of the password, role, favourites, recently viewed phones, search history, the last recommendations, a pending password reset, when the email was verified, when the password was last changed, and the token version. |
+| `PendingSignup` | pendingsignups | One document per sign up waiting for its code: the name, the email, the password hash, the code hash, the number of tries, when the code expires, when it was sent, and when MongoDB may delete the document. |
 | `Review` | reviews | One document per review: the phone, the user, the author name, the rating, the text and the mood. One review per user per phone. |
 | `SearchLog` | searchlogs | One document per search: the query, the filters, whether it was answered directly or by the model, the number of phones found and the user when logged in. |
 
@@ -154,18 +156,28 @@ The backend stores four collections in MongoDB Atlas through Mongoose. All four 
 
 Each call gives the model only the text we choose to send. The model never reads the database itself.
 
-`mail.service.js` has `sendPasswordResetEmail`. With `MAIL_HOST`, `MAIL_USER` and `MAIL_PASS` set it sends the email through Nodemailer, from `MAIL_FROM` or else `MAIL_USER`, with the subject "Reset your CellSense AI password" and the link that works for one hour. Without them it prints the link in the terminal outside production, and an error line in production.
+`mail.service.js` sends every email through Resend. `isMailConfigured` says whether `RESEND_API_KEY` and `MAIL_FROM` are both filled. The first email makes one Resend client with the key, and one private `sendEmail` sends from `MAIL_FROM` to one address with a subject, a plain text part and an HTML part with the same words. The HTML uses the system fonts and near black text on white, has no images and no tracking, shows a code in large spaced digits and a link as one plain link, and escapes every value that comes from a person. Resend answers with an error instead of throwing one, so `sendEmail` prints "Resend could not send to", the address, the error name and the message, and throws an error with that text. A network failure is printed and thrown the same way.
+
+| Function | Subject | When mail is not set up |
+| --- | --- | --- |
+| `sendVerificationCode({ to, name, code })` | Your CellSense AI verification code | Outside production it prints "Mail is not set up. Verification code for", the email and the code. In production it throws 503 with "Email is not set up yet, so we cannot send the code." |
+| `sendPasswordResetEmail({ to, name, link })` | Reset your CellSense AI password | Outside production it prints "Mail is not set up. Reset link for", the email and the link. In production it prints "Mail is not set up, so the reset email was not sent." |
+| `sendPasswordChangedEmail({ to, name })` | Your CellSense AI password was changed | It does nothing. |
+
+`turnstile.service.js` has `isTurnstileConfigured`, which says whether `TURNSTILE_SECRET_KEY` is filled, and `verifyTurnstile(token, ip)`. It answers 400 for a missing token or one longer than 2048 characters, and 503 when the secret is empty. Otherwise it posts the secret, the token and the address as form data to `https://challenges.cloudflare.com/turnstile/v0/siteverify` and waits at most 10 seconds. A network failure or a reply that is not JSON is printed and answers 502, and a reply without `success: true` prints Cloudflare's error codes and answers 400.
 
 ## How login works
 
 We keep no sessions on the server. A logged in user carries a token.
 
-1. Register. `POST /api/auth/register` checks that the name, the email and the password are there, that the email looks like an email and that the password has at least 8 characters. It answers 409 when the email already has an account. Then it hashes the password with bcrypt, stores the user with `passwordHash`, signs a token and answers `{ token, user }` with status 201.
-2. Log in. `POST /api/auth/login` finds the user by email and checks the password against the hash. A wrong email and a wrong password get the same 401 message, "Wrong email or password". A match gets a fresh token.
-3. The token carries the user id and the role and expires after `JWT_EXPIRES_IN`, seven days. `requireAuth` reads it from the `Authorization` header, verifies it, loads the user and puts it on `req.user`, or answers 401 with "Please log in". `optionalAuth` does the same but never answers 401.
-4. `GET /api/auth/me` returns the user for the token. The client calls it once when the site opens with a saved token, so a person stays logged in after a reload.
-5. Forgot password. `POST /api/auth/forgot-password` answers `{ sent: true }` for every valid email, whether or not it has an account. When the email has an account, the controller makes a random token, stores its `sha256` hash with an expiry one hour ahead in `passwordReset` on the user, and hands the link `<CLIENT_URL>/reset-password/<token>` to `mail.service.js`.
-6. Reset password. `POST /api/auth/reset-password` hashes the token it receives, finds the user with that hash and an expiry still in the future, stores the new bcrypt hash and removes `passwordReset`, so the link works once.
+1. Register. `POST /api/auth/register` checks that the name, the email and the password are there, that the name has 2 to 60 characters, that the email looks like an email and that the password has 8 characters to 72 bytes. Then it checks the Turnstile token with Cloudflare, answers 409 when the email already has an account, and 429 when a code went to that email less than 60 seconds ago. It hashes the password with bcrypt, makes a 6 digit code, saves a pending sign up with the code hash, and emails the code. No user exists yet, and the reply holds no token.
+2. Verify email. `POST /api/auth/verify-email` takes one of the five tries in one atomic step, refuses an expired code, and compares the hash of the code it receives with the stored one. The right code creates the user from the pending sign up with `emailVerifiedAt` set, deletes the pending sign up, signs a token and answers `{ token, user }` with status 201. `POST /api/auth/resend-code` sends a new code with five new tries, at most once a minute.
+3. Log in. `POST /api/auth/login` finds the user by email and checks the password against the hash. A wrong email and a wrong password get the same 401 message, "Wrong email or password". A match gets a fresh token.
+4. The token carries the user id, the role and the account's `tokenVersion`, and expires after `JWT_EXPIRES_IN`, seven days. `requireAuth` reads it from the `Authorization` header, verifies it, loads the user, checks that the versions match and puts the user on `req.user`, or answers 401 with "Please log in". `optionalAuth` does the same but never answers 401.
+5. `GET /api/auth/me` returns the user for the token. The client calls it once when the site opens with a saved token, so a person stays logged in after a reload.
+6. Forgot password. `POST /api/auth/forgot-password` answers `{ sent: true }` for every valid email, whether or not it has an account. When the email has an account, the controller makes a random token, stores its `sha256` hash with an expiry one hour ahead in `passwordReset` on the user, and hands the link `<CLIENT_URL>/reset-password/<token>` to `mail.service.js`.
+7. Reset password. `POST /api/auth/reset-password` hashes the token it receives, finds the user with that hash and an expiry still in the future, stores the new bcrypt hash, sets `passwordChangedAt`, raises `tokenVersion` so every older login ends, sets `emailVerifiedAt` when it was empty, and removes `passwordReset`, so the link works once.
+8. The Profile page. A password change needs the current password, stores the new hash, sets `passwordChangedAt`, raises `tokenVersion` and answers with a fresh token, so this device stays logged in and every other device is logged out. Logging out the other devices raises `tokenVersion` the same way. Deleting the account needs the password.
 
 ## The nightly price check
 
@@ -216,26 +228,34 @@ It never removes a phone. At the end it prints a line such as `Seed: 60 phones a
 
 ## The rate limits
 
-Three limits protect the backend. All come from `express-rate-limit` and count the requests from one address.
+Seven limits protect the backend. All come from `express-rate-limit` and count the requests from one address.
 
 | Limit | Where | What the person sees past it |
 | --- | --- | --- |
 | 300 requests every 15 minutes | Every path under `/api`, set in `src/index.js` | 429 with "Too many requests. Try again in a few minutes." |
 | 20 requests every minute | Every path under `/api/ai`, set in `src/routes/ai.routes.js` | 429 with "Too many questions at once. Wait a minute and try again." |
 | 5 requests every 15 minutes | `POST /api/auth/forgot-password`, set in `src/routes/auth.routes.js` | 429 with "Too many reset requests. Try again in 15 minutes." |
+| 10 requests every 15 minutes | `POST /api/auth/register`, set in `src/routes/auth.routes.js` | 429 with "Too many sign up attempts. Try again in 15 minutes." |
+| 20 requests every 15 minutes | `POST /api/auth/verify-email`, set in `src/routes/auth.routes.js` | 429 with "Too many tries. Try again in 15 minutes." |
+| 5 requests every 15 minutes | `POST /api/auth/resend-code`, set in `src/routes/auth.routes.js` | 429 with "Too many new codes asked for. Try again in 15 minutes." |
+| 10 requests every 15 minutes, shared | `PATCH /api/users/me/password`, `POST /api/users/me/sign-out-others` and `DELETE /api/users/me`, set in `src/routes/users.routes.js` | 429 with "Too many tries. Try again in 15 minutes." |
 
-An AI request and a reset request also count toward the 300. The AI limit is lower because one AI request can call the model, which takes time and costs money. The counters live in memory, so they start again when the server restarts.
+A request to any of these routes also counts toward the 300. The AI limit is lower because one AI request can call the model, which takes time and costs money. The counters live in memory, so they start again when the server restarts.
 
 ## The security choices
 
 1. `helmet` sets safe HTTP headers on every answer.
 2. `cors` is limited to the client origin, so other sites cannot read the API from a browser.
-3. The three rate limits above cap what one address can send.
+3. The rate limits above cap what one address can send, so nobody can try codes or passwords quickly.
 4. Passwords are stored only as bcrypt hashes. The hash is left out of every query unless the login code asks for it, and no reply holds it.
 5. Log in gives the same answer for an unknown email and a wrong password, and forgot password gives the same answer whether or not the email has an account.
 6. A reset token is stored only as a `sha256` hash, works once and expires after one hour. A new request replaces the old token.
-7. Tokens expire after seven days. A route that needs login checks the token and loads the user on every request, so a deleted account loses access at once.
+7. Tokens expire after seven days. A route that needs login checks the token and loads the user on every request, so a deleted account loses access at once. The token version ends every other login after a password change, a reset or a log out of the other devices.
 8. Secrets live only in `server/.env`, which git ignores and the submission zip leaves out. The browser never sees the model key, because only the backend calls the model.
 9. Each controller checks its input, so bad input gets a 400 with a clear message. Posting a review looks the phone up first, so an unknown slug gets its 404 before the rating and the text are checked. Typed words are escaped before they go into a database pattern, and the JSON body is limited to 1 MB.
 10. The author name of a review comes from the logged in account, never from the request.
 11. The model only sees the text the backend sends it, and the backend keeps only the keys and value ranges it expects from each reply.
+12. Create account needs a passed Cloudflare Turnstile check, which the server confirms with its secret key, so scripts cannot make accounts in bulk.
+13. An account exists only after the person proves they own the email with a 6 digit code. The code is stored only as an HMAC hash, works for 10 minutes and allows five tries, and a new code can be asked for once a minute.
+14. A password change needs the current password, and deleting the account needs the password. A wrong password there answers 400, not 401.
+15. Every email escapes the values that come from a person before they go into the HTML.

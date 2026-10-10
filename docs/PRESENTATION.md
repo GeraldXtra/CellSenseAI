@@ -42,14 +42,14 @@ The server lives in `server/` and runs on Node 20 with Express 5.
 - **`config/`** reads every setting from `.env` once and connects to MongoDB Atlas.
 - **`routes/`** maps each address to a controller and adds the login check and the limits where they are needed.
 - **`controllers/`** read the request, call the services and the models, and send the answer.
-- **`services/`** hold the rules: the AI calls, the database query builder, the recommendation shortlist and its reasons, the price trend, the review mood and summary, and the reset email.
-- **`models/`** describe the four collections: phones, users, reviews and search logs.
+- **`services/`** hold the rules: the AI calls, the database query builder, the recommendation shortlist and its reasons, the price trend, the review mood and summary, the security check and the emails.
+- **`models/`** describe the five collections: phones, users, pending sign ups, reviews and search logs.
 - **`middleware/`** holds `requireAuth` and `optionalAuth`, which read the JWT from the `Authorization` header, and the error handler, which turns every error into `{ ok: false, error: { message } }`.
 - **`jobs/priceUpdater.js`** runs every night at 2 am. It reads `server/data/prices.json` and adds each new guide price to the phone's price history.
 
 ## Logging in
 
-Create account and Log in post to `/api/auth`. The server hashes the password with bcrypt, signs a JWT that lasts seven days and sends it back with the user. `AuthContext` saves the token in the browser and `api.js` sends it with every request after that. The Dashboard sits behind `ProtectedRoute`, which sends a visitor to Log in and brings them back afterwards. A forgotten password sends an email with a reset link that works once and for one hour.
+Create account posts the details and a Cloudflare Turnstile token to `/api/auth/register`. The server checks the token, keeps a pending sign up with the password hashed by bcrypt, and emails a 6 digit code through Resend. The Verify email page posts the code, and only then is the account created. Verify email and Log in get back a JWT that lasts seven days with the user. `AuthContext` saves the token in the browser and `api.js` sends it with every request after that. The Dashboard and the Profile page sit behind `ProtectedRoute`, which sends a visitor to Log in and brings them back afterwards. A forgotten password sends an email with a reset link that works once and for one hour.
 
 ## The AI features
 
@@ -82,7 +82,7 @@ The five answers become needs. Our own rules pick a shortlist inside the budget 
 The server marks the winner of each row: the lowest price and the highest RAM, storage, cameras, battery, screen size and refresh rate. The client shows that value in bold. The compare list holds up to three phones and is kept in the browser, so it survives a reload.
 
 **How are passwords and accounts kept safe?**
-Passwords are hashed with bcrypt and never stored as text. Login returns a JWT that lasts seven days and is checked on every protected request. A reset link uses a random token whose SHA 256 hash is stored, and it works once and for one hour. Forgot password has its own rate limit, so nobody can flood an inbox.
+Passwords are hashed with bcrypt and never stored as text. Login returns a JWT that lasts seven days and is checked on every protected request. A reset link uses a random token whose SHA 256 hash is stored, and it works once and for one hour. Forgot password has its own rate limit, so nobody can flood an inbox. A new account needs the Turnstile check and the code from its email, and the code allows five tries. Changing the password ends every other login.
 
 **What other security measures are there?**
 Helmet sets the security headers, CORS only accepts our client address, request bodies are capped at 1 MB, all `/api` requests are limited to 300 every 15 minutes, and the AI routes to 20 a minute. Mongoose validates the data, and every error goes back as a plain message without internal details.

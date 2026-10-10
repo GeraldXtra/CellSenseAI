@@ -6,7 +6,7 @@ This file says what is done and what is left, with the owner of each item. It ma
 
 | Item | What it means | Owner |
 | --- | --- | --- |
-| The designs | Every page and every state is drawn in `docs/ui/`, 26 images. The pages are built against them. | Gerald |
+| The designs | Every page and every state is drawn in `docs/ui/`, 29 images. The pages are built against them. | Gerald |
 | The project structure | The client has its routes, theme, services, contexts, hooks, sample data, and one folder per page with a README. The server has its folders, its settings file, its middleware, its models and its scripts. | Gerald |
 | The shared frontend | The layout, the top bar with the account menu, the footer, the assistant button and the floating chat window, the phone card, the phone picture, the loader, the empty state, the login guard, the three contexts, the services, `useAsync` and the Page not found page. | Gerald |
 | Login and password reset | Register, log in and `GET /auth/me` with bcrypt hashes and JWT tokens, and the reset by email with a one hour link that works once. In the client, AuthContext saves the token and sets the user. | Gerald |
@@ -18,6 +18,8 @@ This file says what is done and what is left, with the owner of each item. It ma
 | The assistant | `POST /ai/chat` with the related phones from the database, used by the floating chat window and the Assistant page through ChatContext. | Gerald |
 | Recommendations | `POST /ai/recommend`: the shortlist from our own rules, ranked by the model with a reason for each phone, saved to the dashboard of a logged in user. | Gerald |
 | The dashboard | `GET /users/me/dashboard`, the favourites, and recently viewed phones recorded on the phone route, capped at 20. | Gerald |
+| Email codes and the security check | Create account checks Cloudflare Turnstile and emails a 6 digit code through Resend, and the account exists only after the code. The Verify email page and the Turnstile box, and the change to the Create account page. | Gerald |
+| Profile | The Profile page and its endpoints: the name, the password change that logs out the other devices, clearing the history, logging out other devices and deleting the account. | Gerald |
 | Prices | The trend with its suggestion, the nightly price check from `server/data/prices.json`, and `npm run prices` to run it by hand. | Gerald |
 | The documents | The problem definition, the architecture, the backend guide, the API, the data model, the routes, the components, the ownership, the styling guide, the data flow guide, the team guide, the design specifications, the test cases, the installation steps, the assumptions, the report outline, the deliverables and this roadmap. | Gerald |
 

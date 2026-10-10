@@ -9,7 +9,7 @@ Ibrahim, Osakue, this is one table of every folder and file in `client/` and `se
 | `client/index.html` | shared, changed only by Gerald | The one HTML page: the title, the favicon links and the root div. |
 | `client/vite.config.js` | shared, changed only by Gerald | The Vite config: the React plugin, port 5173 and the proxy that sends `/api` to port 5000. |
 | `client/package.json` | shared, changed only by Gerald | The client packages and the scripts. Ask me before adding a package. |
-| `client/.env.example` | shared, changed only by Gerald | The one client setting, `VITE_API_URL`, left empty for the proxy. |
+| `client/.env.example` | shared, changed only by Gerald | The two client settings: `VITE_API_URL`, left empty for the proxy, and `VITE_TURNSTILE_SITE_KEY`, Cloudflare's test site key for the security check. |
 | `client/.gitignore` | shared, changed only by Gerald | What git ignores in the client. |
 | `client/.oxlintrc.json` | shared, changed only by Gerald | The lint rules. |
 | `client/README.md` | Gerald | How to run the client and the folder map. |
@@ -24,20 +24,20 @@ Ibrahim, Osakue, this is one table of every folder and file in `client/` and `se
 | `client/src/main.jsx` | shared, changed only by Gerald | The entry point: loads Bootstrap and the styles, and renders App inside the router and the three providers. |
 | `client/src/App.jsx` | shared, changed only by Gerald | The route table. Every page sits inside Layout. |
 | `client/src/styles/theme.css` | shared, changed only by Gerald | Every colour, spacing, font size, radius and shadow, the Bootstrap hooks and the shared classes. |
-| `client/src/styles/global.css` | shared, changed only by Gerald | The page shell, the top bar, the footer, the chat window, the loader, the empty box, the card grid, the phone card, the phone picture and the breakpoints. |
+| `client/src/styles/global.css` | shared, changed only by Gerald | The page shell, the top bar, the footer, the chat window, the loader, the empty box, the card grid, the phone card, the phone picture, the security check box and the breakpoints. |
 | `client/src/services/api.js` | shared, changed only by Gerald | The axios instance, the token storage, the auth header and the envelope unwrapping. |
 | `client/src/services/phones.service.js` | shared, changed only by Gerald | listPhones, getPhone, comparePhones, getPriceTrend, getReviews, addReview, getReviewSummary. |
 | `client/src/services/ai.service.js` | shared, changed only by Gerald | searchPhones, chat, recommend. |
-| `client/src/services/auth.service.js` | shared, changed only by Gerald | register, login, me, forgotPassword, resetPassword. |
-| `client/src/services/users.service.js` | shared, changed only by Gerald | getDashboard, addFavourite, removeFavourite. |
-| `client/src/context/AuthContext.jsx` | shared, changed only by Gerald | The logged in user, the loading flag, login, register, logout, and the useAuth hook. |
+| `client/src/services/auth.service.js` | shared, changed only by Gerald | register, verifyEmail, resendCode, login, me, forgotPassword, resetPassword. |
+| `client/src/services/users.service.js` | shared, changed only by Gerald | getDashboard, addFavourite, removeFavourite, getProfile, updateProfile, changePassword, signOutOthers, clearSearchHistory, clearRecentlyViewed, deleteAccount. |
+| `client/src/context/AuthContext.jsx` | shared, changed only by Gerald | The logged in user, the loading flag, login, register, verifyEmail, applySession, updateUser, logout, and the useAuth hook. |
 | `client/src/context/CompareContext.jsx` | shared, changed only by Gerald | The compare list of up to three slugs kept in the browser, the `?ids=` reader, and the useCompare hook. |
 | `client/src/context/ChatContext.jsx` | shared, changed only by Gerald | The chat messages, the loading flag, the error, the open state of the chat window, the send action, and the useChat hook. |
 | `client/src/hooks/useAsync.js` | shared, changed only by Gerald | Runs an async function and gives data, loading, error and reload. |
 | `client/src/data/mockPhones.js` | shared, changed only by Gerald | Six sample phones, the brands, three sample reviews and a sample review summary, only for building a page before you connect it. |
 | `client/src/components/shared/Layout.jsx` | shared, changed only by Gerald | The shell: Navbar, the page, Footer, ChatLauncher, ChatWindow. |
 | `client/src/components/shared/Navbar.jsx` | shared, changed only by Gerald | The top bar and its collapsed form under 768px. |
-| `client/src/components/shared/AccountMenu.jsx` | shared, changed only by Gerald | The Dashboard and Log out dropdown. |
+| `client/src/components/shared/AccountMenu.jsx` | shared, changed only by Gerald | The Dashboard, Profile and Log out dropdown. |
 | `client/src/components/shared/Footer.jsx` | shared, changed only by Gerald | The footer with its five columns. |
 | `client/src/components/shared/ChatLauncher.jsx` | shared, changed only by Gerald | The fixed button that opens the floating chat window. |
 | `client/src/components/shared/ChatWindow.jsx` | shared, changed only by Gerald | The floating chat window over every page but `/assistant`, with the same conversation as the Assistant page. It started in `client/src/components/osakue/` and moved here, so it is mine now. |
@@ -45,7 +45,8 @@ Ibrahim, Osakue, this is one table of every folder and file in `client/` and `se
 | `client/src/components/shared/PhoneCard.jsx` | shared, changed only by Gerald | The product card, and the specLine helper. |
 | `client/src/components/shared/Loader.jsx` | shared, changed only by Gerald | The spinner with a label. |
 | `client/src/components/shared/EmptyState.jsx` | shared, changed only by Gerald | The empty box with a title, a message and an action. |
-| `client/src/components/shared/ProtectedRoute.jsx` | shared, changed only by Gerald | The login guard for the dashboard. |
+| `client/src/components/shared/ProtectedRoute.jsx` | shared, changed only by Gerald | The login guard for the dashboard and the profile. |
+| `client/src/components/shared/Turnstile.jsx` | shared, changed only by Gerald | The Cloudflare Turnstile security check with its status line, placed on Create account. |
 | `client/src/components/ibrahim/SearchBar.jsx` | Ibrahim | The search field and button. Used on Home and Search results. |
 | `client/src/components/ibrahim/UnderstoodChips.jsx` | Ibrahim | The "Understood as" chips on Search results. |
 | `client/src/components/ibrahim/FilterStrip.jsx` | Ibrahim | The filter strip on Search results and Browse. |
@@ -72,12 +73,16 @@ Ibrahim, Osakue, this is one table of every folder and file in `client/` and `se
 | `client/src/pages/Assistant/` (Assistant.jsx, Assistant.css, README.md) | Osakue | The Assistant page. |
 | `client/src/pages/Dashboard/` (Dashboard.jsx, Dashboard.css, README.md) | Osakue | The Dashboard page. |
 | `client/src/pages/Login/` (Login.jsx, Login.css, README.md) | Osakue | The Log in page. |
-| `client/src/pages/Register/` (Register.jsx, Register.css, README.md) | Osakue | The Create account page. |
+| `client/src/pages/Register/` (Register.jsx, Register.css, README.md) | Osakue | The Create account page. I changed `Register.jsx` and `README.md` for the email code and the security check; see the note under this table. |
 | `client/src/pages/ForgotPassword/` (ForgotPassword.jsx, ForgotPassword.css, README.md) | Osakue | The Forgot password page. |
 | `client/src/pages/ResetPassword/` (ResetPassword.jsx, ResetPassword.css, README.md) | Osakue | The Reset password page. |
 | `client/src/pages/NotFound/` (NotFound.jsx, NotFound.css, README.md) | shared, changed only by Gerald | The Page not found page, finished. |
+| `client/src/pages/VerifyEmail/` (VerifyEmail.jsx, VerifyEmail.css, README.md) | Gerald | The Verify email page at `/verify-email`, finished: the second step of Create account. |
+| `client/src/pages/Profile/` (Profile.jsx, Profile.css, README.md) | Gerald | The Profile page at `/profile`, finished. |
 
 The README in each page folder is mine too: I wrote it for the owner of the page. If it is wrong or unclear, tell me and I fix it.
+
+Osakue, Create account is still yours, but I changed it on `backend` so a new account needs the email code and the security check. In `Register.jsx` I added the Turnstile box between the password and the button, a `turnstileToken` and a `resetKey`, kept the button disabled until the three fields are filled and the box is ticked, added the line "Tick the security check to continue." under the button while only the tick is missing, made the submit refuse to send without a token, changed the busy label to "Sending the code", sent `turnstileToken` with the form, cleared the token and changed `resetKey` after every error, and sent the person to `/verify-email?email=<email>` with the same `next` in place of logging them in. Your validation, your fields, your styles and the Log in line are as you wrote them, and `Register.css` is unchanged. I also brought `README.md` up to date with that flow. Sync with `develop` before you touch the page again.
 
 A branch that still holds `client/src/components/osakue/ChatWindow.jsx` from the first skeleton loses it at the next sync with `develop`, which is what we want.
 
@@ -88,7 +93,7 @@ Everything in `server/` is mine. You do not need to open it to build your pages;
 | Path | Owner | What it is for |
 | --- | --- | --- |
 | `server/package.json` | Gerald | The server packages and the scripts dev, start, seed and prices. |
-| `server/.env.example` | Gerald | Every server setting but `NODE_ENV`. Only the port, the token lifetime, the client origin, the price check schedule and the client address for the reset link have values; the rest are empty. The real `.env` is never committed. |
+| `server/.env.example` | Gerald | Every server setting but `NODE_ENV`. Only the port, the token lifetime, the client origin, the price check schedule, Cloudflare's test secret for the security check, the email sender and the client address for the reset link have values; the rest are empty. The real `.env` is never committed. |
 | `server/README.md` | Gerald | How to run the server, the scripts, the keys and the folder map. |
 | `server/data/phones.json` | Gerald | The 60 phones the seed loads, 12 each for Samsung, Apple, OnePlus, Xiaomi and Vivo. |
 | `server/data/prices.json` | Gerald | The price list: a check date and a price per slug, read by the nightly price check and `npm run prices`. |
@@ -99,29 +104,32 @@ Everything in `server/` is mine. You do not need to open it to build your pages;
 | `server/src/config/env.js` | Gerald | Reads every setting once and exports a frozen object. |
 | `server/src/config/db.js` | Gerald | Connects to MongoDB Atlas. |
 | `server/src/models/Phone.js` | Gerald | The phones collection. |
-| `server/src/models/User.js` | Gerald | The users collection, with favourites, recently viewed phones, search history, recommendations and the password reset. |
+| `server/src/models/User.js` | Gerald | The users collection, with favourites, recently viewed phones, search history, recommendations, the password reset, when the email was verified, when the password was last changed, and the token version. |
+| `server/src/models/PendingSignup.js` | Gerald | The pendingsignups collection: sign ups waiting for their email code, removed by MongoDB an hour after the last code. |
 | `server/src/models/Review.js` | Gerald | The reviews collection. |
 | `server/src/models/SearchLog.js` | Gerald | The searchlogs collection. |
-| `server/src/routes/auth.routes.js` | Gerald | The `/api/auth` router, with the limit on forgot password. |
+| `server/src/routes/auth.routes.js` | Gerald | The `/api/auth` router, with the limits on register, verify email, resend code and forgot password. |
 | `server/src/routes/phones.routes.js` | Gerald | The `/api/phones` router. |
 | `server/src/routes/ai.routes.js` | Gerald | The `/api/ai` router, with the limit of 20 requests a minute. |
-| `server/src/routes/users.routes.js` | Gerald | The `/api/users` router: the dashboard and the favourites. |
-| `server/src/controllers/auth.controller.js` | Gerald | Register, login, me, forgot password and reset password. |
+| `server/src/routes/users.routes.js` | Gerald | The `/api/users` router: the dashboard, the favourites and the profile, with one limit shared by the password change, logging out other devices and deleting the account. |
+| `server/src/controllers/auth.controller.js` | Gerald | Register with the security check and the email code, verify email, resend code, login, me, forgot password and reset password. |
 | `server/src/controllers/phones.controller.js` | Gerald | List, compare, detail, price trend, reviews and the review summary. |
 | `server/src/controllers/ai.controller.js` | Gerald | Search, chat and recommend. |
-| `server/src/controllers/users.controller.js` | Gerald | The dashboard and the favourites. |
+| `server/src/controllers/users.controller.js` | Gerald | The dashboard, the favourites and the profile: the name, the password, logging out other devices, clearing the history and deleting the account. |
 | `server/src/services/ai.service.js` | Gerald | The one file that calls the model: search filters, the lookup of a phone we do not have, chat replies, the ranking, the phone summary, the review summary and the review mood. |
 | `server/src/services/phoneQuery.js` | Gerald | Turns the query params into one MongoDB query. |
 | `server/src/services/recommend.service.js` | Gerald | The needs, the shortlist with its score, and the reasons from our rules. |
 | `server/src/services/price.service.js` | Gerald | The trend and the best time to buy note. |
 | `server/src/services/review.service.js` | Gerald | The review mood from the stars and the star based summary. |
-| `server/src/services/mail.service.js` | Gerald | Sends the password reset email with Nodemailer, or prints the link when mail is not set up. |
-| `server/src/middleware/auth.js` | Gerald | requireAuth and optionalAuth. |
+| `server/src/services/mail.service.js` | Gerald | Sends the verification code, the password reset email and the password changed notice through Resend, or prints the code and the link when mail is not set up. |
+| `server/src/services/turnstile.service.js` | Gerald | Checks the security check token from Create account with Cloudflare. |
+| `server/src/middleware/auth.js` | Gerald | requireAuth and optionalAuth, which also check the token version. |
 | `server/src/middleware/error.js` | Gerald | The not found answer and the error handler. |
 | `server/src/jobs/priceUpdater.js` | Gerald | The nightly price check from `server/data/prices.json`. |
 | `server/src/utils/http.js` | Gerald | The response envelope helpers. |
-| `server/src/utils/jwt.js` | Gerald | Signs and verifies the tokens. |
-| `server/src/utils/password.js` | Gerald | Hashes and checks passwords, and makes and hashes the reset tokens. |
+| `server/src/utils/jwt.js` | Gerald | Signs and verifies the tokens, with the token version in each. |
+| `server/src/utils/password.js` | Gerald | Hashes and checks passwords, checks the length of a new password, and makes and hashes the reset tokens and the email codes. |
+| `server/src/utils/name.js` | Gerald | Checks that a name has 2 to 60 characters. |
 | `server/src/utils/slug.js` | Gerald | Builds a phone slug from the brand and the model, with a plus sign written as plus, such as `samsung-galaxy-s24-plus`. The seed and the search lookup use it. |
 
 ## The rule

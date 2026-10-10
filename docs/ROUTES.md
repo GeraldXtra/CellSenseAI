@@ -4,8 +4,8 @@ Ibrahim, Osakue, this is the complete route map: every path in `App.jsx`, every 
 
 Two notes apply everywhere:
 
-- `?next=` on `/login` and `/register`: when a logged out person opens a page that needs login, ProtectedRoute sends them to `/login?next=<the page they asked for>`. After Log in or Create account, the page sends the person to the page in `next` when it is an address inside our site, otherwise to `/`, with `replace: true`. The links between Log in and Create account keep `?next=`, so it is not lost when a new person creates an account first. Someone already logged in who opens either page goes to `/`.
-- Log out (in the account menu, or in the menu panel under 768px) clears the token and the user and stays on the page. If that page is `/dashboard`, ProtectedRoute then sends the person to `/login?next=/dashboard`.
+- `?next=` on `/login`, `/register` and `/verify-email`: when a logged out person opens a page that needs login, ProtectedRoute sends them to `/login?next=<the page they asked for>`. After Log in, the page sends the person to the page in `next` when it is an address inside our site, otherwise to `/`, with `replace: true`. Create account does not log anyone in: it sends the person to `/verify-email?email=<email>` with the same `next`, and Verify email sends them to `next` the same way once the code is right. The links between Log in, Create account and Verify email keep `?next=`, so it is not lost when a new person creates an account first. Someone already logged in who opens any of the three goes to `/`.
+- Log out (in the account menu, or in the menu panel under 768px) clears the token and the user and stays on the page. If that page is `/dashboard` or `/profile`, ProtectedRoute then sends the person to `/login?next=` with that page.
 
 ## Table 1: frontend routes
 
@@ -22,8 +22,10 @@ All routes sit inside `<Route element={<Layout />}>`, so every page gets what La
 | `/recommend` | none | `http://localhost:5173/recommend` | Recommend | Osakue | No |
 | `/assistant` | `?q=` optional, the text to put in the input | `http://localhost:5173/assistant?q=phone%20under%20%24400` | Assistant | Osakue | No |
 | `/dashboard` | none | `http://localhost:5173/dashboard` | Dashboard, inside ProtectedRoute | Osakue | Yes |
+| `/profile` | none | `http://localhost:5173/profile` | Profile, inside ProtectedRoute | Gerald | Yes |
 | `/login` | `?next=` optional | `http://localhost:5173/login?next=/dashboard` | Login | Osakue | No |
 | `/register` | `?next=` optional | `http://localhost:5173/register` | Register | Osakue | No |
+| `/verify-email` | `?email=` the address the code went to, `&next=` optional | `http://localhost:5173/verify-email?email=test.user%40example.com` | VerifyEmail | Gerald | No |
 | `/forgot-password` | none | `http://localhost:5173/forgot-password` | ForgotPassword | Osakue | No |
 | `/reset-password/:token` | `:token` from the email link | `http://localhost:5173/reset-password/abc123` | ResetPassword | Osakue | No |
 | `/about` | anchors `#about`, `#askme`, `#how-prices-work`, `#contact` | `http://localhost:5173/about#how-prices-work` | About | Ibrahim | No |
@@ -44,9 +46,10 @@ All routes sit inside `<Route element={<Layout />}>`, so every page gets what La
 | Top bar | Log in (logged out) | Opens Log in | `/login` |
 | Top bar | The user's name with the chevron (logged in) | Opens the account menu. A click outside it or Escape closes it. | AccountMenu |
 | Account menu | Dashboard | Opens the dashboard | `/dashboard` |
+| Account menu | Profile | Opens the profile | `/profile` |
 | Account menu | Log out | Clears the token and the user, stays on the page | no navigation |
 | Top bar under 768px | Search icon | Opens the search page | `/search` |
-| Top bar under 768px | Menu icon | Opens a panel with the same links plus Log in or Log out. Escape or any link closes it. | the panel |
+| Top bar under 768px | Menu icon | Opens a panel with the same links plus Log in, or Profile and Log out when logged in. Escape or any link closes it. | the panel |
 | Footer, Explore | Browse phones | | `/browse` |
 | Footer, Explore | Compare | | `/compare` |
 | Footer, Explore | Recommend | | `/recommend` |
@@ -56,6 +59,7 @@ All routes sit inside `<Route element={<Layout />}>`, so every page gets what La
 | Footer, Account | Create account | | `/register` |
 | Footer, Account | Favourites | The favourites block on the dashboard | `/dashboard#favourites` |
 | Footer, Account | Search history | The search history block on the dashboard | `/dashboard#search-history` |
+| Footer, Account | Profile | | `/profile`, or `/login?next=/profile` when logged out |
 | Footer, Brands | Samsung, Apple, OnePlus, Xiaomi, Vivo | Browse by that brand | `/browse/samsung`, `/browse/apple`, `/browse/oneplus`, `/browse/xiaomi`, `/browse/vivo` |
 | Footer, About | About CellSense AI | | `/about#about` |
 | Footer, About | How prices work | | `/about#how-prices-work` |
@@ -176,8 +180,34 @@ The values each field sends: `budget` a number from 50 to 5000; `brand` `any` or
 
 | What | What it does | Leads to |
 | --- | --- | --- |
-| "Create account" button | Creates the account and logs in | `register({ name, email, password })` from `useAuth`, then `next` when it is inside our site, otherwise `/` |
+| "Verify you are human" box | The Cloudflare Turnstile check. Ticking it gives the page a token, which works once. | the Turnstile component |
+| "Try again" (only when the check could not load) | Loads the check again | the Turnstile component |
+| "Create account" button | Sends the details and the token, and the server emails a 6 digit code. No account exists yet. Disabled until the three fields are filled and the box is ticked. | `register({ name, email, password, turnstileToken })` from `useAuth`, then `/verify-email?email=<email>`, with `&next=` when there is one |
 | "Log in" | Opens Log in | `/login`, with the same `?next=` when there is one |
+
+### Verify email (Gerald)
+
+| What | What it does | Leads to |
+| --- | --- | --- |
+| The six digit boxes | The code from the email. Typing, Backspace, the arrow keys and pasting move through them as one field. | the boxes |
+| "Verify email" | Checks the code, creates the account and logs in | `verifyEmail({ email, code })` from `useAuth`, then `next` when it is inside our site, otherwise `/` |
+| "Send a new code" | Emails a new code. Disabled for 60 seconds after the page opens and after each new code. | `resendCode(email)` |
+| "Create your account again" (only after the sign up expired) | Opens Create account | `/register`, with the same `?next=` when there is one |
+| "Use a different email" | Opens Create account | `/register`, with the same `?next=` when there is one |
+
+### Profile (Gerald)
+
+| What | What it does | Leads to |
+| --- | --- | --- |
+| "Open your dashboard" | Opens the dashboard | `/dashboard` |
+| "Save name" | Saves the new name, and the top bar shows it at once | `updateProfile({ name })`, then `updateUser(user)` from `useAuth` |
+| The eye button by each password field | Shows or hides that password | the field |
+| "Update password" | Changes the password, keeps this device logged in and logs out the others | `changePassword({ currentPassword, newPassword })`, then `applySession({ token, user })` from `useAuth` |
+| "Clear" by Search history, then "Yes, clear" | Empties the search history | `clearSearchHistory()` |
+| "Clear" by Recently viewed, then "Yes, clear" | Empties the recently viewed list | `clearRecentlyViewed()` |
+| "Log out" by Other devices, then "Yes, log them out" | Logs out every other device | `signOutOthers()`, then `applySession({ token, user })` |
+| "Cancel" after any of the three | Puts the first button back | no call |
+| "Delete my account", then "Yes, delete my account" | Deletes the account with the password typed above it | `deleteAccount(password)`, then `logout()` and `/` with `replace: true` |
 
 ### Forgot password (Osakue)
 
@@ -230,7 +260,16 @@ Every path sits under `/api`. The service function in brackets is what the page 
 | Dashboard | `GET /users/me/dashboard` (`getDashboard()`) (login) | none | `{ recentlyViewed, favourites, searchHistory, recommendations }` |
 | Dashboard | `DELETE /users/me/favourites/:slug` (`removeFavourite(slug)`) (login) | none | `{ favourites }` |
 | Log in | `POST /auth/login` (`login(body)` from `useAuth`) | `{ email, password }` | `{ token, user }`, saved by AuthContext |
-| Create account | `POST /auth/register` (`register(body)` from `useAuth`) | `{ name, email, password }` | `{ token, user }`, saved by AuthContext |
+| Create account | `POST /auth/register` (`register(body)` from `useAuth`) | `{ name, email, password, turnstileToken }` | `{ email, expiresInMinutes, resendAfterSeconds }`, nothing saved |
+| Verify email | `POST /auth/verify-email` (`verifyEmail(body)` from `useAuth`) | `{ email, code }` | `{ token, user }`, saved by AuthContext |
+| Verify email | `POST /auth/resend-code` (`resendCode(email)`) | `{ email }` | `{ sent: true, expiresInMinutes, resendAfterSeconds }` |
+| Profile | `GET /users/me/profile` (`getProfile()`) (login) | none | `{ user, counts }` |
+| Profile | `PATCH /users/me/profile` (`updateProfile({ name })`) (login) | `{ name }` | `{ user }`, passed to `updateUser` |
+| Profile | `PATCH /users/me/password` (`changePassword({ currentPassword, newPassword })`) (login) | `{ currentPassword, newPassword }` | `{ token, user }`, passed to `applySession` |
+| Profile | `POST /users/me/sign-out-others` (`signOutOthers()`) (login) | none | `{ token, user }`, passed to `applySession` |
+| Profile | `DELETE /users/me/search-history` (`clearSearchHistory()`) (login) | none | `{ cleared: true }` |
+| Profile | `DELETE /users/me/recently-viewed` (`clearRecentlyViewed()`) (login) | none | `{ cleared: true }` |
+| Profile | `DELETE /users/me` (`deleteAccount(password)`) (login) | `{ password }` | `{ deleted: true }` |
 | Forgot password | `POST /auth/forgot-password` (`forgotPassword(email)`) | `{ email }` | `{ sent: true }` |
 | Reset password | `POST /auth/reset-password` (`resetPassword(token, password)`) | `{ token, password }` | `{ ok: true }` |
 | Every page on load, with a saved token | `GET /auth/me` (`me()` inside AuthContext) (login) | none | `{ user }` |

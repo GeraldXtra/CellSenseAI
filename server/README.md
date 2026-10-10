@@ -9,13 +9,14 @@ Three documents go deeper. [`docs/BACKEND.md`](../docs/BACKEND.md) explains how 
 Every endpoint is live:
 
 - `GET /api/health`
-- `POST /api/auth/register`, `POST /api/auth/login` and `GET /api/auth/me`
+- `POST /api/auth/register`, `POST /api/auth/verify-email`, `POST /api/auth/resend-code`, `POST /api/auth/login` and `GET /api/auth/me`
 - `POST /api/auth/forgot-password` and `POST /api/auth/reset-password`
 - `GET /api/phones`, `GET /api/phones/compare` and `GET /api/phones/:slug`
 - `GET /api/phones/:slug/price-trend`
 - `GET /api/phones/:slug/reviews`, `POST /api/phones/:slug/reviews` and `GET /api/phones/:slug/review-summary`
 - `POST /api/ai/search`, `POST /api/ai/chat` and `POST /api/ai/recommend`
 - `GET /api/users/me/dashboard`, `POST /api/users/me/favourites/:slug` and `DELETE /api/users/me/favourites/:slug`
+- `GET /api/users/me/profile`, `PATCH /api/users/me/profile`, `PATCH /api/users/me/password`, `POST /api/users/me/sign-out-others`, `DELETE /api/users/me/search-history`, `DELETE /api/users/me/recently-viewed` and `DELETE /api/users/me`
 
 ## Requirements
 
@@ -23,7 +24,8 @@ Every endpoint is live:
 - A MongoDB Atlas connection string.
 - A long random `JWT_SECRET`.
 - Optional: the address, the key and the model name of an OpenAI compatible chat API, for the AI features. We use Groq with the model `openai/gpt-oss-120b`. Without them the server still runs: search is direct only, the assistant answers "The AI features are not set up yet", recommendations come with reasons from our own rules, and review summaries and review moods come from the stars.
-- Optional: an SMTP account for the password reset email. Without it the reset link is printed in the server window.
+- The Cloudflare Turnstile secret key for the security check on Create account. `.env.example` holds Cloudflare's test secret, which is enough on a laptop.
+- Optional: a Resend API key for the emails: the 6 digit code of a new account, the reset link and the notice that a password changed. Without it the codes and the reset links are printed in the server window.
 
 ## Run it
 
@@ -62,16 +64,14 @@ Fill in `server/.env` before the first start. The settings are below. When the s
 | `AI_API_KEY` | The key for that API. |
 | `AI_MODEL` | The name of the model to use there. We use `openai/gpt-oss-120b`. |
 | `PRICE_UPDATER_CRON` | When the nightly price check runs, in Lagos time. `0 2 * * *` is 02:00 every day. |
-| `MAIL_HOST` | The SMTP host that sends the password reset email. |
-| `MAIL_PORT` | The SMTP port. `587` when it is empty. |
-| `MAIL_USER` | The mail account user name. |
-| `MAIL_PASS` | The mail account password. |
-| `MAIL_FROM` | The sender address shown in the email. `MAIL_USER` is used when it is empty. |
+| `TURNSTILE_SECRET_KEY` | The secret key that checks the Cloudflare Turnstile token from Create account. `.env.example` holds Cloudflare's test secret `1x0000000000000000000000000000000AA`. When it is empty, Create account answers "The security check is not set up yet". |
+| `RESEND_API_KEY` | The Resend key that sends every email. Empty on a teammate's laptop. |
+| `MAIL_FROM` | The sender of every email. `.env.example` sets `"CellSense AI <onboarding@resend.dev>"`, which can only send to the email of the Resend account; other people get codes only from an address on a domain verified in Resend. |
 | `CLIENT_URL` | The site address at the start of the reset link. `http://localhost:5173`, which is also the default. |
 
 The three AI settings belong together. The AI features integrate a pre trained language model through an OpenAI compatible chat API, and these three settings say where it is and how to reach it. When any of them is empty, the server still runs and every AI feature falls back as listed under Requirements.
 
-The mail settings can stay empty on a laptop. The email goes out only when `MAIL_HOST`, `MAIL_USER` and `MAIL_PASS` are all filled; until then the reset link is printed in the server window, which is enough to test the reset pages.
+`RESEND_API_KEY` can stay empty on a laptop. The email goes out only when `RESEND_API_KEY` and `MAIL_FROM` are both filled; until then the 6 digit codes and the reset links are printed in the server window, which is enough to test Create account, Verify email and the reset pages. Real Turnstile keys come from the Cloudflare dashboard, as [`docs/INSTALLATION.md`](../docs/INSTALLATION.md) explains.
 
 ## The data
 
@@ -91,4 +91,4 @@ On failure the reason sits in `error.message`:
 { "ok": false, "error": { "message": "..." } }
 ```
 
-Routes that need login want the header `Authorization: Bearer <token>`. One address can send 300 requests every 15 minutes, 20 AI requests every minute and 5 password reset requests every 15 minutes. Past that the answer is 429.
+Routes that need login want the header `Authorization: Bearer <token>`. One address can send 300 requests every 15 minutes, 20 AI requests every minute, 5 password reset requests, 10 sign ups, 20 email codes and 5 new codes every 15 minutes, and 10 requests every 15 minutes to the password change, logging out other devices and deleting the account together. Past that the answer is 429.

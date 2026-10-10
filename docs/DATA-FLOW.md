@@ -5,7 +5,7 @@ Ibrahim, Osakue, the backend is finished. Every endpoint in [API.md](API.md) is 
 ## Before you start
 
 1. On your branch, run `git pull origin develop`.
-2. Run the server on your laptop as [INSTALLATION.md](INSTALLATION.md) says: your own database user in `MONGODB_URI`, your own `JWT_SECRET`, and `npm run dev` in `server`. Then `npm run dev` in `client`.
+2. Run the server on your laptop as [INSTALLATION.md](INSTALLATION.md) says: your own database user in `MONGODB_URI`, your own `JWT_SECRET`, the test line `TURNSTILE_SECRET_KEY` in `server/.env`, and `npm run dev` in `server`. Then the test line `VITE_TURNSTILE_SITE_KEY` in `client/.env`, and `npm run dev` in `client`. Without a Resend key no email goes out: the code of a new account prints in your server terminal.
 3. Leave the three `AI_` lines in `server/.env` empty unless I give you a key. Without them the site still works, with four differences:
    - search is direct only, so a sentence like "phone under $400" finds nothing, while "galaxy s24" works;
    - the chat answers "The AI features are not set up yet", which is the error state of the window and the Assistant page;
@@ -50,26 +50,34 @@ Call only the functions in `src/services`. Never `axios` or `fetch` in a page. N
 
 ## Every function you can call
 
-| Function                            | File                | Calls                               | Gives you                                                        |
-| ----------------------------------- | ------------------- | ----------------------------------- | ---------------------------------------------------------------- |
-| `listPhones(params)`                | `phones.service.js` | `GET /phones`                       | `{ items, total, page, pages }`                                  |
-| `getPhone(slug)`                    | `phones.service.js` | `GET /phones/:slug`                 | `{ phone, isFavourite }`                                         |
-| `comparePhones(slugs)`              | `phones.service.js` | `GET /phones/compare`               | `{ phones, best }`                                               |
-| `getPriceTrend(slug)`               | `phones.service.js` | `GET /phones/:slug/price-trend`     | `{ history, trend, suggestion }`                                 |
-| `getReviews(slug)`                  | `phones.service.js` | `GET /phones/:slug/reviews`         | `{ items, average, count }`                                      |
-| `addReview(slug, { rating, text })` | `phones.service.js` | `POST /phones/:slug/reviews`        | `{ review }`                                                     |
-| `getReviewSummary(slug)`            | `phones.service.js` | `GET /phones/:slug/review-summary`  | `{ summary, sentiment }`                                         |
-| `searchPhones(query)`               | `ai.service.js`     | `POST /ai/search`                   | `{ items, filters, source }`                                     |
-| `recommend(needs)`                  | `ai.service.js`     | `POST /ai/recommend`                | `{ items: [{ phone, reason }], widened }`                        |
-| `getDashboard()`                    | `users.service.js`  | `GET /users/me/dashboard`           | `{ recentlyViewed, favourites, searchHistory, recommendations }` |
-| `addFavourite(slug)`                | `users.service.js`  | `POST /users/me/favourites/:slug`   | `{ favourites }`                                                 |
-| `removeFavourite(slug)`             | `users.service.js`  | `DELETE /users/me/favourites/:slug` | `{ favourites }`                                                 |
-| `forgotPassword(email)`             | `auth.service.js`   | `POST /auth/forgot-password`        | `{ sent: true }`                                                 |
-| `resetPassword(token, password)`    | `auth.service.js`   | `POST /auth/reset-password`         | `{ ok: true }`                                                   |
+| Function                                           | File                | Calls                               | Gives you                                                        |
+| -------------------------------------------------- | ------------------- | ----------------------------------- | ---------------------------------------------------------------- |
+| `listPhones(params)`                               | `phones.service.js` | `GET /phones`                       | `{ items, total, page, pages }`                                  |
+| `getPhone(slug)`                                   | `phones.service.js` | `GET /phones/:slug`                 | `{ phone, isFavourite }`                                         |
+| `comparePhones(slugs)`                             | `phones.service.js` | `GET /phones/compare`               | `{ phones, best }`                                               |
+| `getPriceTrend(slug)`                              | `phones.service.js` | `GET /phones/:slug/price-trend`     | `{ history, trend, suggestion }`                                 |
+| `getReviews(slug)`                                 | `phones.service.js` | `GET /phones/:slug/reviews`         | `{ items, average, count }`                                      |
+| `addReview(slug, { rating, text })`                | `phones.service.js` | `POST /phones/:slug/reviews`        | `{ review }`                                                     |
+| `getReviewSummary(slug)`                           | `phones.service.js` | `GET /phones/:slug/review-summary`  | `{ summary, sentiment }`                                         |
+| `searchPhones(query)`                              | `ai.service.js`     | `POST /ai/search`                   | `{ items, filters, source }`                                     |
+| `recommend(needs)`                                 | `ai.service.js`     | `POST /ai/recommend`                | `{ items: [{ phone, reason }], widened }`                        |
+| `getDashboard()`                                   | `users.service.js`  | `GET /users/me/dashboard`           | `{ recentlyViewed, favourites, searchHistory, recommendations }` |
+| `addFavourite(slug)`                               | `users.service.js`  | `POST /users/me/favourites/:slug`   | `{ favourites }`                                                 |
+| `removeFavourite(slug)`                            | `users.service.js`  | `DELETE /users/me/favourites/:slug` | `{ favourites }`                                                 |
+| `forgotPassword(email)`                            | `auth.service.js`   | `POST /auth/forgot-password`        | `{ sent: true }`                                                 |
+| `resetPassword(token, password)`                   | `auth.service.js`   | `POST /auth/reset-password`         | `{ ok: true }`                                                   |
+| `resendCode(email)`                                | `auth.service.js`   | `POST /auth/resend-code`            | `{ sent: true, expiresInMinutes, resendAfterSeconds }`           |
+| `getProfile()`                                     | `users.service.js`  | `GET /users/me/profile`             | `{ user, counts }`                                               |
+| `updateProfile({ name })`                          | `users.service.js`  | `PATCH /users/me/profile`           | `{ user }`                                                       |
+| `changePassword({ currentPassword, newPassword })` | `users.service.js`  | `PATCH /users/me/password`          | `{ token, user }`                                                |
+| `signOutOthers()`                                  | `users.service.js`  | `POST /users/me/sign-out-others`    | `{ token, user }`                                                |
+| `clearSearchHistory()`                             | `users.service.js`  | `DELETE /users/me/search-history`   | `{ cleared: true }`                                              |
+| `clearRecentlyViewed()`                            | `users.service.js`  | `DELETE /users/me/recently-viewed`  | `{ cleared: true }`                                              |
+| `deleteAccount(password)`                          | `users.service.js`  | `DELETE /users/me`                  | `{ deleted: true }`                                              |
 
-Three things you do not call directly:
+The last eight rows are for my Verify email and Profile pages. Three things you do not call directly:
 
-- `login` and `register` come from `useAuth()`, which saves the token and sets the user.
+- `login`, `register` and `verifyEmail` come from `useAuth()`. `login` and `verifyEmail` save the token and set the user. `register` only starts the sign up and saves nothing.
 - The chat goes through `useChat()`; `send(text)` calls the server for you.
 - `me()` runs by itself when the site opens.
 
@@ -186,22 +194,47 @@ No data. Text and links only, with the four anchors the footer links to: `#about
 
 ### Log in and Create account
 
-- `login({ email, password })` and `register({ name, email, password })` from `useAuth()`. Never `auth.service.js` directly; the context is what saves the token and sets the user, and that is what makes the top bar show the name with the chevron.
-- After success, go to the page in `?next=` when it is an address inside our site, otherwise to `/`, with `replace: true`. Someone already logged in who opens either page goes to `/`.
-- The links between the two pages keep `?next=`.
-- **Messages to show as they come:** "Email and password are required", "Wrong email or password", "Name, email and password are required", "Enter a valid email address", "Password must be at least 8 characters", "An account with that email already exists", and "Could not reach the server" when the backend is not running.
+- **Log in:** `login({ email, password })` from `useAuth()`. Never `auth.service.js` directly; the context is what saves the token and sets the user, and that is what makes the top bar show the name with the chevron. After success, go to the page in `?next=` when it is an address inside our site, otherwise to `/`, with `replace: true`.
+- **Create account no longer logs anyone in.** It takes two steps: this page sends the details and the server emails a 6 digit code, then my Verify email page takes the code, creates the account and logs the person in.
+- **The security check:** `<Turnstile onToken={setTurnstileToken} resetKey={resetKey} />` from `components/shared/Turnstile.jsx` sits between the password and the button. `onToken` gets the token after the tick, and `''` when it expires or fails. Keep the button disabled until the name, the email and the password are filled and there is a token. While the token is the only thing missing, show "Tick the security check to continue." under the button. A token works once, so after every error change `resetKey` (for example add one to it), which clears the box for a new tick.
+- **Sending:** `register({ name, email, password, turnstileToken })` from `useAuth()`. While it runs, the button reads "Sending the code" and stays disabled. It resolves to `{ email, expiresInMinutes: 10, resendAfterSeconds: 60 }` and saves no token. Then go to `/verify-email?email=<the email, encoded>`, with `&next=` when there is a `next`.
+- Someone already logged in who opens either page goes to `/`. The links between the two pages keep `?next=`.
+- **Messages to show as they come, from Log in:** "Email and password are required" and "Wrong email or password".
+- **From Create account:** "Name, email and password are required", "Enter a name between 2 and 60 characters", "Enter a valid email address", "Password must be at least 8 characters", "Keep your password under 72 characters", "Complete the security check", "The security check failed. Tick it again.", "The security check is not set up yet", "Could not reach the security check. Try again in a moment.", "An account with that email already exists", "Wait 45 seconds before asking for another code." (the number changes), "We could not send the code. Try again in a moment.", "Email is not set up yet, so we cannot send the code." and "Too many sign up attempts. Try again in 15 minutes."
+- **Both:** "Could not reach the server. Check that it is running." when the backend is not running.
 
 ### Forgot password
 
 - **Sending:** `forgotPassword(email)` gives `{ sent: true }`, always, whether or not the email has an account. Show the sent state from `forget-password-sent.png`. Send it again calls the same function.
-- **On your laptop,** the link prints in your server terminal, because the mail settings are empty. Copy it into the browser to test the next page.
+- **On your laptop,** the link prints in your server terminal, because `RESEND_API_KEY` is empty. Copy it into the browser to test the next page.
 - **Messages:** "Enter a valid email address", and "Too many reset requests. Try again in 15 minutes." after five requests from one address.
 
 ### Reset password
 
 - **The token** comes from the address `/reset-password/:token`, through `useParams()`.
 - **Saving:** `resetPassword(token, password)` gives `{ ok: true }`. Show the saved state from `reset-password-saved.png` with its Log in button to `/login`. The person is not logged in automatically.
-- **Messages:** "Password must be at least 8 characters", "This reset link is not complete. Open the link from the email again." and "This reset link is invalid or has expired. Ask for a new one." Show the last one with a link to `/forgot-password`. A link works once and for one hour.
+- **Messages:** "Password must be at least 8 characters", "Keep your password under 72 characters", "This reset link is not complete. Open the link from the email again." and "This reset link is invalid or has expired. Ask for a new one." Show the last one with a link to `/forgot-password`. A link works once and for one hour.
+- **After a reset** every older login of that account ends, on every device, so the person logs in again with the new password.
+
+## My pages
+
+Both are finished. You do not build them, but they sit next to your account pages, so here is what they call.
+
+### Verify email
+
+- **The address:** `/verify-email?email=<email>`, with `&next=` from Create account. With no `email` the page goes to `/register`, and someone already logged in goes to `/`.
+- **Checking the code:** `verifyEmail({ email, code })` from `useAuth()`, with the six digits as one string. It resolves to the user and saves the token, so the person arrives logged in, at `next` when it is inside our site, otherwise at `/`.
+- **A new code:** `resendCode(email)` gives `{ sent: true, expiresInMinutes: 10, resendAfterSeconds: 60 }`. The page waits 60 seconds after it opens and after each new code before it allows another.
+- **Messages:** "Enter the 6 digit code from the email", "That code is not right. You have 4 tries left." (down to "You have 1 try left."), "Too many wrong codes. Ask for a new code.", "This code has expired. Ask for a new one.", "This sign up has expired. Create your account again.", "An account with that email already exists", "Too many tries. Try again in 15 minutes.", and from a new code "Wait 45 seconds before asking for another code.", "We could not send the code. Try again in a moment." and "Too many new codes asked for. Try again in 15 minutes."
+
+### Profile
+
+- **Data:** `getProfile()` with `[]` as the list gives `{ user: { _id, name, email, emailVerified, emailVerifiedAt, createdAt, passwordChangedAt }, counts: { favourites, recentlyViewed, searchHistory, reviews } }`.
+- **The name:** `updateProfile({ name })` gives `{ user }`, which goes to `updateUser(user)` from `useAuth()`, so the top bar shows the new name at once. Every review the person wrote takes the new name too.
+- **The password:** `changePassword({ currentPassword, newPassword })` gives `{ token, user }`. The old token stops working at that moment on every device, so the page calls `applySession({ token, user })` from `useAuth()` before any other request, and this device stays logged in.
+- **Privacy:** `clearSearchHistory()` and `clearRecentlyViewed()` give `{ cleared: true }`. `signOutOthers()` gives `{ token, user }`, which goes to `applySession` the same way.
+- **Deleting the account:** `deleteAccount(password)` gives `{ deleted: true }`, then `logout()` and `/` with `replace: true`. The reviews of that account go with it.
+- **Messages:** "Enter a name between 2 and 60 characters", "Enter your current password and a new password", "Password must be at least 8 characters", "Keep your password under 72 characters", "Your new password must be different from your current password", "Your current password is not right", "Enter your password to delete your account", "Your password is not right" and "Too many tries. Try again in 15 minutes." A wrong password there answers 400, so the person stays logged in.
 
 ## The floating chat window
 
@@ -220,7 +253,7 @@ Every phone already has its picture path in `imageUrl`, but the files are not in
 ## When something does not work
 
 - **"Could not reach the server"**: the backend is not running. Start it with `npm run dev` in `server`.
-- **"Please log in"**: the page needs a login, or the token expired after seven days. Log in again.
+- **"Please log in"**: the page needs a login, the token expired after seven days, or the password was changed or the other devices were logged out on the Profile page. Log in again.
 - **"Too many requests. Try again in a few minutes."**: more than 300 requests in 15 minutes from your laptop. Wait.
 - **A page that keeps loading**: check the list in `useAsync`. It must hold only plain values.
 - **Anything else:** the server terminal prints one line per request with its status code, and the Network tab in the browser shows the reply. Send me both.

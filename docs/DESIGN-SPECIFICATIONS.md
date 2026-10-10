@@ -10,13 +10,14 @@ CellSense AI is a responsive single page web application we are building for ASK
 | React Router | Browser | Maps each route in the site map to a page without a full page reload. |
 | Bootstrap 5 and plain CSS | Browser | Bootstrap gives us the grid, the form controls and the buttons. Our own colours, spacing, font sizes, corner radius and shadows live in `client/src/styles/theme.css`. |
 | Node 20 with Express 5 | Server | Receives every request from the browser on port 5000, reads and writes the database and calls the model when a feature needs it. |
-| MongoDB Atlas with Mongoose | Cloud database | Stores phones, users, reviews and search logs as documents. Mongoose defines the shape of each document. |
+| MongoDB Atlas with Mongoose | Cloud database | Stores phones, users, pending sign ups, reviews and search logs as documents. Mongoose defines the shape of each document. |
 | JWT with bcrypt | Server | Handles login. Passwords are stored as bcrypt hashes. A logged in user carries a JWT token. |
 | OpenAI compatible chat API | External service | The pre trained language model we integrate: Groq with the model `openai/gpt-oss-120b`. It runs the language parts of search, the lookup of a phone we do not have, the assistant, the recommendation ranking, phone summaries, review summaries and review sentiment. |
 | `node-cron` | Server | Runs the price check once a day, at 02:00 Lagos time, from our price list. |
-| Nodemailer | Server | Sends the password reset email. |
+| Resend | External service | Sends the emails: the 6 digit code of a new account, the password reset link and the notice that a password changed. |
+| Cloudflare Turnstile | Browser and external service | The security check on Create account. The browser shows the box and gets a token, and the server checks the token with Cloudflare. |
 
-The client also has `axios`, `recharts` and `react-icons` installed. `client/.env.example` holds `VITE_API_URL=`. We leave it empty so the browser uses the Vite proxy, which passes `/api` requests to port 5000.
+The client also has `axios`, `recharts` and `react-icons` installed. `client/.env.example` holds `VITE_API_URL=` and `VITE_TURNSTILE_SITE_KEY=`. We leave the first empty so the browser uses the Vite proxy, which passes `/api` requests to port 5000. The second holds Cloudflare's test site key for the security check.
 
 ### Why we chose these parts
 
@@ -36,8 +37,10 @@ The client also has `axios`, `recharts` and `react-icons` installed. `client/.en
   * Recommend `/recommend`
   * Assistant `/assistant`
   * Dashboard `/dashboard` (login required)
+  * Profile `/profile` (login required)
   * Log in `/login`
     * Create account `/register`
+      * Verify email `/verify-email?email=`
     * Forgot password `/forgot-password`
     * Reset password `/reset-password/:token`
   * About `/about`
@@ -57,7 +60,9 @@ The client also has `axios`, `recharts` and `react-icons` installed. `client/.en
 | Assistant | `/assistant` | Osakue | The chat thread, the phone cards under a reply, the input and the suggested questions. The floating chat window on every other page is a shared component owned by Gerald and shows the same conversation. |
 | Dashboard | `/dashboard` | Osakue | Recently viewed, favourites, search history and recommended for you. Login required. |
 | Log in | `/login` | Osakue | Email and password, a Forgot password link and a link to create an account. |
-| Create account | `/register` | Osakue | Name, email and password. |
+| Create account | `/register` | Osakue | Name, email, password and the security check. It sends a 6 digit code to the email and opens Verify email. |
+| Verify email | `/verify-email?email=` | Gerald | Six boxes for the code from the email, a new code after 60 seconds, and a link to use a different email. The right code creates the account and logs the person in. |
+| Profile | `/profile` | Gerald | The account summary, the name, the read only email, the password change, clearing the history, logging out other devices and deleting the account. Login required. |
 | Forgot password | `/forgot-password` | Osakue | The email field, then the "Check your email" state. |
 | Reset password | `/reset-password/:token` | Osakue | The new password twice, then the "Password updated" state. |
 | About | `/about` | Ibrahim | About CellSense AI, ASKME Ltd., how prices work and contact. |
@@ -220,6 +225,9 @@ The finished designs live in `docs/ui/`, 26 images. The pages are built against 
 | `dashboard-new-account.png` | Dashboard for a new account. |
 | `log-in.png` | Log in. |
 | `create-account.png` | Create account. |
+| `create-account-security-check.png` | Create account with the security check before it is ticked. |
+| `verify-email.png` | Verify email, with three digits typed and the new code countdown. |
+| `profile.png` | Profile. |
 | `forget-password.png` | Forgot password. |
 | `forget-password-sent.png` | Forgot password after the link was sent. |
 | `reset-password.png` | Reset password. |
@@ -230,12 +238,13 @@ The finished designs live in `docs/ui/`, 26 images. The pages are built against 
 
 ## Data model
 
-The full field list is in [`DATA-MODEL.md`](DATA-MODEL.md). We have four collections in MongoDB Atlas.
+The full field list is in [`DATA-MODEL.md`](DATA-MODEL.md). We have five collections in MongoDB Atlas.
 
 | Collection | What it holds |
 |---|---|
 | phones | One document per phone: slug, brand, model, picture path, category, release year, specs, current price with the date it was checked, price history, summary, saved review summary and source. |
-| users | Name, email, password hash, role, favourites, recently viewed phones, search history, recommendations and the pending password reset. |
+| users | Name, email, password hash, role, favourites, recently viewed phones, search history, recommendations, the pending password reset, when the email was verified, when the password was last changed, and the token version. |
+| pendingsignups | A sign up waiting for its email code: name, email, password hash, code hash, tries, when the code expires, when it was sent, and when MongoDB removes it. |
 | reviews | The phone, the user id, the author name, a rating from 1 to 5, the text and the sentiment. One review per user per phone. |
 | searchlogs | The query, the filters, the source (direct or the model), the result count and the user when logged in. |
 
@@ -275,11 +284,13 @@ The site still runs without the model. With the three AI settings empty, search 
 
 ## Security
 
-1. Login uses email and password. A successful login returns a JWT token that expires after seven days (`JWT_EXPIRES_IN=7d`). The browser sends it as `Authorization: Bearer <token>`. Protected routes reject requests without a valid token.
+1. Login uses email and password. A successful login returns a JWT token that expires after seven days (`JWT_EXPIRES_IN=7d`). The browser sends it as `Authorization: Bearer <token>`. Protected routes reject requests without a valid token, or with a token older than the last password change or log out of the other devices.
 2. Passwords are hashed with bcrypt before they are stored. The users collection holds `passwordHash`, never the plain password.
 3. Password reset uses a random token that is only ever stored as a hash, with an expiry one hour ahead, and works once. The reply to a reset request is the same whether or not the email exists.
 4. `helmet` sets safe HTTP headers on every response from Express.
 5. CORS is limited to the client origin in `CLIENT_ORIGIN`, which `server/.env.example` sets to `http://localhost:5173` for development. Only pages served from that origin may call the API from a browser.
-6. Rate limiting caps what one address can send: 300 requests every 15 minutes to `/api`, 20 requests every minute to the AI routes, and 5 password reset requests every 15 minutes.
-7. API keys and mail passwords live only in `server/.env`. The repo holds `server/.env.example`, where every secret is left empty. The real `server/.env` is not in the submission zip. The browser never sees the model key, because only the backend calls the model.
+6. Rate limiting caps what one address can send: 300 requests every 15 minutes to `/api`, 20 requests every minute to the AI routes, 5 password reset requests, 10 sign ups, 20 email codes and 5 new codes every 15 minutes, and 10 requests every 15 minutes to the password change, logging out other devices and deleting the account together.
+7. API keys, the email key and the security check secret live only in `server/.env`. The repo holds `server/.env.example`, where every secret is left empty. The real `server/.env` is not in the submission zip. The browser never sees the model key, because only the backend calls the model.
 8. The login middleware and the error handler sit in `server/src/middleware` (`auth.js` and `error.js`). Each controller checks its own input and answers 400 with a clear message.
+9. Create account needs a passed Cloudflare Turnstile check, which the server confirms with its secret key, and an account exists only after the person types the 6 digit code sent to the email. The code is stored only as a hash, works for 10 minutes and allows five tries.
+10. A password change needs the current password, and deleting the account needs the password.

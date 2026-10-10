@@ -1,6 +1,6 @@
 # Data model
 
-This file describes the four collections that CellSense AI stores in MongoDB Atlas, field by field, as the Mongoose schemas define them. Each collection has a model file in `server/src/models/`: `Phone.js`, `User.js`, `Review.js` and `SearchLog.js`. We chose documents over fixed table columns because phone specs are uneven from one phone to the next. The endpoints that read and write these collections are in [API.md](API.md).
+This file describes the five collections that CellSense AI stores in MongoDB Atlas, field by field, as the Mongoose schemas define them. Each collection has a model file in `server/src/models/`: `Phone.js`, `User.js`, `PendingSignup.js`, `Review.js` and `SearchLog.js`. We chose documents over fixed table columns because phone specs are uneven from one phone to the next. The endpoints that read and write these collections are in [API.md](API.md).
 
 ## Units
 
@@ -10,7 +10,7 @@ We state the units once here and do not repeat them in the tables. RAM and stora
 
 The type column uses string, number, boolean, date, id, mixed, object and array. A field of type id holds the id of a document in another collection. A mixed field holds any JSON value. A field name with a dot, such as `specs.ram`, is a field nested inside an object.
 
-Every document in the four collections also has `_id`, the id MongoDB gives it, and the two dates `createdAt` and `updatedAt`, which Mongoose fills in. We do not repeat them in the tables. Entries inside the arrays `priceHistory`, `recentlyViewed`, `searchHistory` and `recommendations` have no `_id` of their own.
+Every document in the five collections also has `_id`, the id MongoDB gives it, and the two dates `createdAt` and `updatedAt`, which Mongoose fills in. We do not repeat them in the tables. Entries inside the arrays `priceHistory`, `recentlyViewed`, `searchHistory` and `recommendations` have no `_id` of their own.
 
 ## The slug
 
@@ -70,8 +70,8 @@ Collection `users`, model `server/src/models/User.js`. One document per account.
 
 | Field | Type | Notes |
 | --- | --- | --- |
-| `name` | string | Required, trimmed. Shown in the top bar and copied onto each review the user writes. |
-| `email` | string | Required and unique, trimmed and stored in lowercase. Used to log in. |
+| `name` | string | Required, trimmed, 2 to 60 characters when it is set through the site. Shown in the top bar and copied onto each review the user writes. A name change on the Profile page also changes the author on every review the user wrote. |
+| `email` | string | Required and unique, trimmed and stored in lowercase. Used to log in. It never changes after the account is created. |
 | `passwordHash` | string | Required. The bcrypt hash of the password. We never store the password itself. The model leaves this field out of every query unless the code asks for it, so it never reaches a reply. |
 | `role` | string | `user` or `admin`. The default is `user`. The login token carries it. Every account made on the site is a `user`, and no route treats the two differently. |
 | `favourites` | array of ids | The phones the user saved, each once, in the order they were saved. The replies show the latest first. |
@@ -80,8 +80,28 @@ Collection `users`, model `server/src/models/User.js`. One document per account.
 | `recommendations` | array of objects | Each entry holds `phone` (id), `reason` (string) and `at` (date, default now). The picks of the user's last recommendation, up to three. Each recommendation the user asks for while logged in replaces the list, as long as it found at least one phone. |
 | `passwordReset.tokenHash` | string | The `sha256` hash of the reset token in the email link. We never store the token itself. |
 | `passwordReset.expiresAt` | date | One hour after the reset was asked for. A token past this time is refused. |
+| `emailVerifiedAt` | date | When the person proved they own the email: the moment the right code created the account, or the first password reset. Empty for accounts made before email codes, until they reset their password. Replies show it as `emailVerified`, true or false. |
+| `passwordChangedAt` | date | When the password was last changed on the Profile page or through a reset. Empty until then. The Profile page shows it as Last changed. |
+| `tokenVersion` | number | The default is 0. Every login token carries the value it had when the token was made, and a token works only while the two match. A password change, a reset and a log out of the other devices each raise it by one, which ends every older login. |
 
-`passwordReset` is set by forgot password, replaced by the next request, and removed by a successful reset, so each link works once. A reply never holds the whole user document: the model method `toSafeJSON` returns only `_id`, `name`, `email` and `role`.
+`passwordReset` is set by forgot password, replaced by the next request, and removed by a successful reset, so each link works once. A reply never holds the whole user document: the model method `toSafeJSON` returns only `_id`, `name`, `email`, `role`, `emailVerified` and `createdAt`.
+
+Deleting the account on the Profile page removes the user document, with its favourites and history, and every review the user wrote.
+
+## Pending sign ups
+
+Collection `pendingsignups`, model `server/src/models/PendingSignup.js`. One document per sign up that is waiting for its email code. Create account writes it, and the right code turns it into a user and deletes it.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `name` | string | Required, trimmed. The name the person typed. |
+| `email` | string | Required and unique, trimmed and stored in lowercase. A new sign up for the same email replaces the old one. |
+| `passwordHash` | string | Required. The bcrypt hash of the password, copied to the user when the code is right. |
+| `codeHash` | string | Required. The HMAC SHA 256 hash of the email and the 6 digit code, keyed with `JWT_SECRET`. We never store the code itself. |
+| `attempts` | number | How many codes were tried. The default is 0. After 5 tries no code is accepted until a new one is sent, which sets it back to 0. |
+| `codeExpiresAt` | date | Required. 10 minutes after the code was sent. A code past this time is refused. |
+| `lastSentAt` | date | Required. When the last code was sent. A new code can be asked for 60 seconds later. |
+| `expiresAt` | date | Required. 60 minutes after the last code was sent. A TTL index on this field with `expireAfterSeconds` 0 lets MongoDB delete the document by itself once this time has passed, which it checks about once a minute. |
 
 ## Reviews
 
@@ -91,7 +111,7 @@ Collection `reviews`, model `server/src/models/Review.js`. One document per revi
 | --- | --- | --- |
 | `phone` | id | Required. The phone the review is about. Indexed, because reviews are always read by phone. |
 | `user` | id | Required. The account that wrote the review. |
-| `author` | string | Required, trimmed. The name shown with the review, copied from the account when the review is posted. |
+| `author` | string | Required, trimmed. The name shown with the review, copied from the account when the review is posted, and changed when the user changes their name. |
 | `rating` | number | Required, from 1 to 5. The route also requires a whole number. |
 | `text` | string | Required, trimmed, at most 1000 characters. The route also requires at least 3. |
 | `sentiment` | string | One of `positive`, `neutral` or `negative`. The default is `neutral`. With the AI settings filled the model judges it from the text. Otherwise, or when the model fails, the stars decide: 4 or 5 is positive, 3 is neutral, 1 or 2 is negative. |
@@ -108,7 +128,7 @@ Collection `searchlogs`, model `server/src/models/SearchLog.js`. One document pe
 | `filters` | mixed | The filters the search ran with. A direct search stores `{ q }` with the query in it. When the model reads the query, the keys can be `brand`, `minPrice`, `maxPrice`, `has5G`, `minRam`, `minStorage`, `minCamera`, `minBattery`, `minRefresh`, `category`, `sort` and `q`. |
 | `source` | string | Required. `direct` when the words were matched against brand and model, `ai` when the model turned the query into filters. |
 | `resultCount` | number | How many phones the search returned. The default is 0. |
-| `user` | id | Set when the person is logged in, empty otherwise. |
+| `user` | id | Set when the person is logged in, empty otherwise. Removed when the account is deleted, so the search stays in the records without a name. |
 
 ## Links between collections
 

@@ -9,16 +9,17 @@ They live in `client/src/components/shared/`. Import them with a relative path, 
 | Component | What it does | Props |
 | --- | --- | --- |
 | Layout | The shell around every page: Navbar, the page content, Footer, ChatLauncher and ChatWindow. `App.jsx` puts every route inside it. On every new page it scrolls to the top, or to the element named after `#` in the address, such as `/dashboard#favourites`. It looks for that element once, when the page first draws, so a block an anchor points to must be on the page while its data loads. Going back or forward does not scroll to the top. You never render it yourself. | none |
-| Navbar | The top bar: the logo mark and "CellSense AI", the links Browse, Compare, Recommend, Assistant and Dashboard, and "Log in" for a visitor. For a logged in user it shows the user's name with a chevron; a click on it opens AccountMenu, and a click outside or Escape closes it. Under 768px it shows the logo, a search icon that goes to `/search` and a menu icon. The menu panel holds the same links plus Log in or Log out, and closes on Escape or when the page changes. | none |
-| AccountMenu | The small dropdown under the user's name with a Dashboard link and a Log out button. It calls `onClose` after either one. | `onClose` |
-| Footer | Four link columns (Explore, Account, Brands, About), the Built by column, the three lines at the bottom and "Nigeria / English". | none |
+| Navbar | The top bar: the logo mark and "CellSense AI", the links Browse, Compare, Recommend, Assistant and Dashboard, and "Log in" for a visitor. For a logged in user it shows the user's name with a chevron; a click on it opens AccountMenu, and a click outside or Escape closes it. Under 768px it shows the logo, a search icon that goes to `/search` and a menu icon. The menu panel holds the same links plus Log in, or Profile and Log out for a logged in user, and closes on Escape or when the page changes. | none |
+| AccountMenu | The small dropdown under the user's name with a Dashboard link, a Profile link and a Log out button. It calls `onClose` after any of them. | `onClose` |
+| Footer | Four link columns (Explore, Account, Brands, About), the Built by column, the three lines at the bottom and "Nigeria / English". The Account column ends with Profile. | none |
 | ChatLauncher | The fixed button at the bottom right, labelled "Open the assistant", that opens ChatWindow. It is a button, not a link: it calls `openWindow()` and never changes the page. Hidden on `/assistant` and while the window is open. Focus comes back to it when the window closes. | none |
 | ChatWindow | The floating chat window, 380 by 560, fixed at the bottom right over the page without moving anything under it. Under 768px it fills the screen below the top bar, less a small margin on each side. It draws its own thread and form and reads everything from `useChat()`, so it shows the same conversation as the Assistant page. Details below the table. Layout renders it; you never render it yourself. | none |
 | PhoneImage | The phone picture when `imageUrl` is set and the file loads, otherwise a grey box with the phone name. | `phone` (required, an object; pass `{}` when there is no phone), `className` |
 | PhoneCard | The product card: the rank, the picture, the name, the spec line or the reason, the price with the Estimated label, the Compare checkbox and the "See details" link. | `phone` (required), `reason`, `estimated`, `rank`, `compare` (default `true`) |
 | Loader | A spinner with a label, announced to screen readers. | `label` (default "Loading") |
 | EmptyState | A centred grey box with a title, a message and an action. Each part shows only when you pass it. | `title`, `message`, `action` (a node, such as a Link or a button) |
-| ProtectedRoute | Shows Loader with "Checking your account" while AuthContext checks a saved token. Sends a logged out person to `/login?next=<the page they asked for>`, with `replace`. Otherwise shows the page. `App.jsx` wraps Dashboard in it. | `children` |
+| ProtectedRoute | Shows Loader with "Checking your account" while AuthContext checks a saved token. Sends a logged out person to `/login?next=<the page they asked for>`, with `replace`. Otherwise shows the page. `App.jsx` wraps Dashboard and Profile in it. | `children` |
+| Turnstile | The Cloudflare Turnstile security check with a status line under it. Create account puts it between the password and the button. Details below the table. | `onToken` (required), `resetKey` |
 
 ### ChatWindow in detail
 
@@ -31,6 +32,18 @@ ChatWindow is mine. It does not use ChatThread or ChatInput: it draws its own bu
 5. The form has the field "Ask about a phone, a price or a budget" and a square send button labelled "Send". Enter sends. The text clears when the send worked and stays when it failed.
 6. Escape closes the window while the focus is inside it. The field gets the focus when the window opens, and the thread scrolls to the newest message.
 7. It shows nothing on `/assistant`, so the page and the window never sit on top of each other.
+
+### Turnstile in detail
+
+Turnstile is mine, in `components/shared/Turnstile.jsx`. Osakue, it sits on your Create account page; you only pass the two props.
+
+1. It loads `https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit` once for the whole app, the first time it shows, and draws the Cloudflare box into its own `div` with the site key from `VITE_TURNSTILE_SITE_KEY`, the light theme, the flexible size and `appearance: always`. The flexible size fills the width and needs at least 300px. At 375px the account card leaves 303px, so it fits.
+2. `onToken(token)` gets the token when the person ticks the box. It gets `''` when the token expires, times out or fails, and when `resetKey` changes. A token works only once, so the page changes `resetKey` after every failed send, which clears the box for a new tick.
+3. It removes its box when it goes away, so React StrictMode never leaves two boxes.
+4. Under the box sits a status line that screen readers announce: "Loading the security check" until the box shows, then "Tick the box to show you are human", then "Security check done" with a check icon. When the script cannot load or the box fails, it says "The security check could not load. Check your connection, then try again." with a "Try again" button that loads it again.
+5. Without `VITE_TURNSTILE_SITE_KEY` it shows only "The security check is not set up yet." and never calls `onToken`, so the page cannot send.
+
+Its styles are the `.cs-turnstile` classes in `global.css`. The box keeps the height in `--cs-turnstile-h` while it loads, so the page does not jump.
 
 ### PhoneImage in detail
 
@@ -54,6 +67,13 @@ With `phone.imageUrl` set, PhoneImage draws an `<img>` with the phone name as it
 
 It lives in `client/src/pages/NotFound/` and is mine. It shows a tilted grey phone (PhoneImage with an empty phone), "Page not found", "That link does not exist." and a "Go home" button to `/`, and sets the browser tab title to "Page not found | CellSense AI" while it is open. `App.jsx` sends every unknown path to it.
 
+## My other pages: Verify email and Profile
+
+Both are mine and finished, and each folder has a README like yours.
+
+- `client/src/pages/VerifyEmail/` at `/verify-email`: the second step of Create account. Six single digit boxes take the code from the email, "Verify email" calls `verifyEmail` from `useAuth`, and "Send a new code" calls `resendCode`. The tab title is "Check your email | CellSense AI".
+- `client/src/pages/Profile/` at `/profile`, inside ProtectedRoute: the account summary, the name, the read only email, the password change, the privacy actions and deleting the account. It calls the profile functions in `users.service.js` and `updateUser`, `applySession` and `logout` from `useAuth`. The tab title is "Your profile | CellSense AI".
+
 ## The contexts
 
 The providers wrap the whole app in `main.jsx`, so every page and component can use the three hooks. Each hook throws an error when it is used outside its provider.
@@ -62,10 +82,13 @@ The providers wrap the whole app in `main.jsx`, so every page and component can 
 
 | Value | What it is |
 | --- | --- |
-| `user` | `{ _id, name, email, role }` for a logged in person, or `null`. |
+| `user` | `{ _id, name, email, role, emailVerified, createdAt }` for a logged in person, or `null`. |
 | `loading` | `true` while the site checks a saved token when it opens, `false` otherwise. |
 | `login(body)` | Sends `{ email, password }`, saves the token, sets `user` and returns the user. Throws an error with the server's message when it fails. |
-| `register(body)` | Sends `{ name, email, password }`, saves the token, sets `user` and returns the user. Throws an error with the server's message when it fails. |
+| `register(body)` | Sends `{ name, email, password, turnstileToken }` and returns the server's reply, `{ email, expiresInMinutes, resendAfterSeconds }`. It saves no token and sets no user, because the account exists only after the code. Throws an error with the server's message when it fails. |
+| `verifyEmail(body)` | Sends `{ email, code }`, saves the token, sets `user` and returns the user, like `login`. Throws an error with the server's message when it fails. |
+| `applySession({ token, user })` | Saves a new token and sets `user`. The Profile page calls it with the reply of a password change or of logging out the other devices, because the old token stops working at that moment. |
+| `updateUser(user)` | Merges the fields it gets into `user`, so the top bar shows a new name at once. Nothing is sent to the server. |
 | `logout()` | Clears the token and `user`. Nothing is sent to the server. |
 
 When the site opens with a saved token, AuthContext calls `me()`. A 401 or 403 removes the token. Any other failure, such as the server being off, leaves the token in place and the person logged out until the next reload.
@@ -129,7 +152,9 @@ They live in `client/src/services/`. Each function returns a promise of the `dat
 | `searchPhones(query)` | `ai.service.js` | The words typed | `{ items, filters, source }` |
 | `chat(messages)` | `ai.service.js` | `[{ role, content }]`. ChatContext calls it; you call `send` instead. | `{ reply, phones }` |
 | `recommend(needs)` | `ai.service.js` | `{ budget, brand, purpose, performance, camera, gaming, battery }` | `{ items: [{ phone, reason }], widened }` |
-| `register(body)` | `auth.service.js` | `{ name, email, password }`. AuthContext calls it; you call `useAuth().register`. | `{ token, user }` |
+| `register(body)` | `auth.service.js` | `{ name, email, password, turnstileToken }`. AuthContext calls it; you call `useAuth().register`. | `{ email, expiresInMinutes, resendAfterSeconds }` |
+| `verifyEmail(body)` | `auth.service.js` | `{ email, code }`. AuthContext calls it; Verify email calls `useAuth().verifyEmail`. | `{ token, user }` |
+| `resendCode(email)` | `auth.service.js` | The email of the pending sign up | `{ sent: true, expiresInMinutes, resendAfterSeconds }` |
 | `login(body)` | `auth.service.js` | `{ email, password }`. AuthContext calls it; you call `useAuth().login`. | `{ token, user }` |
 | `me()` | `auth.service.js` | none. AuthContext calls it when the site opens. | `{ user }` |
 | `forgotPassword(email)` | `auth.service.js` | An email | `{ sent: true }` |
@@ -137,6 +162,13 @@ They live in `client/src/services/`. Each function returns a promise of the `dat
 | `getDashboard()` | `users.service.js` | none | `{ recentlyViewed, favourites, searchHistory, recommendations }` |
 | `addFavourite(slug)` | `users.service.js` | A slug | `{ favourites }` |
 | `removeFavourite(slug)` | `users.service.js` | A slug | `{ favourites }` |
+| `getProfile()` | `users.service.js` | none | `{ user, counts }` |
+| `updateProfile({ name })` | `users.service.js` | The new name | `{ user }` |
+| `changePassword({ currentPassword, newPassword })` | `users.service.js` | The current and the new password | `{ token, user }` |
+| `signOutOthers()` | `users.service.js` | none | `{ token, user }` |
+| `clearSearchHistory()` | `users.service.js` | none | `{ cleared: true }` |
+| `clearRecentlyViewed()` | `users.service.js` | none | `{ cleared: true }` |
+| `deleteAccount(password)` | `users.service.js` | The password, sent as the body of the DELETE request | `{ deleted: true }` |
 
 What each field of a reply holds, and each error message, is in [API.md](API.md).
 
@@ -178,6 +210,7 @@ Osakue, you own eight. They live in `client/src/components/osakue/`.
 * FilterStrip and SortSelect (Ibrahim) are used on Search results and Browse.
 * ReviewsSection (Osakue) sits inside Phone detail (Ibrahim). Osakue builds it, Ibrahim places it.
 * AuthCard (Osakue) is used on all four account pages.
+* Turnstile (mine) sits inside Create account (Osakue), between the password and the button.
 * ChatWindow (mine) and the Assistant page (Osakue) show the same conversation. Both read it from `useChat()`, and neither keeps its own copy of the messages.
 
 When you use a component the other one owns, use it as it is. If it needs a change, tell its owner, do not edit it on your branch.

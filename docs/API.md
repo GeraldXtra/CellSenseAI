@@ -1,6 +1,6 @@
 # CellSense AI API
 
-We list here every endpoint of the CellSense AI backend, all of them live: who can call it, what it takes, what it returns, every error message it can send and the rate limits. The frontend pages call these endpoints only through the functions in `client/src/services/`. The fields of a phone, a user, a review and a search log are in [DATA-MODEL.md](DATA-MODEL.md). How a request travels through the server is in [BACKEND.md](BACKEND.md).
+We list here every endpoint of the CellSense AI backend, all of them live: who can call it, what it takes, what it returns, every error message it can send and the rate limits. The frontend pages call these endpoints only through the functions in `client/src/services/`. The fields of a phone, a user, a pending sign up, a review and a search log are in [DATA-MODEL.md](DATA-MODEL.md). How a request travels through the server is in [BACKEND.md](BACKEND.md).
 
 ## Base URL
 
@@ -24,17 +24,19 @@ The reply shapes below show what sits inside `data`. The error messages below ar
 
 ## Login and the token
 
-`POST /auth/register` and `POST /auth/login` return a JWT token. The token carries the user id and the role, and it expires after `JWT_EXPIRES_IN`, which is seven days. The client keeps it in the browser and sends it with every request:
+`POST /auth/verify-email` and `POST /auth/login` return a JWT token, and so do `PATCH /users/me/password` and `POST /users/me/sign-out-others`. `POST /auth/register` returns none, because no account exists until the code from the email is confirmed. The token carries the user id, the role and `ver`, the account's `tokenVersion` when the token was made. It expires after `JWT_EXPIRES_IN`, which is seven days. The client keeps it in the browser and sends it with every request:
 
 ```
 Authorization: Bearer <token>
 ```
 
+A token works only while its `ver` equals the account's `tokenVersion`. Changing the password, resetting it or logging out the other devices raises `tokenVersion` by one, so every older token stops working at once. A password change and a log out of the other devices answer with a fresh token for the device that asked, so that device stays logged in. A reset answers with no token. A token made before `ver` existed counts as version 0, so those logins keep working until the version is raised.
+
 The Login column in the tables has three values.
 
 | Login | Meaning |
 | --- | --- |
-| Yes | The route runs `requireAuth`. Without a valid token it answers 401 with "Please log in". That covers a missing header, a fake or expired token, and a token whose account no longer exists. |
+| Yes | The route runs `requireAuth`. Without a valid token it answers 401 with "Please log in". That covers a missing header, a fake or expired token, a token whose account no longer exists, and a token made before the account's last password change or log out of other devices. |
 | Optional | The route runs `optionalAuth`. It works for everyone and does a little more for a logged in user. A missing, fake or expired token is ignored and the request runs as a visitor. |
 | No | The route never reads the token. |
 
@@ -47,31 +49,35 @@ Every limit counts the requests from one address. The counters live in the serve
 | 300 requests every 15 minutes | Every path under `/api` | 429, "Too many requests. Try again in a few minutes." |
 | 20 requests every minute | Every path under `/api/ai`: search, chat and recommend share one counter | 429, "Too many questions at once. Wait a minute and try again." |
 | 5 requests every 15 minutes | `POST /auth/forgot-password` | 429, "Too many reset requests. Try again in 15 minutes." |
+| 10 requests every 15 minutes | `POST /auth/register` | 429, "Too many sign up attempts. Try again in 15 minutes." |
+| 20 requests every 15 minutes | `POST /auth/verify-email` | 429, "Too many tries. Try again in 15 minutes." |
+| 5 requests every 15 minutes | `POST /auth/resend-code` | 429, "Too many new codes asked for. Try again in 15 minutes." |
+| 10 requests every 15 minutes | `PATCH /users/me/password`, `POST /users/me/sign-out-others` and `DELETE /users/me`, which share one counter | 429, "Too many tries. Try again in 15 minutes." |
 
-A request to `/api/ai` or to forgot password also counts toward the 300.
+Every request counts, whether it works or fails. A request to `/api/ai`, to forgot password or to any of the routes above also counts toward the 300. The shared counter of the three account routes counts only requests with a valid token, because the login check runs before it.
 
 ## Status codes and general errors
 
 | Code | Meaning |
 | --- | --- |
 | 200 | It worked. |
-| 201 | Something was created: an account or a review. |
-| 400 | The request is wrong, such as a missing field or a rating of 7. |
+| 201 | Something was created: an account, when its email code is confirmed, or a review. |
+| 400 | The request is wrong, such as a missing field, a rating of 7, a wrong email code or a failed security check. |
 | 401 | Not logged in, or the email and password do not match. |
 | 404 | No such phone, or no such route. |
 | 409 | It already exists: an email that has an account, or a second review of the same phone. |
 | 413 | The JSON body is larger than 1 MB. |
-| 429 | Too many requests, see Rate limits. |
+| 429 | Too many requests (see Rate limits), too many wrong email codes, or a new code asked for within 60 seconds of the last one. |
 | 500 | Something broke on the server. |
-| 502 | The model could not be reached, or its reply could not be read. Only search and chat answer this. |
-| 503 | Chat was called while the AI settings are empty. |
+| 502 | A service the server calls could not be reached or answered badly: the model (search and chat only), the security check, or the email service when a code is sent. |
+| 503 | Something is not set up: chat without the AI settings, the security check without `TURNSTILE_SECRET_KEY`, or a code in production without the mail settings. |
 
 These answers can come from any route:
 
 - A path with no route answers 404 with "No route for", the method and the path, for example "No route for GET /api/nothing". Under `/api/users` the login check runs first, so a request there without a valid token answers 401 with "Please log in", even for a path that does not exist.
 - A body that is not valid JSON answers 400, and a body over 1 MB answers 413. Both carry the message of the JSON parser.
 - A value that Mongoose refuses answers 400 with the message from Mongoose. A value that must be unique and is already taken answers 409 with "That value is already taken".
-- Any other failure answers 500. While `NODE_ENV` is not `production` the reply holds the real message. In production a plain 500 carries "Something went wrong on the server." instead. A 502 or 503 keeps its own message in production too, so the person sees what went wrong with the model.
+- Any other failure answers 500. While `NODE_ENV` is not `production` the reply holds the real message. In production a plain 500 carries "Something went wrong on the server." instead. A 502 or 503 keeps its own message in production too, so the person sees what went wrong with the model, the security check or the email.
 
 ## Health
 
@@ -85,24 +91,84 @@ The health check does not touch the database, so it answers even when MongoDB is
 
 | Method | Path | Login | Body | Reply |
 | --- | --- | --- | --- | --- |
-| POST | `/auth/register` | No | `{ name, email, password }` | 201, `{ token, user }` |
+| POST | `/auth/register` | No | `{ name, email, password, turnstileToken }` | 200, `{ email, expiresInMinutes: 10, resendAfterSeconds: 60 }` |
+| POST | `/auth/verify-email` | No | `{ email, code }` | 201, `{ token, user }` |
+| POST | `/auth/resend-code` | No | `{ email }` | 200, `{ sent: true, expiresInMinutes: 10, resendAfterSeconds: 60 }` |
 | POST | `/auth/login` | No | `{ email, password }` | 200, `{ token, user }` |
 | GET | `/auth/me` | Yes | none | 200, `{ user }` |
 | POST | `/auth/forgot-password` | No | `{ email }` | 200, `{ sent: true }` |
 | POST | `/auth/reset-password` | No | `{ token, password }` | 200, `{ ok: true }` |
 
-`user` is always `{ _id, name, email, role }`. The password hash never leaves the server.
+`user` is always `{ _id, name, email, role, emailVerified, createdAt }`. `emailVerified` is true when the account has `emailVerifiedAt`. The password hash never leaves the server.
+
+Creating an account takes two steps. `POST /auth/register` checks the details and the security check, keeps them in a pending sign up and emails a 6 digit code. `POST /auth/verify-email` takes that code, creates the account and logs the person in. The pending sign up lives in the `pendingsignups` collection described in [DATA-MODEL.md](DATA-MODEL.md).
 
 ### POST /auth/register
 
-The name and the email are trimmed, and the email is stored in lowercase, so the same person cannot sign up twice with different capitals. The password is stored only as a bcrypt hash.
+No account is created here. The name and the email are trimmed, and the email is kept in lowercase, so the same person cannot sign up twice with different capitals. The password is kept only as a bcrypt hash, and the code only as an HMAC SHA 256 hash keyed with `JWT_SECRET`.
+
+`turnstileToken` is the token the Cloudflare Turnstile box gives the page when the person ticks it. The server sends it to Cloudflare's siteverify address with `TURNSTILE_SECRET_KEY` and the caller's address, and waits at most 10 seconds. A token works only once.
+
+When the checks pass, the server makes a random 6 digit code and saves the pending sign up for that email, replacing any earlier one: the name, the password hash, the code hash, 0 tries, a code that works for 10 minutes, the time it was sent, and an end 60 minutes ahead, after which MongoDB removes the pending sign up by itself. Then it emails the code. When the email cannot be sent, the pending sign up is deleted again.
+
+The checks run in this order:
 
 | Status | Message | When |
 | --- | --- | --- |
 | 400 | Name, email and password are required | A field is missing or empty. |
+| 400 | Enter a name between 2 and 60 characters | The trimmed name is shorter than 2 or longer than 60 characters. |
 | 400 | Enter a valid email address | The email does not have the form name@domain.ending. |
 | 400 | Password must be at least 8 characters | The password is shorter than 8 characters. |
+| 400 | Keep your password under 72 characters | The password is longer than 72 bytes. bcrypt reads only the first 72. |
+| 400 | Complete the security check | `turnstileToken` is missing, empty or longer than 2048 characters. |
+| 503 | The security check is not set up yet | `TURNSTILE_SECRET_KEY` is empty. |
+| 502 | Could not reach the security check. Try again in a moment. | Cloudflare did not answer within 10 seconds, the request could not be sent, or the reply was not JSON. The server prints "Could not reach the security check:" with the reason. |
+| 400 | The security check failed. Tick it again. | Cloudflare refused the token, for example because it was already used. The server prints "The security check failed:" with Cloudflare's error codes. |
 | 409 | An account with that email already exists | The email already has an account. |
+| 429 | Wait N seconds before asking for another code. | A code went to this email less than 60 seconds ago. N is the number of seconds left. |
+| 503 | Email is not set up yet, so we cannot send the code. | In production, when the mail settings are empty. |
+| 502 | We could not send the code. Try again in a moment. | Resend refused the email or could not be reached. |
+| 429 | Too many sign up attempts. Try again in 15 minutes. | More than ten requests in 15 minutes from one address. |
+
+### POST /auth/verify-email
+
+`code` must be exactly 6 digits. Each request with a 6 digit code uses up one of five tries on the pending sign up, right or wrong, taken in one atomic database step, so two requests at once cannot both get the last try. The right code creates the account with `emailVerifiedAt` set to now, deletes the pending sign up and answers 201 with `{ token, user }`, so the person is logged in.
+
+| Status | Message | When |
+| --- | --- | --- |
+| 400 | Enter the 6 digit code from the email | `code` is not exactly 6 digits. |
+| 429 | Too many wrong codes. Ask for a new code. | All five tries are used up. A new code from `POST /auth/resend-code` gives five new tries. |
+| 400 | This sign up has expired. Create your account again. | There is no pending sign up for that email: it was never made, its hour passed, or it was already used. |
+| 400 | This code has expired. Ask for a new one. | The 10 minutes of the code have passed. |
+| 400 | That code is not right. You have N tries left. | A wrong code with tries left. With one try left it reads "You have 1 try left." |
+| 429 | Too many wrong codes. Ask for a new code. | The fifth wrong code. |
+| 409 | An account with that email already exists | An account with that email was created meanwhile. The pending sign up is deleted. |
+| 429 | Too many tries. Try again in 15 minutes. | More than 20 requests in 15 minutes from one address. |
+
+### POST /auth/resend-code
+
+Sends a new code for a pending sign up. The new code replaces the old one, which stops working, the tries go back to five, the code works for another 10 minutes, and the pending sign up gets another 60 minutes. When the email cannot be sent, the pending sign up is deleted, as in register.
+
+| Status | Message | When |
+| --- | --- | --- |
+| 400 | Enter a valid email address | The email is missing or does not have the form name@domain.ending. |
+| 400 | This sign up has expired. Create your account again. | There is no pending sign up for that email. |
+| 429 | Wait N seconds before asking for another code. | The last code went out less than 60 seconds ago. |
+| 503 | Email is not set up yet, so we cannot send the code. | In production, when the mail settings are empty. |
+| 502 | We could not send the code. Try again in a moment. | Resend refused the email or could not be reached. |
+| 429 | Too many new codes asked for. Try again in 15 minutes. | More than five requests in 15 minutes from one address. |
+
+### How the emails are sent
+
+Every email goes through Resend, with `RESEND_API_KEY` and the sender in `MAIL_FROM`. Mail counts as set up only when both are filled. Each email has a plain text part and a simple HTML part with the same words, with no images and no tracking, and every value that comes from a person, such as the name, is escaped in the HTML.
+
+| Email | Subject | When mail is not set up |
+| --- | --- | --- |
+| The code | Your CellSense AI verification code | Outside production the server prints "Mail is not set up. Verification code for", the email and the code. In production register and resend code answer 503. |
+| The reset link | Reset your CellSense AI password | Outside production the server prints "Mail is not set up. Reset link for", the email and the link. In production it prints "Mail is not set up, so the reset email was not sent." |
+| The password changed notice | Your CellSense AI password was changed | Nothing is sent and nothing is printed. |
+
+When Resend refuses an email or cannot be reached, the server prints "Resend could not send to", the address, and Resend's error name and message.
 
 ### POST /auth/login
 
@@ -119,7 +185,7 @@ Returns the user the token belongs to. The client calls it once when the site op
 
 The reply is `{ sent: true }` for every valid email, whether or not it has an account. When it has one, the backend makes a random token, stores only its `sha256` hash with an expiry one hour ahead in `passwordReset` on the user, and builds the link `<CLIENT_URL>/reset-password/<token>`. A new request replaces the earlier token, so only the newest link works.
 
-When `MAIL_HOST`, `MAIL_USER` and `MAIL_PASS` are all set, Nodemailer sends the link by email with the subject "Reset your CellSense AI password". When any of them is empty, no email goes out. Outside production the server prints "Mail is not set up. Reset link for", the email and the link, in its terminal. In production it prints "Mail is not set up, so the reset email was not sent." A failed send is printed as "Could not send the reset email:" with the reason, and the reply stays `{ sent: true }`.
+When the mail settings are filled, Resend sends the link by email with the subject "Reset your CellSense AI password". When either is empty, no email goes out. Outside production the server prints "Mail is not set up. Reset link for", the email and the link, in its terminal. In production it prints "Mail is not set up, so the reset email was not sent." The reply does not wait for the email. A failed send is printed as "Could not send the reset email:" with the reason, and the reply stays `{ sent: true }`.
 
 | Status | Message | When |
 | --- | --- | --- |
@@ -128,12 +194,13 @@ When `MAIL_HOST`, `MAIL_USER` and `MAIL_PASS` are all set, Nodemailer sends the 
 
 ### POST /auth/reset-password
 
-On success the backend stores the new bcrypt hash and removes `passwordReset`, so a link works once. The reply holds no token: the person logs in with the new password.
+On success the backend stores the new bcrypt hash, sets `passwordChangedAt` to now, raises `tokenVersion` by one and removes `passwordReset`, so a link works once and every older login ends. When `emailVerifiedAt` is empty it is set to now too, because the link proves the person owns the inbox. The reply holds no token: the person logs in with the new password.
 
 | Status | Message | When |
 | --- | --- | --- |
 | 400 | This reset link is not complete. Open the link from the email again. | The token is missing. |
 | 400 | Password must be at least 8 characters | The new password is shorter than 8 characters. |
+| 400 | Keep your password under 72 characters | The new password is longer than 72 bytes. |
 | 400 | This reset link is invalid or has expired. Ask for a new one. | No account holds that token, the link was already used, or the hour has passed. |
 
 ## Phones
@@ -330,6 +397,13 @@ Every route under `/users` needs login and answers 401 with "Please log in" with
 | GET | `/users/me/dashboard` | Yes | none | 200, `{ recentlyViewed, favourites, searchHistory, recommendations }` |
 | POST | `/users/me/favourites/:slug` | Yes | none | 200, `{ favourites }` |
 | DELETE | `/users/me/favourites/:slug` | Yes | none | 200, `{ favourites }` |
+| GET | `/users/me/profile` | Yes | none | 200, `{ user, counts }` |
+| PATCH | `/users/me/profile` | Yes | `{ name }` | 200, `{ user }` |
+| PATCH | `/users/me/password` | Yes | `{ currentPassword, newPassword }` | 200, `{ token, user }` |
+| POST | `/users/me/sign-out-others` | Yes | none | 200, `{ token, user }` |
+| DELETE | `/users/me/search-history` | Yes | none | 200, `{ cleared: true }` |
+| DELETE | `/users/me/recently-viewed` | Yes | none | 200, `{ cleared: true }` |
+| DELETE | `/users/me` | Yes | `{ password }` | 200, `{ deleted: true }` |
 
 The dashboard holds four lists:
 
@@ -343,3 +417,56 @@ The dashboard holds four lists:
 A new account gets four empty lists. A phone that no longer exists is left out of every list.
 
 `POST /users/me/favourites/:slug` adds the phone to the favourites. Adding it a second time changes nothing. `DELETE /users/me/favourites/:slug` removes it. Both return the whole favourites list after the change, the most recently saved first, and both answer 404 with "Phone not found" when no phone has that slug.
+
+### GET /users/me/profile
+
+```js
+{
+  user: { _id, name, email, emailVerified, emailVerifiedAt, createdAt, passwordChangedAt },
+  counts: { favourites, recentlyViewed, searchHistory, reviews }
+}
+```
+
+`emailVerifiedAt` and `passwordChangedAt` are `null` when they are not set. `favourites` and `recentlyViewed` count only phones that still exist, as the dashboard shows them. `searchHistory` is the length of the user's search history, and `reviews` is the number of reviews the user wrote.
+
+### PATCH /users/me/profile
+
+Changes the name. The name is trimmed. Every review the user wrote gets the new name as its author. The reply is `{ user }` in the usual shape. The email can never change: a body with an `email` other than the account's, ignoring capitals and spaces, is refused.
+
+| Status | Message | When |
+| --- | --- | --- |
+| 400 | Your email cannot be changed | The body holds an email that is not the account's. |
+| 400 | Enter a name between 2 and 60 characters | The trimmed name is missing, shorter than 2 or longer than 60 characters. |
+
+### PATCH /users/me/password
+
+On success the backend stores the new bcrypt hash, sets `passwordChangedAt` to now and raises `tokenVersion` by one, so every other device is logged out. The reply carries a fresh token for this device. The backend then sends the password changed notice without waiting for it; a failed send is printed as "Could not send the password changed email:" with the reason. A wrong current password answers 400, never 401, so the client does not treat it as a lost login.
+
+The checks run in this order:
+
+| Status | Message | When |
+| --- | --- | --- |
+| 400 | Enter your current password and a new password | A field is missing or empty. |
+| 400 | Password must be at least 8 characters | The new password is shorter than 8 characters. |
+| 400 | Keep your password under 72 characters | The new password is longer than 72 bytes. |
+| 400 | Your new password must be different from your current password | The two are the same. |
+| 400 | Your current password is not right | The current password does not match. |
+| 429 | Too many tries. Try again in 15 minutes. | More than ten requests in 15 minutes from one address to the three account routes together. |
+
+### POST /users/me/sign-out-others
+
+Raises `tokenVersion` by one, so every other device is logged out, and answers with a fresh token for this device. Past the shared limit it answers 429 with "Too many tries. Try again in 15 minutes."
+
+### DELETE /users/me/search-history and DELETE /users/me/recently-viewed
+
+Each empties that list on the account and answers `{ cleared: true }`. The search logs stay, because they belong to the site's records, not to the history the person sees.
+
+### DELETE /users/me
+
+The body is `{ password }`. With the right password the backend deletes every review the user wrote, clears the saved model review summary of each phone they reviewed so it is written again from the reviews that are left, removes the user from their search logs, which stay without a name, and deletes the account with its favourites and history. The reply is `{ deleted: true }` and the token stops working.
+
+| Status | Message | When |
+| --- | --- | --- |
+| 400 | Enter your password to delete your account | The password is missing or empty. |
+| 400 | Your password is not right | The password does not match. |
+| 429 | Too many tries. Try again in 15 minutes. | Past the shared limit of the three account routes. |

@@ -1,8 +1,8 @@
 # Installation
 
-These steps set up CellSense AI on a Windows 11 laptop. We use PowerShell for every command, and every command is on its own line. The backend runs on port 5000 and the frontend on port 5173. The site needs an internet connection for the database and the model.
+These steps set up CellSense AI on a Windows 11 laptop. We use PowerShell for every command, and every command is on its own line. The backend runs on port 5000 and the frontend on port 5173. The site needs an internet connection for the database, the model, the security check on Create account and the email.
 
-Steps 1 to 8 are for a teammate who runs the site on their own laptop against the database we share, with their own database user. The sections after them cover a machine outside the team, which needs a fresh database of its own, and the machine that runs the AI features and the reset email.
+Steps 1 to 8 are for a teammate who runs the site on their own laptop against the database we share, with their own database user. The sections after them cover a machine outside the team, which needs a fresh database of its own, the machine that runs the AI features and sends real email, and the real security check keys for a public site.
 
 ## Step 1: Install Node.js
 
@@ -99,12 +99,9 @@ AI_BASE_URL=
 AI_API_KEY=
 AI_MODEL=
 PRICE_UPDATER_CRON=0 2 * * *
-# used by the password reset email
-MAIL_HOST=
-MAIL_PORT=
-MAIL_USER=
-MAIL_PASS=
-MAIL_FROM=
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+RESEND_API_KEY=
+MAIL_FROM="CellSense AI <onboarding@resend.dev>"
 CLIENT_URL=http://localhost:5173
 ```
 
@@ -119,12 +116,16 @@ Each line does this:
 | `CLIENT_ORIGIN` | `http://localhost:5173`. CORS allows only this origin. | The server falls back to the same `http://localhost:5173`. |
 | `AI_BASE_URL`, `AI_API_KEY`, `AI_MODEL` | Empty on a teammate's laptop. See Turning on the AI features. | Search is direct only, the assistant answers "The AI features are not set up yet", recommendations come with plain reasons, review moods come from the stars, review summaries are star based unless the model already saved one, and a phone page shows a summary only when one is already stored. |
 | `PRICE_UPDATER_CRON` | `0 2 * * *`, which is 02:00 every day. | The server uses `0 2 * * *`. |
-| `MAIL_HOST`, `MAIL_PORT`, `MAIL_USER`, `MAIL_PASS`, `MAIL_FROM` | Empty on a teammate's laptop. See Turning on the reset email. | No email goes out, and the reset link is printed in the backend window. `MAIL_PORT` falls back to 587. |
+| `TURNSTILE_SECRET_KEY` | `1x0000000000000000000000000000000AA`, Cloudflare's test secret key for the security check on Create account. | Create account answers "The security check is not set up yet", so nobody can create an account on this laptop. |
+| `RESEND_API_KEY` | Empty on a teammate's laptop. See Turning on real email. | No email goes out. The 6 digit code of a new account and the reset link are printed in the backend window. |
+| `MAIL_FROM` | `"CellSense AI <onboarding@resend.dev>"`, the sender of every email. | No email goes out, as for `RESEND_API_KEY`. |
 | `CLIENT_URL` | `http://localhost:5173`, the address at the start of the reset link. | The server falls back to the same `http://localhost:5173`. |
 
-`NODE_ENV` is not in the file. We leave it out, so the server runs in development mode and shows the real reason for an error. What each setting does in the server is explained in [BACKEND.md](BACKEND.md).
+`NODE_ENV` is not in the file. We leave it out, so the server runs in development mode, shows the real reason for an error, and prints the codes and links that it cannot email. What each setting does in the server is explained in [BACKEND.md](BACKEND.md).
 
 A teammate leaves the three AI lines empty. The AI features integrate a pre trained language model through an OpenAI compatible chat API, and the key for it stays on Gerald's laptop. With the three lines empty the site still runs, with the differences in the table. That is expected and nothing is broken.
+
+The Turnstile value is one of Cloudflare's test keys. It passes every check, and it accepts only the test token `XXXX.DUMMY.TOKEN.XXXX`, which the test site key in `client/.env` (Step 6) gives the page. The two test keys belong together. A teammate also leaves `RESEND_API_KEY` empty: without it no email goes out, and the backend window prints the code of each new account as `Mail is not set up. Verification code for <email>: <code>` and each reset link as `Mail is not set up. Reset link for <email>: <link>`. We copy the code from there into the Check your email page.
 
 6. Save the file and start the backend:
 
@@ -158,13 +159,19 @@ npm install
 Copy-Item .env.example .env
 ```
 
-The client file has one line, and we leave its value empty:
+The client file has two lines, and we keep them exactly like this:
 
 ```
 VITE_API_URL=
+VITE_TURNSTILE_SITE_KEY=3x00000000000000000000FF
 ```
 
-With it empty, `client/src/services/api.js` calls `/api`, and the Vite dev server forwards every `/api` request to the backend on port 5000 through the proxy in `client/vite.config.js`.
+| Setting | What goes in it | When it is empty |
+| --- | --- | --- |
+| `VITE_API_URL` | Nothing. | `client/src/services/api.js` calls `/api`, and the Vite dev server forwards every `/api` request to the backend on port 5000 through the proxy in `client/vite.config.js`. That is what we want. |
+| `VITE_TURNSTILE_SITE_KEY` | `3x00000000000000000000FF`, Cloudflare's test site key for the security check. It always shows the checkbox, so a person must tick it by hand. | Create account shows "The security check is not set up yet." and its button stays off. |
+
+Both Turnstile values in this guide are Cloudflare's test keys, not real ones: the site key here and `TURNSTILE_SECRET_KEY` in `server/.env`. They work on any address, including `localhost`, and protect nothing. Real keys come later, as Real security check keys explains. Vite reads `client/.env` only when it starts, so after a change to it we stop the frontend with Ctrl+C and start it again. `client/.env` is ignored by git.
 
 3. Start the frontend:
 
@@ -207,8 +214,9 @@ Invoke-RestMethod http://localhost:5173/api/health
 It prints the same answer as check 1.
 
 4. Open `http://localhost:5173` in a browser. The pages load with the top bar, the footer and the assistant button at the bottom right. A page that is not built yet shows only its name.
+5. Open `http://localhost:5173/register`, fill in the form, tick "Verify you are human" and press Create account. The Check your email page opens, and the backend window prints `Mail is not set up. Verification code for`, the email and a 6 digit code. Type that code on the page to finish. The account is then logged in.
 
-If all four checks pass, the setup is complete. To start the site later we only run `npm run dev` in the `server` folder first and then `npm run dev` in the `client` folder, each in its own PowerShell window. To stop an app, press Ctrl+C in its window.
+If all five checks pass, the setup is complete. To start the site later we only run `npm run dev` in the `server` folder first and then `npm run dev` in the `client` folder, each in its own PowerShell window. To stop an app, press Ctrl+C in its window.
 
 ## Step 8: Leave the two scripts to Gerald
 
@@ -263,19 +271,36 @@ With all three filled, a search that reads like a sentence goes to the model, se
 
 The key is a secret. It lives only in `server/.env`, which is never committed and never shared. To switch provider later we change `AI_BASE_URL` and `AI_API_KEY`, and `AI_MODEL` when the new provider uses another model name.
 
-## Turning on the reset email
+## Turning on real email
 
-Without the mail settings, the reset link is printed in the backend window, which is enough to test the reset pages. To send real email, fill the five mail lines in `server/.env` with an SMTP account and start the backend again:
+Every email goes through Resend: the 6 digit code for a new account, the reset link and the notice that a password was changed. Without `RESEND_API_KEY`, the codes and the reset links are printed in the backend window, which is enough to test every page. A teammate does not need a key.
+
+1. Open `https://resend.com` in a browser, create an account, and create an API key under API Keys.
+2. Put the key into `server/.env`, with the key in place of the value in angle brackets, and keep the sender line:
 
 ```
-MAIL_HOST=<the SMTP host of the mail account>
-MAIL_PORT=587
-MAIL_USER=<the user name of the mail account>
-MAIL_PASS=<the password of the mail account>
-MAIL_FROM=<the address the email comes from>
+RESEND_API_KEY=<the key from Resend>
+MAIL_FROM="CellSense AI <onboarding@resend.dev>"
 ```
 
-The email goes out only when `MAIL_HOST`, `MAIL_USER` and `MAIL_PASS` are all filled. An empty `MAIL_FROM` sends from `MAIL_USER`. Port 465 uses a secure connection from the start, and 587 is the usual port otherwise. `CLIENT_URL` must hold the address people open the site at, because the link starts with it.
+3. Start the backend again.
+
+The email goes out only when both lines are filled. `onboarding@resend.dev` is Resend's shared test sender, and it can only send to the email address of the Resend account itself. With it, a code reaches only that one inbox. To send codes to other people, we add our own domain under Domains in Resend, add the DNS records it shows, wait until the domain shows as verified, and set `MAIL_FROM` to an address on that domain, such as `"CellSense AI <no-reply@our domain>"`. `CLIENT_URL` must hold the address people open the site at, because the reset link starts with it.
+
+The key is a secret. It lives only in `server/.env`, which is never committed and never shared.
+
+## Real security check keys
+
+The two Turnstile values in Step 5 and Step 6 are Cloudflare's test keys, so the security check stops nobody. Before the site goes public we replace them with real keys:
+
+1. Open the Cloudflare dashboard at `https://dash.cloudflare.com` and sign in, or create a free account.
+2. Open Turnstile and click Add widget.
+3. Give it a name, add the hostname the site runs on, such as the domain of the public site, and choose Managed mode.
+4. Create it. Cloudflare shows a site key and a secret key.
+5. Replace the line `VITE_TURNSTILE_SITE_KEY` in `client/.env` with the site key, and the line `TURNSTILE_SECRET_KEY` in `server/.env` with the secret key.
+6. Start both apps again, and build the frontend again for the public site, because the build takes the site key from `client/.env`.
+
+Real keys should not allow `localhost`, so they work only on the public site. Laptops keep the two test keys. The secret key is a secret like the other keys in `server/.env`; the site key is public, because the browser needs it.
 
 ## Common problems
 
@@ -309,9 +334,25 @@ The backend waits for a while and then prints `MongoDB connection failed`. The m
 
 The health check works, but the phone list waits about ten seconds and then answers 500. The backend is running without a database. Look at the backend window: it shows `MongoDB connection failed` or a warning that `MONGODB_URI` is empty. Fix `MONGODB_URI` in `server/.env` and start the backend again.
 
-### Log in or Create account answers 500
+### Log in or Verify email answers 500
 
-`JWT_SECRET` is empty in `server/.env`, so the backend cannot sign a login token. Make one with the command in Step 5, put it in `server/.env` and start the backend again. An account created while the secret was empty is already saved, so we log in with it after the fix and do not create it again.
+`JWT_SECRET` is empty in `server/.env`, so the backend cannot sign a login token. Make one with the command in Step 5, put it in `server/.env` and start the backend again. An account confirmed with its code while the secret was empty is already saved, so we log in with it after the fix and do not create it again.
+
+### Create account says the security check is not set up
+
+The page shows "The security check is not set up yet." under the form when `VITE_TURNSTILE_SITE_KEY` is missing from `client/.env`. Add the line from Step 6 and start the frontend again. The same message in red after pressing Create account comes from the backend: `TURNSTILE_SECRET_KEY` is missing from `server/.env`. Add the line from Step 5 and start the backend again.
+
+### The security check failed. Tick it again.
+
+The site key and the secret key do not belong together, for example a real site key with the test secret, or the other way round. On a laptop both must be the test keys from Steps 5 and 6. A token also works only once, so the page clears the box after every failed try and the person ticks it again.
+
+### The security check could not load
+
+The box under the password shows "The security check could not load. Check your connection, then try again." The browser could not reach `challenges.cloudflare.com`. Check the internet connection, then press Try again.
+
+### No code arrives by email
+
+With `RESEND_API_KEY` empty, no email is sent: the code is in the backend window, as Step 7 shows. With a key and the sender `onboarding@resend.dev`, Resend sends only to the email of the Resend account, so any other address gets nothing and the page says "We could not send the code. Try again in a moment." The backend window then shows `Resend could not send to` with Resend's reason. Use a verified domain in `MAIL_FROM`, as Turning on real email explains.
 
 ### A sentence search finds nothing, or the assistant says the AI features are not set up
 
@@ -319,7 +360,7 @@ The three AI lines are empty. Search then looks for every word in the brand and 
 
 ### No reset link shows in the backend window
 
-The link is printed only for an email that has an account, and only while the mail settings are empty. After five requests in 15 minutes from one address, the page answers "Too many reset requests. Try again in 15 minutes." and no link is made until the time has passed.
+The link is printed only for an email that has an account, and only while `RESEND_API_KEY` or `MAIL_FROM` is empty. After five requests in 15 minutes from one address, the page answers "Too many reset requests. Try again in 15 minutes." and no link is made until the time has passed.
 
 ### A phone shows a grey box in place of its picture
 

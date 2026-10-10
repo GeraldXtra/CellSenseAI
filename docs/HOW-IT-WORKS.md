@@ -55,7 +55,7 @@ The pages never talk to the server by themselves. They always go through a small
 | `api.js` | The messenger. Every request goes through this one file. It adds the user's login pass to each request, sends it to the server, and brings back only the useful part of the answer. If the server is off, it turns the problem into a simple message like "Could not reach the server". |
 | `phones.service.js` | Asks for phone things: the list of phones, one phone, compare, price history and reviews. |
 | `ai.service.js` | Asks for AI things: smart search, the assistant chat and recommendations. |
-| `auth.service.js` | Asks for account things: create account, log in, forgot password and reset password. |
+| `auth.service.js` | Asks for account things: create account, check the email code, send a new code, log in, forgot password and reset password. |
 | `users.service.js` | Asks for the dashboard and adds or removes favourites. |
 
 ### The helpers that remember things
@@ -109,13 +109,13 @@ If anything goes wrong at any step, the error handler (`src/middleware/error.js`
 | --- | --- |
 | `src/index.js` | Starts the server. Adds the safety checks, connects all the routes, connects to the database, starts the nightly price check, and opens port 5000. |
 | `src/config/` | The settings. `env.js` reads the secret settings from the `.env` file once, like the database address and the AI key. `db.js` connects to the MongoDB database. |
-| `src/routes/` | The address book. It says which address goes to which controller. There are four: `auth.routes.js` for accounts, `phones.routes.js` for phones, `ai.routes.js` for the AI features and `users.routes.js` for the dashboard and favourites. It also adds the extra limits, like 20 AI requests a minute. |
-| `src/controllers/` | The managers. One per area: `auth.controller.js` (create account, log in, reset password), `phones.controller.js` (list phones, one phone, compare, price trend, reviews), `ai.controller.js` (smart search, chat, recommend) and `users.controller.js` (dashboard, favourites). |
-| `src/services/` | The workers that do the hard parts. `ai.service.js` talks to the AI. `phoneQuery.js` turns filters into a database search. `recommend.service.js` picks phones for a budget. `price.service.js` works out if a price is rising or falling. `review.service.js` works out the review mood from the stars. `mail.service.js` sends the reset password email. |
-| `src/models/` | The shape of each kind of data in the database. There are four: `Phone.js`, `User.js`, `Review.js` and `SearchLog.js`. Part 4 explains them. |
+| `src/routes/` | The address book. It says which address goes to which controller. There are four: `auth.routes.js` for accounts, `phones.routes.js` for phones, `ai.routes.js` for the AI features and `users.routes.js` for the dashboard, favourites and the profile. It also adds the extra limits, like 20 AI requests a minute. |
+| `src/controllers/` | The managers. One per area: `auth.controller.js` (create account with the email code, log in, reset password), `phones.controller.js` (list phones, one phone, compare, price trend, reviews), `ai.controller.js` (smart search, chat, recommend) and `users.controller.js` (dashboard, favourites, profile). |
+| `src/services/` | The workers that do the hard parts. `ai.service.js` talks to the AI. `phoneQuery.js` turns filters into a database search. `recommend.service.js` picks phones for a budget. `price.service.js` works out if a price is rising or falling. `review.service.js` works out the review mood from the stars. `mail.service.js` sends the emails through Resend: the code for a new account, the reset password link and the password changed notice. `turnstile.service.js` asks Cloudflare whether the security check on Create account was passed. |
+| `src/models/` | The shape of each kind of data in the database. There are five: `Phone.js`, `User.js`, `PendingSignup.js`, `Review.js` and `SearchLog.js`. Part 4 explains them. |
 | `src/middleware/` | Checks that run before or after the managers. `auth.js` checks the login token. `error.js` turns any error into a clear message. |
 | `src/jobs/priceUpdater.js` | A timer that runs every night at 2 am and updates the phone prices. |
-| `src/utils/` | Small helper tools. `http.js` builds the answer shape. `jwt.js` makes and checks login tokens. `password.js` scrambles passwords and makes reset codes. `slug.js` makes the short name of a phone, like `samsung-galaxy-s24`. |
+| `src/utils/` | Small helper tools. `http.js` builds the answer shape. `jwt.js` makes and checks login tokens. `password.js` scrambles passwords and makes reset codes and email codes. `slug.js` makes the short name of a phone, like `samsung-galaxy-s24`. |
 | `data/phones.json` | The list of our 60 starting phones, 12 each for Samsung, Apple, OnePlus, Xiaomi and Vivo. |
 | `data/prices.json` | The latest guide price for each phone, read by the nightly price check. |
 | `scripts/seed.js` | Run with `npm run seed`. Copies the phones from `phones.json` into the database. |
@@ -141,12 +141,13 @@ We use **MongoDB**, on a hosted service called **MongoDB Atlas**, so the databas
 
 MongoDB does not store data in tables with rows like Excel. It stores each item as a **document**, which looks like a card with labels and values. Documents of the same kind are kept together in a **collection**, like a drawer of cards.
 
-### Our four collections
+### Our five collections
 
 | Collection | What one document holds |
 | --- | --- |
 | `phones` | One phone: its short name (slug), brand, model, picture path, category (budget, midrange, flagship, gaming or camera), release year, specs, current price, price history, the AI summary, the review summary, and where it came from (our list or the AI). |
-| `users` | One person: name, email, scrambled password, favourite phones, recently viewed phones (last 20), search history (last 50), last recommendations, and the password reset code when they ask for one. |
+| `users` | One person: name, email, scrambled password, favourite phones, recently viewed phones (last 20), search history (last 50), last recommendations, the password reset code when they ask for one, when their email was checked, when their password last changed, and a login version number that ends old logins when it goes up. |
+| `pendingsignups` | One sign up that is waiting for its email code: the name, the email, the scrambled password, the scrambled code and how many tries are used. The database deletes it by itself an hour after the last code. |
 | `reviews` | One review: which phone, which user, the name shown, the stars from 1 to 5, the text (up to 1000 letters) and the mood. One person can review a phone only once. |
 | `searchlogs` | One search: what was typed, the filters used, whether the AI helped, how many phones were found, and who searched if they were logged in. We use this to see what people look for. |
 

@@ -96,9 +96,11 @@ One row per variable, in the same order as the file. The last column says where 
 | `--cs-control-h` | `44px` | Buttons and inputs | `log-in.png` the fields and the button |
 | `--cs-search-h` | `48px` | The big search field | `home-page.png` the search field |
 | `--cs-card-image-h` | `220px` | The picture area of a product card, and the height of the grey box PhoneImage draws when a phone has no picture | `search-result.png` the picture on a card |
-| `--cs-auth-card-w` | `440px` | Log in, Create account, Forgot password and Reset password cards | `log-in.png` the card |
+| `--cs-auth-card-w` | `440px` | Log in, Create account, Verify email, Forgot password and Reset password cards | `log-in.png` the card |
+| `--cs-turnstile-h` | `65px` | The height the security check box keeps while it loads, so the form does not jump | `create-account-security-check.png` the "Verify you are human" box |
 | `--cs-dialog-w` | `640px` | The Add a phone dialog | `compare-add-phone.png` the dialog |
 | `--cs-launcher-size` | `56px` | The assistant launcher | Every page, the launcher |
+| `--cs-avatar-size` | `104px` | The circle with the first letter of the name on the Profile page | `profile.png` the "G" circle |
 | `--cs-chat-w` | `380px` | The width of the floating chat window | `assistant-window.png` the window at the bottom right |
 | `--cs-chat-h` | `560px` | The height of the floating chat window | `assistant-window.png` the window at the bottom right |
 | `--cs-chat-thumb-h` | `80px` | The height of the phone picture in a row under a reply in the chat window | `assistant-window.png` the pictures next to Redmi Note 13 Pro and Vivo V30 |

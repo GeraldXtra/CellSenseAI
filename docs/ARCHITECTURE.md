@@ -9,7 +9,7 @@ CellSense AI is a single page web application. The browser loads the app once. A
 The site is made of four parts. Each part has one job.
 
 1. The browser. This is the React app, built with React 19, Vite, React Router, Bootstrap 5 and plain CSS. It shows the pages, takes input from the visitor and asks the backend for data.
-2. The backend. This is a Node 20 server built with Express 5. It receives every request from the browser and checks who is asking. It reads and writes the database, calls the model when a feature needs it, sends the password reset email, and sends an answer back.
+2. The backend. This is a Node 20 server built with Express 5. It receives every request from the browser and checks who is asking. It reads and writes the database, calls the model when a feature needs it, checks the Cloudflare Turnstile security check on Create account, sends the emails through Resend, and sends an answer back.
 3. The database. This is MongoDB Atlas, a cloud database, used through Mongoose. It stores phones, users, reviews and search logs.
 4. The model. This is a pre trained language model that we reach through an OpenAI compatible chat API. We use Groq with the model `openai/gpt-oss-120b`. It reads the text the backend sends and answers with text or JSON. We integrate it, we do not train it.
 
@@ -19,7 +19,7 @@ We keep five rules between the parts.
 2. The backend is the only part that reads and writes MongoDB.
 3. The backend is the only part that calls the model. It decides what to send and what to do with the reply.
 4. The model never talks to the database directly. It only sees the text the backend gives it.
-5. The keys and passwords for the database, the model and the mail account live only in `server/.env`. The browser never sees them.
+5. The keys and passwords for the database, the model, the security check and the email service live only in `server/.env`. The browser never sees them.
 
 Here is one request, step by step. A visitor types "5G phone with long battery life" and presses Enter.
 
@@ -114,18 +114,19 @@ A logged in user writes a review with a rating from 1 to 5 and text. The page se
 
 Login uses email and password.
 
-1. On register, the browser sends name, email and password to `POST /api/auth/register`. The backend stores the password as a bcrypt hash. We never store the password itself.
-2. On login, the browser sends email and password to `POST /api/auth/login`. The backend checks the password against the hash and, if it matches, returns a JWT token and the user. The token expires after seven days.
-3. The browser sends the token with every request in the header `Authorization: Bearer <token>`. The backend reads the token to know which user is asking. A protected route refuses a request without a valid token.
-4. `GET /api/auth/me` returns the logged in user. The browser calls it once when the app loads with a stored token, so the visitor stays logged in after a reload.
+1. On register, the browser sends name, email, password and the Turnstile token to `POST /api/auth/register`. The backend checks the token with Cloudflare, keeps the details in a pending sign up with the password as a bcrypt hash and the code as a hash, and emails a 6 digit code. We never store the password or the code themselves. No account exists yet.
+2. On Verify email, the browser sends the email and the code to `POST /api/auth/verify-email`. The code works for 10 minutes and allows five tries. The right code creates the account with its email marked as verified, and the backend returns a JWT token and the user, so the person is logged in.
+3. On login, the browser sends email and password to `POST /api/auth/login`. The backend checks the password against the hash and, if it matches, returns a JWT token and the user. The token expires after seven days.
+4. The browser sends the token with every request in the header `Authorization: Bearer <token>`. The backend reads the token to know which user is asking. A protected route refuses a request without a valid token. Each token carries the account's token version, and a password change, a reset or logging out the other devices raises it, which ends every older login.
+5. `GET /api/auth/me` returns the logged in user. The browser calls it once when the app loads with a stored token, so the visitor stays logged in after a reload.
 
 ### Password reset
 
 A visitor who forgets their password gets a new one in three steps.
 
 1. Request. On the Forgot password page the visitor enters their email. The browser sends it to `POST /api/auth/forgot-password`. For any valid email the backend answers `{ sent: true }`, whether or not it has an account, so nobody can use this page to find out which emails have an account. One address can ask five times every 15 minutes.
-2. Email with a one hour link. When the email belongs to a user, the backend creates a random token, stores a hash of it and an expiry one hour ahead in the `passwordReset` field of the user, and sends an email through Nodemailer. The email holds a link to `<CLIENT_URL>/reset-password/<token>`. The mail settings live in `server/.env`. While they are empty, the backend prints the link in its terminal instead of sending an email, so we can test the flow without a mail account.
-3. New password. The link opens the Reset password page. The visitor types the new password twice. The browser sends `{ token, password }` to `POST /api/auth/reset-password`. The backend hashes the token, finds the user with that hash, checks that the expiry has not passed, stores the new bcrypt hash, clears `passwordReset` and answers `{ ok: true }`, so the link works once. An invalid or expired token gets a 400 answer, and the page offers the Forgot password page again.
+2. Email with a one hour link. When the email belongs to a user, the backend creates a random token, stores a hash of it and an expiry one hour ahead in the `passwordReset` field of the user, and sends an email through Resend. The email holds a link to `<CLIENT_URL>/reset-password/<token>`. The mail settings live in `server/.env`. While they are empty, the backend prints the link in its terminal instead of sending an email, so we can test the flow without a Resend key.
+3. New password. The link opens the Reset password page. The visitor types the new password twice. The browser sends `{ token, password }` to `POST /api/auth/reset-password`. The backend hashes the token, finds the user with that hash, checks that the expiry has not passed, stores the new bcrypt hash, raises the token version so every older login ends, clears `passwordReset` and answers `{ ok: true }`, so the link works once. An invalid or expired token gets a 400 answer, and the page offers the Forgot password page again.
 
 ### Favourites, recently viewed and the dashboard
 
@@ -137,6 +138,10 @@ The Dashboard page needs login. It calls `GET /api/users/me/dashboard` and gets 
 4. Last recommendations: the phones and reasons from the user's last recommendation. Recommend fills it in.
 
 In the browser, the route `/dashboard` sits behind a login guard. A logged out visitor who opens it is sent to the Log in page and comes back after logging in.
+
+### Profile
+
+The Profile page at `/profile` sits behind the same login guard. It calls `GET /api/users/me/profile` for the account and its counts. A name change goes to `PATCH /api/users/me/profile` and also renames the author on the user's reviews; the email never changes. A password change goes to `PATCH /api/users/me/password` with the current password, and logging out the other devices to `POST /api/users/me/sign-out-others`; both raise the token version and return a fresh token that the browser saves, so this device stays logged in. The page can also empty the search history and the recently viewed list, and delete the account with its reviews after the password is typed again.
 
 ### The nightly price check and the price trend
 
@@ -169,12 +174,12 @@ The root holds `client/`, `server/`, `docs/`, `README.md`, `.gitignore` and `.gi
 - `client/src/pages/`: one folder per page with the page file, its stylesheet and a README that says what to build.
 - `server/`: the Express backend. `src/index.js` starts the server, mounts `/api/auth`, `/api/phones`, `/api/ai`, `/api/users` and `GET /api/health`, and starts the nightly price check.
 - `server/src/config/`: `env.js`, which reads every setting once, and `db.js`, which connects to MongoDB Atlas.
-- `server/src/models/`: the Mongoose models `Phone.js`, `User.js`, `Review.js` and `SearchLog.js`, one per collection.
+- `server/src/models/`: the Mongoose models `Phone.js`, `User.js`, `PendingSignup.js`, `Review.js` and `SearchLog.js`, one per collection.
 - `server/src/routes/`: one route file per URL group. Each maps a URL to its middleware and its controller.
 - `server/src/controllers/`: the code that runs for each route.
 - `server/src/middleware/`: `auth.js` checks the login token and `error.js` handles errors. Each controller checks its own input.
-- `server/src/services/`: `ai.service.js` talks to the model, `phoneQuery.js` builds the phone query for MongoDB, `recommend.service.js` builds and scores the recommendation shortlist, `price.service.js` computes the trend, `review.service.js` gives the star based sentiment and summary, and `mail.service.js` sends the password reset email.
-- `server/src/utils/`: `http.js` for the envelope, `jwt.js` for the tokens, `password.js` for the hashes and the reset tokens, and `slug.js` for the phone slugs.
+- `server/src/services/`: `ai.service.js` talks to the model, `phoneQuery.js` builds the phone query for MongoDB, `recommend.service.js` builds and scores the recommendation shortlist, `price.service.js` computes the trend, `review.service.js` gives the star based sentiment and summary, `mail.service.js` sends the verification code, the password reset email and the password changed notice through Resend, and `turnstile.service.js` checks the security check token with Cloudflare.
+- `server/src/utils/`: `http.js` for the envelope, `jwt.js` for the tokens, `password.js` for the hashes, the reset tokens and the email codes, `name.js` for the name rule, and `slug.js` for the phone slugs.
 - `server/src/jobs/`: `priceUpdater.js`, the nightly price check.
 - `server/scripts/`: `seed.js` loads the phones into the database and `runPriceUpdate.js` runs the price check once.
 - `server/data/`: `phones.json` with our 60 phones, `prices.json` with the price list, and a `README.md` about the phone file.
