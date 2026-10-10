@@ -18,6 +18,7 @@ const columns = [
       { label: "Create account", to: "/register" },
       { label: "Favourites", to: "/dashboard#favourites" },
       { label: "Search history", to: "/dashboard#search-history" },
+      { label: "Profile", to: "/profile" },
     ],
   },
   {

@@ -13,6 +13,8 @@ import Login from "./pages/Login/Login.jsx";
 import Register from "./pages/Register/Register.jsx";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword/ResetPassword.jsx";
+import VerifyEmail from "./pages/VerifyEmail/VerifyEmail.jsx";
+import Profile from "./pages/Profile/Profile.jsx";
 import About from "./pages/About/About.jsx";
 import NotFound from "./pages/NotFound/NotFound.jsx";
 
@@ -36,8 +38,17 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/about" element={<About />} />

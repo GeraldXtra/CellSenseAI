@@ -4,6 +4,7 @@ import {
   login as loginRequest,
   me,
   register as registerRequest,
+  verifyEmail as verifyEmailRequest,
 } from "../services/auth.service.js";
 
 const AuthContext = createContext(null);
@@ -34,18 +35,29 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
+  function applySession({ token, user: nextUser }) {
+    setToken(token);
+    setUser(nextUser);
+  }
+
   async function login(body) {
     const data = await loginRequest(body);
-    setToken(data.token);
-    setUser(data.user);
+    applySession(data);
     return data.user;
   }
 
-  async function register(body) {
-    const data = await registerRequest(body);
-    setToken(data.token);
-    setUser(data.user);
+  function register(body) {
+    return registerRequest(body);
+  }
+
+  async function verifyEmail(body) {
+    const data = await verifyEmailRequest(body);
+    applySession(data);
     return data.user;
+  }
+
+  function updateUser(nextUser) {
+    setUser((current) => (current ? { ...current, ...nextUser } : nextUser));
   }
 
   function logout() {
@@ -53,7 +65,16 @@ export function AuthProvider({ children }) {
     setUser(null);
   }
 
-  const value = { user, loading, login, register, logout };
+  const value = {
+    user,
+    loading,
+    login,
+    register,
+    verifyEmail,
+    applySession,
+    updateUser,
+    logout,
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

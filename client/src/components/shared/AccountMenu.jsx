@@ -18,6 +18,9 @@ export default function AccountMenu({ onClose }) {
       <Link to="/dashboard" className="cs-account-item" onClick={close}>
         Dashboard
       </Link>
+      <Link to="/profile" className="cs-account-item" onClick={close}>
+        Profile
+      </Link>
       <button type="button" className="cs-account-item" onClick={handleLogout}>
         Log out
       </button>

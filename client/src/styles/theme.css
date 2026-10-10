@@ -76,6 +76,8 @@
   --cs-chart-line: var(--cs-ink);
   --cs-chart-grid: var(--cs-line);
   --cs-cell-best-bg: var(--cs-band-bg);
+  --cs-turnstile-h: 65px;
+  --cs-avatar-size: 104px;
 }
 
 :root {

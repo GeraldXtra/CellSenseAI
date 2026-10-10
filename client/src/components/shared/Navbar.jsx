@@ -91,13 +91,18 @@ export default function Navbar() {
             </NavLink>
           ))}
           {user ? (
-            <button
-              type="button"
-              className="cs-nav-link cs-nav-action cs-mobile-only"
-              onClick={handleLogout}
-            >
-              Log out
-            </button>
+            <>
+              <NavLink to="/profile" className="cs-nav-link cs-mobile-only">
+                Profile
+              </NavLink>
+              <button
+                type="button"
+                className="cs-nav-link cs-nav-action cs-mobile-only"
+                onClick={handleLogout}
+              >
+                Log out
+              </button>
+            </>
           ) : (
             <Link to="/login" className="cs-nav-link cs-mobile-only">
               Log in

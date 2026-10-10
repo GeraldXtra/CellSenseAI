@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import AuthCard from "../../components/osakue/AuthCard.jsx";
 import Loader from "../../components/shared/Loader.jsx";
+import Turnstile from "../../components/shared/Turnstile.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import "./Register.css";
 
@@ -22,6 +23,8 @@ export default function Register() {
   const [errors, setErrors] = useState({});
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [resetKey, setResetKey] = useState(0);
 
   if (loading) return <Loader label="Checking your account" />;
   if (user && !submitting) return <Navigate to="/" replace />;
@@ -34,19 +37,32 @@ export default function Register() {
     if (password.length < 8) found.password = "At least 8 characters.";
     setErrors(found);
     if (Object.keys(found).length) return;
+    if (!turnstileToken) return;
 
     setSubmitting(true);
     setError("");
     try {
-      await register({ name: name.trim(), email: email.trim(), password });
-      navigate(safeNext(next), { replace: true });
+      const data = await register({
+        name: name.trim(),
+        email: email.trim(),
+        password,
+        turnstileToken,
+      });
+      const sentTo = encodeURIComponent(data.email || email.trim());
+      const target = safeNext(next);
+      const nextPart = target === "/" ? "" : `&next=${encodeURIComponent(target)}`;
+      navigate(`/verify-email?email=${sentTo}${nextPart}`);
     } catch (err) {
       setError(err.message || "Something went wrong. Try again.");
+      setTurnstileToken("");
+      setResetKey((key) => key + 1);
       setSubmitting(false);
     }
   }
 
   const loginLink = next ? `/login?next=${encodeURIComponent(next)}` : "/login";
+  const filled = Boolean(name.trim() && email.trim() && password);
+  const needsTick = filled && !turnstileToken;
 
   return (
     <AuthCard
@@ -106,9 +122,17 @@ export default function Register() {
             </div>
           )}
         </div>
-        <button type="submit" className="btn btn-primary auth-submit" disabled={submitting}>
-          {submitting ? "Creating your account" : "Create account"}
+        <div className="auth-field">
+          <Turnstile onToken={setTurnstileToken} resetKey={resetKey} />
+        </div>
+        <button
+          type="submit"
+          className="btn btn-primary auth-submit"
+          disabled={submitting || !filled || !turnstileToken}
+        >
+          {submitting ? "Sending the code" : "Create account"}
         </button>
+        {needsTick && <p className="auth-note">Tick the security check to continue.</p>}
         {error && (
           <p className="auth-error" role="alert">
             {error}
