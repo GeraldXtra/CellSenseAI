@@ -41,8 +41,21 @@ function envelopeMessage(body) {
   return null;
 }
 
+const API_BASE = (import.meta.env.VITE_API_URL || "/api").replace(/\/+$/, "");
+const PUBLIC_BASE = import.meta.env.BASE_URL;
+
+export function assetUrl(path) {
+  if (typeof path !== "string" || !path.startsWith("/") || path.startsWith("//")) {
+    return path;
+  }
+  if (path === "/api" || path.startsWith("/api/")) {
+    return `${API_BASE}${path.slice(4)}`;
+  }
+  return `${PUBLIC_BASE}${path.slice(1)}`;
+}
+
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "/api",
+  baseURL: API_BASE,
 });
 
 api.interceptors.request.use((config) => {

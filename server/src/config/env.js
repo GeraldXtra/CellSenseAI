@@ -5,6 +5,10 @@ export const env = Object.freeze({
   PORT: +process.env.PORT || 5000,
   NODE_ENV: process.env.NODE_ENV || "development",
   CLIENT_ORIGIN: process.env.CLIENT_ORIGIN || "http://localhost:5173",
+  CLIENT_ORIGINS: (process.env.CLIENT_ORIGIN || "http://localhost:5173")
+    .split(",")
+    .map((origin) => origin.trim().replace(/\/+$/, ""))
+    .filter(Boolean),
   MONGODB_URI: process.env.MONGODB_URI || "",
   JWT_SECRET: process.env.JWT_SECRET || "",
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || "7d",

@@ -78,6 +78,7 @@
   --cs-cell-best-bg: var(--cs-band-bg);
   --cs-turnstile-h: 65px;
   --cs-avatar-size: 104px;
+  --cs-table-thumb-h: 64px;
 }
 
 :root {

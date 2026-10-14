@@ -3,7 +3,7 @@ import { matchPath, useLocation } from "react-router-dom";
 
 const CompareContext = createContext(null);
 const STORAGE_KEY = "cs_compare";
-const MAX = 3;
+const MAX = 4;
 
 function readSaved() {
   try {

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import AuthCard from "../../components/osakue/AuthCard.jsx";
 import Loader from "../../components/shared/Loader.jsx";
+import Turnstile from "../../components/shared/Turnstile.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import "./Login.css";
 
@@ -19,6 +20,8 @@ export default function Login() {
   const [errors, setErrors] = useState({});
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [resetKey, setResetKey] = useState(0);
 
   if (loading) return <Loader label="Checking your account" />;
   if (user && !submitting) return <Navigate to="/" replace />;
@@ -30,19 +33,24 @@ export default function Login() {
     if (!password) found.password = "Enter your password.";
     setErrors(found);
     if (Object.keys(found).length) return;
+    if (!turnstileToken) return;
 
     setSubmitting(true);
     setError("");
     try {
-      await login({ email: email.trim(), password });
+      await login({ email: email.trim(), password, turnstileToken });
       navigate(safeNext(next), { replace: true });
     } catch (err) {
       setError(err.message || "Something went wrong. Try again.");
+      setTurnstileToken("");
+      setResetKey((key) => key + 1);
       setSubmitting(false);
     }
   }
 
   const registerLink = next ? `/register?next=${encodeURIComponent(next)}` : "/register";
+  const filled = Boolean(email.trim() && password);
+  const needsTick = filled && !turnstileToken;
 
   return (
     <AuthCard title="Log in" subtitle="Your favourites and history are saved to your account.">
@@ -80,9 +88,17 @@ export default function Login() {
             <Link to="/forgot-password">Forgot password?</Link>
           </div>
         </div>
-        <button type="submit" className="btn btn-primary auth-submit" disabled={submitting}>
+        <div className="auth-field">
+          <Turnstile onToken={setTurnstileToken} resetKey={resetKey} />
+        </div>
+        <button
+          type="submit"
+          className="btn btn-primary auth-submit"
+          disabled={submitting || !filled || !turnstileToken}
+        >
           {submitting ? "Logging in" : "Log in"}
         </button>
+        {needsTick && <p className="auth-note">Tick the security check to continue.</p>}
         {error && (
           <p className="auth-error" role="alert">
             {error}

@@ -12,8 +12,8 @@ export function resendCode(email) {
   return api.post("/auth/resend-code", { email });
 }
 
-export function login(body) {
-  return api.post("/auth/login", body);
+export function login({ email, password, turnstileToken }) {
+  return api.post("/auth/login", { email, password, turnstileToken });
 }
 
 export function me() {

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { assetUrl } from "../../services/api.js";
 
 export function phoneName(phone) {
   const brand = phone.brand || "";
@@ -15,7 +16,7 @@ export default function PhoneImage({ phone, className = "" }) {
   if (showPicture) {
     return (
       <img
-        src={phone.imageUrl}
+        src={assetUrl(phone.imageUrl)}
         alt={name}
         className={`cs-phone-image ${className}`}
         loading="lazy"

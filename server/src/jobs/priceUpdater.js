@@ -1,7 +1,7 @@
 // priceUpdater: the nightly node-cron job that refreshes phone prices and appends to priceHistory. Owner: Gerald.
 import fs from "node:fs/promises";
 import cron from "node-cron";
-import { Phone } from "../models/Phone.js";
+import { recordPrices } from "../services/price.service.js";
 import { env } from "../config/env.js";
 
 const PRICE_FILE = new URL("../../data/prices.json", import.meta.url);
@@ -17,44 +17,11 @@ async function readPriceList() {
 
 export async function runPriceUpdate() {
   const { checkedOn, prices } = await readPriceList();
-  const slugs = Object.keys(prices);
-  const phones = await Phone.find({ slug: { $in: slugs } })
-    .select("slug price")
-    .lean();
-
-  let changed = 0;
-  let unchanged = 0;
-  let skipped = 0;
-
-  for (const phone of phones) {
-    const price = Number(prices[phone.slug]);
-    if (!Number.isFinite(price) || price <= 0) {
-      skipped += 1;
-      continue;
-    }
-
-    const result = await Phone.updateOne(
-      {
-        _id: phone._id,
-        $or: [
-          { "price.updatedAt": { $lt: checkedOn } },
-          { "price.updatedAt": null },
-        ],
-      },
-      {
-        $set: { "price.current": price, "price.updatedAt": checkedOn },
-        $push: { priceHistory: { price, date: checkedOn, source: "manual" } },
-      },
-    );
-
-    if (!result.modifiedCount) skipped += 1;
-    else if (price !== phone.price.current) changed += 1;
-    else unchanged += 1;
-  }
-
-  const missing = slugs.filter(
-    (slug) => !phones.some((phone) => phone.slug === slug),
+  const { changed, unchanged, skipped, missing } = await recordPrices(
+    checkedOn,
+    prices,
   );
+
   if (missing.length)
     console.warn(`Not in the database, skipped: ${missing.join(", ")}`);
 

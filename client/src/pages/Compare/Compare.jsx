@@ -66,7 +66,7 @@ export default function Compare() {
         <div className="cs-container">
           <h1 className="cs-heading">Compare</h1>
           <p className="cs-subheading">
-            Up to three phones. The <strong className="compare-bold">bold</strong> value wins each row.
+            Up to four phones. The <strong className="compare-bold">bold</strong> value wins each row.
           </p>
 
           <CompareSlots

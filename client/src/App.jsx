@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import Layout from "./components/shared/Layout.jsx";
 import ProtectedRoute from "./components/shared/ProtectedRoute.jsx";
+import AdminRoute from "./components/shared/AdminRoute.jsx";
 import Home from "./pages/Home/Home.jsx";
 import SearchResults from "./pages/SearchResults/SearchResults.jsx";
 import Browse from "./pages/Browse/Browse.jsx";
@@ -16,6 +17,9 @@ import ResetPassword from "./pages/ResetPassword/ResetPassword.jsx";
 import VerifyEmail from "./pages/VerifyEmail/VerifyEmail.jsx";
 import Profile from "./pages/Profile/Profile.jsx";
 import About from "./pages/About/About.jsx";
+import Admin from "./pages/Admin/Admin.jsx";
+import AdminPhone from "./pages/AdminPhone/AdminPhone.jsx";
+import AdminPrices from "./pages/AdminPrices/AdminPrices.jsx";
 import NotFound from "./pages/NotFound/NotFound.jsx";
 
 export default function App() {
@@ -52,6 +56,38 @@ export default function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/about" element={<About />} />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <Admin />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/phones/new"
+          element={
+            <AdminRoute>
+              <AdminPhone />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/phones/:slug"
+          element={
+            <AdminRoute>
+              <AdminPhone />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/prices"
+          element={
+            <AdminRoute>
+              <AdminPrices />
+            </AdminRoute>
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

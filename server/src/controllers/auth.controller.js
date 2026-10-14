@@ -214,6 +214,8 @@ export async function login(req, res) {
   if (!email || !password)
     throw httpError(400, "Email and password are required");
 
+  await verifyTurnstile(req.body?.turnstileToken, req.ip);
+
   const user = await User.findOne({ email }).select("+passwordHash");
   const valid = user && (await checkPassword(password, user.passwordHash));
   if (!valid) throw httpError(401, "Wrong email or password");

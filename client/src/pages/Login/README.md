@@ -14,7 +14,8 @@ Where every click on this page leads, from `docs/ROUTES.md`:
 
 | What | Leads to |
 | --- | --- |
-| "Log in" button | `login({ email, password })` from `useAuth`, then `next` when it is inside our site, otherwise `/` |
+| "Verify you are human" box | the Cloudflare Turnstile check; ticking it gives a token, which works once |
+| "Log in" button | `login({ email, password, turnstileToken })` from `useAuth`, then `next` when it is inside our site, otherwise `/` |
 | "Forgot password?" | `/forgot-password` |
 | "Create an account" | `/register`, with the same `?next=` when there is one |
 
@@ -28,12 +29,13 @@ From `log-in.png`. The page body is the grey band, and the card floats in the mi
 
 1. AuthCard: a white `.cs-card` with `--cs-auth-card-w` as its max width, centred. Inside, at the top: the heading "Log in" in `--cs-size-page-title`, centred, and the sub line "Your favourites and history are saved to your account." in `--cs-ink-soft`, centred.
 2. The form: label "Email" and a `form-control` with the placeholder "Enter your email" (type email); label "Password" and a `form-control` with the placeholder "Enter your password" (type password). Under the password field, right aligned, the small link "Forgot password?" in `--cs-ink-soft`. Labels have `--cs-space-2` to their field and `--cs-space-5` between the two fields.
-3. A full width `btn btn-primary` "Log in".
-4. Under the button, centred: "New here? " in `--cs-ink-soft` followed by the underlined link "Create an account" in `--cs-ink`.
+3. My Turnstile security check, `<Turnstile onToken={setTurnstileToken} resetKey={resetKey} />` from `components/shared/Turnstile.jsx`, between the password field and the button.
+4. A full width `btn btn-primary` "Log in", disabled until the email and the password are filled and the box is ticked. While only the tick is missing, "Tick the security check to continue." shows under it.
+5. Under the button, centred: "New here? " in `--cs-ink-soft` followed by the underlined link "Create an account" in `--cs-ink`.
 
 ## Components to use
 
-- Shared: Loader (inside the button while the call runs, or change the label to "Logging in").
+- Shared: Loader (inside the button while the call runs, or change the label to "Logging in"), and Turnstile for the security check (`components/shared/Turnstile.jsx`), to which you pass `onToken` and `resetKey`.
 - Yours: AuthCard. Give it `title`, `subtitle` and `children`; the pages put the form or the message inside. Build it in `src/components/osakue/AuthCard.jsx`.
 
 ## Data
@@ -41,14 +43,14 @@ From `log-in.png`. The page body is the grey band, and the card floats in the mi
 The endpoint is live. The exact contract for this page and Create account is in [`docs/DATA-FLOW.md`, Log in and Create account](../../../../docs/DATA-FLOW.md#log-in-and-create-account).
 
 - Context: `useAuth()` from `src/context/AuthContext.jsx`, for `login`, and for `user` and `loading` to send a person who is already logged in to `/`.
-- Service: none called by the page. `login({ email, password })` from the context calls `login` in `src/services/auth.service.js`, stores the token and sets the user, so the top bar shows the name at once. Do not call `auth.service.js` yourself.
+- Service: none called by the page. `login({ email, password, turnstileToken })` from the context calls `login` in `src/services/auth.service.js`, stores the token and sets the user, so the top bar shows the name at once. Do not call `auth.service.js` yourself.
 - Reply: the server answers `{ token, user }`; the context keeps the token, and `login` resolves to the user:
 
 ```js
 { _id, name: "Test User", email: "test.user@example.com", role: "user" }
 ```
 
-- Messages: `login` throws an error with the server's message. "Email and password are required" when a field is empty, "Wrong email or password" when the two do not match an account, and "Could not reach the server. Check that it is running." when the server is off. Build the form, the error line and the redirect against those. To test, start the server as `docs/INSTALLATION.md` says and create an account on the Create account page.
+- Messages: `login` throws an error with the server's message. "Email and password are required" when a field is empty, "Complete the security check" and "The security check failed. Tick it again." from the security box, "Wrong email or password" when the two do not match an account, and "Could not reach the server. Check that it is running." when the server is off. Build the form, the error line and the redirect against those. To test, start the server as `docs/INSTALLATION.md` says and create an account on the Create account page.
 
 ## The states to handle
 
@@ -56,6 +58,7 @@ The endpoint is live. The exact contract for this page and Create account is in 
 - Submitting: the button disabled with the label "Logging in".
 - Error: the server message in `--cs-error` under the button, for example "Wrong email or password". The fields keep their values.
 - Bad input: an empty email or password shows the field with `is-invalid` and a short line under it; the form does not submit.
+- Not ticked: the button stays disabled while the box is not ticked, and "Tick the security check to continue." shows once the email and password are filled. After a failed login, change `resetKey` so the box clears for a new tick.
 - Already logged in: redirect to `/`.
 
 ## Done checklist

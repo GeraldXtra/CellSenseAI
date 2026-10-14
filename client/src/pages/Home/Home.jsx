@@ -150,7 +150,7 @@ export default function Home() {
       <section className="cs-section cs-section-alt">
         <div className="cs-container">
           <h2 className="cs-heading home-section-title">Compare side by side</h2>
-          <p className="cs-subheading">Two or three phones, every spec in one table.</p>
+          <p className="cs-subheading">Two to four phones, every spec in one table.</p>
           <CompareTeaser />
         </div>
       </section>

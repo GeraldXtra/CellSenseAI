@@ -17,11 +17,51 @@
 }
 
 .compare-slot {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   min-width: 0;
+}
+
+.compare-slot-close {
+  position: absolute;
+  top: var(--cs-space-2);
+  right: var(--cs-space-2);
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cs-control-h);
+  height: var(--cs-control-h);
+  padding: 0;
+  background-color: var(--cs-card-bg);
+  border: 1px solid var(--cs-line);
+  border-radius: 50%;
+  box-shadow: var(--cs-shadow-float);
+  color: var(--cs-ink);
+  font-size: var(--cs-icon);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--cs-transition), background-color var(--cs-transition);
+}
+
+.compare-slot:hover .compare-slot-close,
+.compare-slot:focus-within .compare-slot-close {
+  opacity: 1;
+}
+
+.compare-slot-close:hover,
+.compare-slot-close:focus-visible {
+  background-color: var(--cs-band-bg);
+  outline: none;
+}
+
+@media (hover: none) {
+  .compare-slot-close {
+    opacity: 1;
+  }
 }
 
 .compare-slot-image {

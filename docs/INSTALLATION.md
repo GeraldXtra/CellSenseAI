@@ -231,7 +231,7 @@ The seed is safe: running it again cannot undo a price or a review. Only Gerald 
 
 ## The phone pictures
 
-The pictures go in `client/public/phones/`, one PNG per phone, named after its slug, such as `samsung-galaxy-s24.png`. Vite serves that folder at `/phones/`, so the file is reached at `/phones/samsung-galaxy-s24.png`. The database stores only that path, in `imageUrl`, and the seed writes it for every phone. A new picture needs no change to the database: the file name only has to match the slug. When `imageUrl` is empty or the file is missing, the site shows a grey box with the phone name in place of the picture.
+The pictures go in `client/public/phones/`, one PNG per phone, named after its slug, such as `samsung-galaxy-s24.png`. Vite serves that folder at `/phones/`, so the file is reached at `/phones/samsung-galaxy-s24.png`. The database stores only that path, in `imageUrl`, and the seed writes it for every phone. A new picture needs no change to the database: the file name only has to match the slug. When `imageUrl` is empty or the file is missing, the site shows a grey box with the phone name in place of the picture. A picture an admin uploads on the Admin pages is different: the server saves it in the database, in the `phonepictures` collection, and `imageUrl` points at the server, such as `/api/uploads/phones/<slug>.png?v=<n>`.
 
 ## A machine outside the team: a fresh database
 
@@ -364,4 +364,4 @@ The link is printed only for an email that has an account, and only while `RESEN
 
 ### A phone shows a grey box in place of its picture
 
-The picture file is missing from `client/public/phones/`, or its name does not match the slug. Add the PNG named after the slug, such as `samsung-galaxy-s24.png`, and reload the page.
+The picture file is missing from `client/public/phones/`, or its name does not match the slug. Add the PNG named after the slug, such as `samsung-galaxy-s24.png`, and reload the page. For a picture an admin uploaded, upload it again on the Edit phone page.

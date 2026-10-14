@@ -1,4 +1,6 @@
-// priceService: computes the price trend and the best time to buy note from priceHistory. Owner: Gerald.
+// priceService: computes the price trend and the best time to buy note from priceHistory, and records checked prices. Owner: Gerald.
+import { Phone } from "../models/Phone.js";
+
 const WINDOW_DAYS = 90;
 const THRESHOLD = 0.02;
 
@@ -32,4 +34,46 @@ export function priceTrend(priceHistory = []) {
   if (change >= THRESHOLD) trend = "rising";
 
   return { history, trend, suggestion: SUGGESTIONS[trend] };
+}
+
+export async function recordPrices(checkedOn, prices = {}) {
+  const slugs = Object.keys(prices);
+  const phones = await Phone.find({ slug: { $in: slugs } })
+    .select("slug price")
+    .lean();
+
+  let changed = 0;
+  let unchanged = 0;
+  let skipped = 0;
+
+  for (const phone of phones) {
+    const price = Number(prices[phone.slug]);
+    if (!Number.isFinite(price) || price <= 0) {
+      skipped += 1;
+      continue;
+    }
+
+    const result = await Phone.updateOne(
+      {
+        _id: phone._id,
+        $or: [
+          { "price.updatedAt": { $lt: checkedOn } },
+          { "price.updatedAt": null },
+        ],
+      },
+      {
+        $set: { "price.current": price, "price.updatedAt": checkedOn },
+        $push: { priceHistory: { price, date: checkedOn, source: "manual" } },
+      },
+    );
+
+    if (!result.modifiedCount) skipped += 1;
+    else if (price !== phone.price.current) changed += 1;
+    else unchanged += 1;
+  }
+
+  const missing = slugs.filter(
+    (slug) => !phones.some((phone) => phone.slug === slug),
+  );
+  return { changed, unchanged, skipped, missing };
 }

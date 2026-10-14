@@ -10,9 +10,11 @@ import { AuthProvider } from "./context/AuthContext.jsx";
 import { CompareProvider } from "./context/CompareContext.jsx";
 import { ChatProvider } from "./context/ChatContext.jsx";
 
+const basename = import.meta.env.BASE_URL.replace(/\/+$/, "") || "/";
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <AuthProvider>
         <CompareProvider>
           <ChatProvider>

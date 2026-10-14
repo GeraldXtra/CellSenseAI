@@ -1,0 +1,73 @@
+name: Deploy client to GitHub Pages
+
+on:
+  push:
+    paths:
+      - "client/**"
+      - ".github/workflows/deploy-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Build
+        env:
+          REPO_NAME: ${{ github.event.repository.name }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_TURNSTILE_SITE_KEY: ${{ vars.VITE_TURNSTILE_SITE_KEY || '3x00000000000000000000FF' }}
+        run: |
+          case "$REPO_NAME" in
+            *.github.io) export VITE_BASE_PATH="/" ;;
+            *) export VITE_BASE_PATH="/$REPO_NAME/" ;;
+          esac
+          if [ -z "$VITE_API_URL" ]; then
+            echo "::warning::The repository variable VITE_API_URL is not set, so the site cannot reach the backend."
+          fi
+          npm run build
+          cp dist/index.html dist/404.html
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: client/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

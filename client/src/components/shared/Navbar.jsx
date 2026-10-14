@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import { FiChevronDown, FiMenu, FiSearch, FiX } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext.jsx";
 import AccountMenu from "./AccountMenu.jsx";
+import { assetUrl } from "../../services/api.js";
 
 const links = [
   { to: "/browse", label: "Browse" },
@@ -73,7 +74,7 @@ export default function Navbar() {
     <header className="cs-topbar">
       <div className="cs-container cs-topbar-inner">
         <Link to="/" className="cs-brand">
-          <img src="/brand/favicon-mark.png" alt="" className="cs-brand-mark" />
+          <img src={assetUrl("/brand/favicon-mark.png")} alt="" className="cs-brand-mark" />
           <span>
             CellSense <span className="cs-brand-suffix">AI</span>
           </span>
@@ -95,6 +96,11 @@ export default function Navbar() {
               <NavLink to="/profile" className="cs-nav-link cs-mobile-only">
                 Profile
               </NavLink>
+              {user.role === "admin" && (
+                <NavLink to="/admin" className="cs-nav-link cs-mobile-only">
+                  Admin
+                </NavLink>
+              )}
               <button
                 type="button"
                 className="cs-nav-link cs-nav-action cs-mobile-only"

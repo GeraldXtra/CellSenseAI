@@ -79,7 +79,7 @@ export async function comparePhones(req, res) {
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean)
-    .slice(0, 3);
+    .slice(0, 4);
   if (slugs.length < 2)
     throw httpError(400, "Choose at least two phones to compare");
 

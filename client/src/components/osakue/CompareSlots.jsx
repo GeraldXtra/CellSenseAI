@@ -1,4 +1,4 @@
-import { FiPlus } from "react-icons/fi";
+import { FiPlus, FiX } from "react-icons/fi";
 import PhoneImage, { phoneName } from "../shared/PhoneImage.jsx";
 import { specLine } from "../shared/PhoneCard.jsx";
 
@@ -16,6 +16,14 @@ export default function CompareSlots({ phones, single = false, onRemove, onAdd, 
     <ul className="compare-slots">
       {phones.map((phone) => (
         <li key={phone.slug} className={single ? "compare-slot cs-card compare-slot-single" : "compare-slot"}>
+          <button
+            type="button"
+            className="compare-slot-close"
+            aria-label={`Remove ${phoneName(phone)} from compare`}
+            onClick={() => onRemove(phone.slug)}
+          >
+            <FiX aria-hidden="true" />
+          </button>
           <div className="compare-slot-image">
             <PhoneImage phone={phone} />
           </div>

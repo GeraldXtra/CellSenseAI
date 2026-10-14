@@ -1,4 +1,4 @@
-// auth: middleware that reads the JWT from the Authorization header and attaches the user to the request. Owner: Gerald.
+// auth: middleware that reads the JWT from the Authorization header and attaches the user to the request, and checks the admin role. Owner: Gerald.
 import { User } from "../models/User.js";
 import { verifyToken } from "../utils/jwt.js";
 import { httpError } from "../utils/http.js";
@@ -23,6 +23,11 @@ export async function requireAuth(req, res, next) {
   const user = await userFromRequest(req);
   if (!user) throw httpError(401, "Please log in");
   req.user = user;
+  next();
+}
+
+export function requireAdmin(req, res, next) {
+  if (req.user?.role !== "admin") throw httpError(403, "Admins only");
   next();
 }
 
