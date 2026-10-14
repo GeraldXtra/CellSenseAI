@@ -22,10 +22,9 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.24.4",
     "morgan": "^1.12.1",
+    "multer": "^2.4.0",
     "node-cron": "^3.0.3",
-    "nodemailer": "^6.10.1",
-    "openai": "^4.104.0",
-    "zod": "^3.25.76"
+    "resend": "^6.32.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

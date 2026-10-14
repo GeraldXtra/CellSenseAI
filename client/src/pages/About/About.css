@@ -1,0 +1,58 @@
+.about-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.about-intro .cs-subheading {
+  margin-bottom: var(--cs-space-6);
+}
+
+.about-phone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(var(--cs-card-image-h) * 0.85);
+}
+
+.about-phone .cs-phone-image,
+.about-phone .cs-phone-placeholder {
+  height: 100%;
+}
+
+.about-band {
+  padding-top: var(--cs-space-12);
+  padding-bottom: var(--cs-space-12);
+}
+
+.about-band .about-title {
+  font-size: var(--cs-size-section-title);
+  margin-bottom: var(--cs-space-4);
+}
+
+.about-text {
+  max-width: calc(var(--cs-container) * 0.6);
+  margin: 0 auto;
+  text-align: center;
+  color: var(--cs-ink-soft);
+  line-height: var(--cs-line-body);
+}
+
+.about-mail {
+  color: var(--cs-ink);
+}
+
+.about-mail:hover {
+  color: var(--cs-button-bg-hover);
+}
+
+@media (max-width: 767px) {
+  .about-band {
+    padding-top: var(--cs-space-10);
+    padding-bottom: var(--cs-space-10);
+  }
+
+  .about-band .about-title {
+    font-size: var(--cs-size-block-title);
+  }
+}

@@ -1,83 +1,47 @@
 # CellSense AI Portal
 
-CellSense AI Portal, called CellSense AI, is a website that answers the questions people ask before they buy a phone. A person types what they need in plain words, browses by brand, opens a phone page, compares two or three phones side by side, asks for a recommendation or talks to the assistant. We build it for ASKME Ltd., a company that answers those questions by telephone today. This is the eProject for our Advanced Diploma in Software Engineering (ADSE) course at Aptech NG. The brief is the Semester 1 eProject and we are building it now that we have entered Semester 2.
+CellSense AI Portal, called CellSense AI, is a phone information website built for ASKME Ltd. People use it to search phones in plain words, read specs and guide prices, compare phones side by side, get a recommendation for their budget and ask an assistant questions about phones.
 
-## The team
+This is our eProject for the Advanced Diploma in Software Engineering (ADSE) at Aptech NG. The brief is the Semester 1 eProject and we are building it now that we have entered Semester 2.
 
-- Gerald, project lead: the backend, the database, the AI features, the shared parts of the site, the documentation, and the review and merge of every pull request.
-- Ibrahim: the Home, Search results, Browse, Phone detail and About pages and the components they need.
-- Osakue: the Compare, Recommend, Assistant and Dashboard pages, the four account pages, and the components they need.
+## The problem
 
-## The problem we are solving
-
-ASKME Ltd. answers customer questions by telephone. A large share of the calls are the same five questions about phones: which model has a specific feature, what the specifications of a phone are, what the current price is, how one phone differs from another, and which phone is best within a budget. Every one of those calls is answered by a person. Thousands of them need enough staff on the phones, and that staff time costs money. Ordinary phone websites do not help, because they show static specs and leave the deciding to the reader.
-
-CellSense AI answers the five questions on the page instead. A search in plain words finds the phones with the feature. A phone page shows the specs and the price with the date it was checked. A comparison table shows how two or three phones differ. A recommendation picks the best phones within a budget. The assistant answers anything else from the same data. ASKME gets fewer calls and customers get an answer at once.
+ASKME Ltd. answers customer questions over the telephone. Most of the calls are about phones, and most of them are the same five questions: which phone has a certain feature, what the specs of a phone are, what it costs today, how two phones differ, and which phone is the best for a budget. Answering thousands of those calls by hand costs support time, staff and money. CellSense AI answers the same questions on a website, so people get the answer themselves and nobody has to call.
 
 ## What the site does
 
-1. Smart search: a person types a sentence such as "phone under $400 with a great camera" and gets the phones that fit, with chips that show how the sentence was understood.
-2. Browse: phones by brand, price range and features, with a sort order.
-3. Phone pages: the specs, the price with the date it was checked, the price history and a plain English summary of the phone.
-4. Side by side comparison: two or three phones in one table, with the best value marked in each row.
-5. Recommendations: five quick questions, then the three phones that fit with a reason for each.
-6. The assistant: a chat page that answers phone questions from our own phone data.
-7. The dashboard: a logged in person sees the phones they opened, their favourites, their search history and their last recommendations.
-8. Price history with a best time to buy note: each phone page shows how the price has moved and whether it is falling, rising or stable.
-9. Reviews with a summary: people rate a phone and write a few lines, and the page shows a short summary of what they said.
+1. Smart search. A brand or a model name is matched directly. A sentence such as "phone under $400 with a great camera" goes to the model, which turns it into filters for the same database search. When the search names a real phone we do not have, the model supplies its specifications and the site shows it marked as estimated.
+2. Browse by brand, price range and features, sorted by date or price, 24 phones a page.
+3. A page for every phone: the specs, the guide price with the date it was checked, a plain English summary written by the model, the price history chart, and Save to favourites.
+4. Side by side comparison of two or three phones, with the best value marked in each row.
+5. Recommendations from five quick questions: our own rules pick a shortlist inside the budget, and the model ranks the top three and explains each one.
+6. The assistant: a chat page and a floating chat window on every other page, sharing one conversation, answering from our own phone data.
+7. A personal dashboard with recently viewed phones, favourites, search history and the last recommendations.
+8. Price history with a trend, falling, rising or stable, and a best time to buy note. A price check runs every night and adds each new guide price to the history.
+9. Reviews with a mood for each review and a short summary of all of them, written by the model.
+
+Accounts use email and password. A new account exists only after the person passes a Cloudflare Turnstile security check and types the 6 digit code we email them, and a forgotten password is reset through a link sent by email that works once and for one hour. A Profile page lets a person change their name or password, clear their history, log out their other devices and delete the account. Without the AI settings the site still runs: search is direct only, recommendations and review summaries fall back to our own rules, and the assistant says the AI features are not set up.
 
 ## How it is built
 
-The site has five parts.
+The site runs in the browser and asks our server for everything it shows. The server keeps the phones, users, pending sign ups, reviews and search logs in MongoDB and calls a pre trained language model through an OpenAI compatible chat API when a feature needs it. We integrate the model; we do not train or build one.
 
-- The site in the browser. This is what a person sees and clicks. It shows the pages and asks the server for data. It never talks to the database or the model itself.
-- The server. It receives every request from the browser, checks who is asking, reads and writes the database, calls the model when a feature needs it, and sends the answer back.
-- The database. It stores the phones, the users, the reviews and the search logs.
-- The model. A pre trained language model that we integrate through an OpenAI compatible API. The server sends it text and our phone data and gets text or JSON back. It does the natural language understanding for search and the assistant, ranks the recommendation shortlist and explains its choices, writes the plain English summaries and summarises reviews. We do not train, build or design any model.
-- A nightly price check. A job inside the server runs every night, asks a price source for the price of every phone and adds it to the phone's price history. The trend on a phone page is a calculation from that history, not a forecast model.
+Stack: React 19 with Vite, React Router, Bootstrap 5 and plain CSS; Node 20 with Express 5; MongoDB Atlas with Mongoose; JWT login with bcrypt; an OpenAI compatible chat API, for which we use Groq with the model `openai/gpt-oss-120b`; `node-cron` for the nightly price check; Resend for the emails; Cloudflare Turnstile for the security check on Create account.
 
-One example, step by step. A person types "phone under $400 with a great camera" and presses Enter.
+## How to run it
 
-1. The browser sends the sentence to the server.
-2. The server first tries to match the words against the brands and models in the database. A sentence like this matches nothing directly.
-3. The server sends the sentence to the model and asks for filters.
-4. The model answers with filters as JSON: a maximum price of 400 and a minimum camera resolution, sorted by camera.
-5. The server runs a database query with those filters and gets three phones back.
-6. The server writes the search to the search log and sends the three phones and the filters to the browser.
-7. The browser shows the three phones as cards and the filters as chips: "Max price $400", "Camera 48MP or more", "Sorted by camera".
+The full steps for a Windows laptop are in [`docs/INSTALLATION.md`](docs/INSTALLATION.md). In short: fill `server/.env`, run `npm install` and `npm run dev` in `server`, then `npm install` and `npm run dev` in `client`, and open `http://localhost:5173`. The backend runs on port 5000 and the client sends every `/api` request to it through the Vite proxy.
 
-The stack: React 19 with Vite, React Router, Bootstrap 5 and plain CSS in the browser; Node 20 with Express 5 on the server; MongoDB Atlas with Mongoose for the database; JWT login with bcrypt; an OpenAI compatible chat API for the model; `node-cron` for the nightly price check; Nodemailer for the password reset email. The full explanation is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/BACKEND.md](docs/BACKEND.md).
+## The live site
 
-## How the work is split
+The frontend is published on GitHub Pages at `https://geraldxtra.github.io/cellsenseai/` and the backend runs on Render.
 
-Gerald builds the backend, the database, the AI features and the shared parts of the site: the routes, the theme, the services, the shared components and the page shell. Ibrahim builds Home, Search results, Browse, Phone detail and About. Osakue builds Compare, Recommend, Assistant, Dashboard and the four account pages: Log in, Create account, Forgot password and Reset password. The split is even by weight: Ibrahim's five pages are the heavy browsing pages, Osakue's four account pages share one card component and are small. Who builds what, the branches, the rules and the checklist are in [docs/TEAM-GUIDE.md](docs/TEAM-GUIDE.md).
+## The docs
 
-## Where we are and what is next
+The finished designs are in [`docs/ui/`](docs/ui/), one image per page state, and the report diagrams go in `docs/diagrams/`.
 
-The designs are finished: every page and every state is drawn. The project structure is finished: the routes, the theme, the shared components, the services and one folder per page with a README that says what to build. Next, in order: the backend, the pages built against the designs, the mobile layouts, then the report, the test data and the demo video. The full order with an owner for each item is in [docs/ROADMAP.md](docs/ROADMAP.md).
+## The team
 
-## Documents
-
-- [docs/PROBLEM-DEFINITION.md](docs/PROBLEM-DEFINITION.md): the problem, the solution, the objectives, the scope, the users, and how the project covers the five terms in the brief.
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): how the parts of the site talk to each other and the flow of every feature.
-- [docs/BACKEND.md](docs/BACKEND.md): the backend explained folder by folder, the life of one request, login, the AI service, the price updater, the seed script, the settings and security.
-- [docs/API.md](docs/API.md): every endpoint with its method, path, body and response.
-- [docs/DATA-MODEL.md](docs/DATA-MODEL.md): the four collections and every field we store.
-- [docs/DATA-FLOW.md](docs/DATA-FLOW.md): how a page gets its data, step by step, from the service call to the rendered result.
-- [docs/ROUTES.md](docs/ROUTES.md): every frontend route, every click in the designs and the endpoints each page calls.
-- [docs/COMPONENTS.md](docs/COMPONENTS.md): the reusable components, who owns each one and which pages use it.
-- [docs/OWNERSHIP.md](docs/OWNERSHIP.md): every folder and file in client and server with its owner.
-- [docs/STYLING.md](docs/STYLING.md): the theme variables, the shared classes, the spacing guide and the breakpoints.
-- [docs/TEAM-GUIDE.md](docs/TEAM-GUIDE.md): who builds what, how to start, the rules and the pull request checklist.
-- [docs/DESIGN-SPECIFICATIONS.md](docs/DESIGN-SPECIFICATIONS.md): the stack, the site map, the pages, the visual theme, the AI integration and security.
-- [docs/DIAGRAMS.md](docs/DIAGRAMS.md): the list of diagrams for the report.
-- [docs/TEST-DATA.md](docs/TEST-DATA.md): the test data and the test cases.
-- [docs/INSTALLATION.md](docs/INSTALLATION.md): setup and run steps for a fresh Windows machine.
-- [docs/ASSUMPTIONS.md](docs/ASSUMPTIONS.md): the assumptions that go into the ReadMe.doc.
-- [docs/REPORT-OUTLINE.md](docs/REPORT-OUTLINE.md): the structure of the final report and the submission checklist.
-- [docs/DELIVERABLES.md](docs/DELIVERABLES.md): what we hand in at the end, who prepares each item and where it comes from.
-- [docs/ROADMAP.md](docs/ROADMAP.md): what is finished, what is next in order, and who owns each item.
-- `docs/ui/`: the finished designs as PNG files, one per page state.
-- `docs/diagrams/`: the diagrams for the report.
-
-To run the project, read [docs/INSTALLATION.md](docs/INSTALLATION.md).
+- Gerald, project lead. The backend and the database, the AI features, the phone data and pictures, the shared client files (the routes, the theme, the services, the contexts, the hooks and the shared components, including the chat window, the security check and Page not found), the Verify email and Profile pages, the docs and the diagrams. Gerald reviews and merges every pull request.
+- Ibrahim. Home, Search results, Browse, Phone detail and About, with eight components: SearchBar, UnderstoodChips, FilterStrip, BrandTabs, SortSelect, SpecTable, PriceHistoryChart and NoticeBar.
+- Osakue. Compare, Recommend, Assistant, Dashboard, Log in, Create account, Forgot password and Reset password, with eight components: CompareTable, CompareSlots, AddPhoneDialog, RecommendForm, ChatThread, ChatInput, ReviewsSection and AuthCard.

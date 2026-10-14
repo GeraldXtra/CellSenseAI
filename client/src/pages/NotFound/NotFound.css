@@ -1,0 +1,35 @@
+.notfound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--cs-space-16) 0 var(--cs-space-20);
+  text-align: center;
+}
+
+.notfound .notfound-phone {
+  width: calc(var(--cs-card-image-h) * 0.75);
+  height: calc(var(--cs-card-image-h) * 1.5);
+  margin: var(--cs-space-8) 0 var(--cs-space-16);
+  transform: rotate(-12deg);
+}
+
+.notfound .cs-heading {
+  font-size: var(--cs-size-hero);
+  margin-bottom: var(--cs-space-4);
+}
+
+.notfound .cs-subheading {
+  margin-bottom: var(--cs-space-8);
+}
+
+.notfound-action {
+  padding-left: var(--cs-space-12);
+  padding-right: var(--cs-space-12);
+  margin-bottom: var(--cs-space-16);
+}
+
+@media (max-width: 767px) {
+  .notfound .cs-heading {
+    font-size: var(--cs-size-page-title);
+  }
+}

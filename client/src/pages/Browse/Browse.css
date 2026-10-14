@@ -1,0 +1,109 @@
+.browse-top {
+  padding-bottom: 0;
+}
+
+.browse-top .cs-subheading {
+  font-size: var(--cs-size-card-title);
+}
+
+.brand-tabs {
+  display: flex;
+  justify-content: center;
+  gap: var(--cs-space-10);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.brand-tab {
+  flex-shrink: 0;
+  padding: var(--cs-space-2) var(--cs-space-3) var(--cs-space-3);
+  color: var(--cs-ink-soft);
+  font-size: var(--cs-size-card-title);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+
+.brand-tab:hover {
+  color: var(--cs-ink);
+}
+
+.brand-tab-active {
+  color: var(--cs-ink);
+  font-weight: var(--cs-weight-medium);
+  border-bottom-color: var(--cs-ink);
+}
+
+.brand-tab:focus-visible {
+  outline: none;
+  box-shadow: var(--cs-focus-ring);
+  border-radius: var(--cs-radius-chip);
+}
+
+.browse-strip-band {
+  background-color: var(--cs-page-bg);
+  border-top: 1px solid var(--cs-line);
+  border-bottom: 1px solid var(--cs-line);
+  padding: var(--cs-space-6) 0;
+}
+
+.browse-results {
+  padding-top: var(--cs-space-6);
+}
+
+.browse-tools {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--cs-space-6);
+}
+
+.browse-title {
+  margin-bottom: var(--cs-space-4);
+}
+
+.browse-name {
+  font-size: var(--cs-size-section-title);
+  font-weight: var(--cs-weight-bold);
+  line-height: var(--cs-line-heading);
+  letter-spacing: var(--cs-tracking-heading);
+  margin: 0;
+}
+
+.browse-count {
+  color: var(--cs-ink-soft);
+  font-size: var(--cs-size-card-title);
+  margin: var(--cs-space-1) 0 0;
+}
+
+.browse-pages {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cs-space-4);
+  margin-top: var(--cs-space-10);
+}
+
+.browse-page-number {
+  color: var(--cs-ink-soft);
+  font-size: var(--cs-size-small);
+}
+
+@media (max-width: 767px) {
+  .browse-top .cs-heading {
+    font-size: var(--cs-size-section-title);
+  }
+
+  .brand-tabs {
+    justify-content: flex-start;
+    gap: var(--cs-space-4);
+  }
+
+  .brand-tab {
+    font-size: var(--cs-size-body);
+  }
+
+  .browse-tools {
+    justify-content: flex-start;
+  }
+}

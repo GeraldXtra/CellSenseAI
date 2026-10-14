@@ -1,0 +1,120 @@
+.auth-page {
+  padding-top: var(--cs-space-20);
+  padding-bottom: var(--cs-space-20);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: var(--cs-auth-card-w);
+  margin: var(--cs-space-16) auto;
+  padding: var(--cs-space-10) var(--cs-space-8);
+  border: none;
+}
+
+.auth-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cs-launcher-size);
+  height: var(--cs-launcher-size);
+  margin: 0 auto var(--cs-space-6);
+  border-radius: 50%;
+  background-color: var(--cs-band-bg);
+  color: var(--cs-ink);
+  font-size: var(--cs-icon-lg);
+}
+
+.auth-card .auth-card-title {
+  margin-bottom: var(--cs-space-3);
+}
+
+.auth-card .auth-card-subtitle {
+  margin-bottom: var(--cs-space-8);
+}
+
+.auth-field + .auth-field {
+  margin-top: var(--cs-space-5);
+}
+
+.auth-forgot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--cs-space-2);
+}
+
+.auth-forgot a,
+.auth-muted-link {
+  color: var(--cs-ink-soft);
+  font-size: var(--cs-size-small);
+  text-decoration: none;
+}
+
+.auth-forgot a:hover,
+.auth-muted-link:hover {
+  color: var(--cs-ink);
+  text-decoration: underline;
+}
+
+.auth-submit {
+  width: 100%;
+  margin-top: var(--cs-space-8);
+}
+
+.auth-submit .cs-loader {
+  padding: 0;
+  color: inherit;
+}
+
+.auth-error {
+  color: var(--cs-error);
+  font-size: var(--cs-size-small);
+  text-align: center;
+  margin: var(--cs-space-4) 0 0;
+}
+
+.auth-note {
+  color: var(--cs-ink-soft);
+  font-size: var(--cs-size-small);
+  text-align: center;
+  margin: var(--cs-space-3) 0 0;
+}
+
+.auth-footer {
+  text-align: center;
+  color: var(--cs-ink-soft);
+  margin: var(--cs-space-6) 0 0;
+}
+
+.auth-footer a {
+  color: var(--cs-ink);
+  text-decoration: underline;
+}
+
+.auth-muted-link {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  .auth-page {
+    padding-top: var(--cs-space-8);
+    padding-bottom: var(--cs-space-8);
+  }
+
+  .auth-page .cs-container {
+    padding-left: var(--cs-space-4);
+    padding-right: var(--cs-space-4);
+  }
+
+  .auth-card {
+    max-width: none;
+    margin: 0;
+    padding: var(--cs-space-8) var(--cs-space-5);
+  }
+
+  .auth-card .auth-card-title {
+    font-size: var(--cs-size-section-title);
+  }
+}
