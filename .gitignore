@@ -12,3 +12,16 @@ Thumbs.db
 .claude/settings.local.json
 client/dist/
 .claude/
+
+client/**/*.md
+server/**/*.md
+
+docs/*.md
+docs/*.doc
+docs/*.docx
+docs/*.xlsx
+client/**/*.md
+server/**/*.md
+CellSense-AI-Project-Report.docx
+ReadMe.doc
+CellSense-AI-Demo.mp4
